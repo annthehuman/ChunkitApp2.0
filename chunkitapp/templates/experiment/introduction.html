@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+{% extends 'experiment/base.html' %}
+
+
+{% block content %}
+<section>
+    <h1>Welcome to ChunkitApp 2.0!</h1>
+    <p class='paragraph'>Please make sure that you have plugged in&nbsp;your headphones/earphones. It&nbsp;is&nbsp;vital that you complete the experiment while wearing them.</p>
+    <a href='{% url 'consent' %}'>Proceed</a>
+</section>
+{% endblock %}
