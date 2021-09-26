@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+{% extends 'experiment/base.html' %}
+
+
+{% block content %}
+
+
+    <h2>Training (2/3)</h2>
+
+<div id='instructions_1' style='display: block;'>
+    <h2>Instructions</h2>
+    <p class='paragraph'>You will now listen to&nbsp;the recording again. This time please follow these instructions: </p>
+    <p class='paragraph'>Humans process information constantly. When we&nbsp;take in&nbsp;information, we&nbsp;tend to&nbsp;break it&nbsp;up&nbsp;quickly into small bits or&nbsp;chunks. We&nbsp;ask you to&nbsp;work intuitively. Your task is&nbsp;to&nbsp;mark boundaries between chunks by&nbsp;clicking &rsquo;〜&rsquo; symbols. A&nbsp;chunk can be&nbsp;any number of&nbsp;words. </p>
+    <p class='paragraph'>One click makes the boundary appear. If&nbsp;you click the symbol again, the boundary will disappear. You need to put at least one boundary in each extract. If&nbsp;you lose the line in&nbsp;the text, stay with the speaker and do&nbsp;not try to&nbsp;go&nbsp;back. Note that the signal in&nbsp;the recordings is&nbsp;obstructed, try getting past&nbsp;it.</p>
+
+    <a href='#' onclick="displaytext();togglePlay();">Start</a>
+</div>
+
+
+<audio preload="auto" id="Player_1" style="display: none;">
+     <source src="../../audio/training_164_noise.wav"/>
+</audio>
+
+<div id="practice_1" style="display: none;">
+<a href="#" id='btnPause' onclick="togglePlay();handler(this);">Pause</a>
+    <span class='text' id='text_0' style="display: block;">
+    <form method="post"  class="post-form" id='post-form-0'>{% csrf_token %}
+    <span>ironically<input id="0checkbox0" class="checkbox0" type="checkbox" name="check" value="0"><label class="checkbox_label" for="0checkbox0"><span>~</span><span>|</span></label></span>
+    <span>very<input id="0checkbox1" class="checkbox0" type="checkbox" name="check" value="1"><label class="checkbox_label" for="0checkbox1"><span>~</span><span>|</span></label></span>
+    <span>often<input id="0checkbox2" class="checkbox0" type="checkbox" name="check" value="2"><label class="checkbox_label" for="0checkbox2"><span>~</span><span>|</span></label></span>
+    <span>interdisciplinary<input id="0checkbox3" class="checkbox0" type="checkbox" name="check" value="3"><label class="checkbox_label" for="0checkbox3"><span>~</span><span>|</span></label></span>
+    <span>knowledge<input id="0checkbox4" class="checkbox0" type="checkbox" name="check" value="4"><label class="checkbox_label" for="0checkbox4"><span>~</span><span>|</span></label></span>
+    <span>is<input id="0checkbox5" class="checkbox0" type="checkbox" name="check" value="5"><label class="checkbox_label" for="0checkbox5"><span>~</span><span>|</span></label></span>
+    <span>more<input id="0checkbox6" class="checkbox0" type="checkbox" name="check" value="6"><label class="checkbox_label" for="0checkbox6"><span>~</span><span>|</span></label></span>
+    <span>important<input id="0checkbox7" class="checkbox0" type="checkbox" name="check" value="7"><label class="checkbox_label" for="0checkbox7"><span>~</span><span>|</span></label></span>
+    <span>than<input id="0checkbox8" class="checkbox0" type="checkbox" name="check" value="8"><label class="checkbox_label" for="0checkbox8"><span>~</span><span>|</span></label></span>
+    <span>knowledge<input id="0checkbox9" class="checkbox0" type="checkbox" name="check" value="9"><label class="checkbox_label" for="0checkbox9"><span>~</span><span>|</span></label></span>
+    <span>in<input id="0checkbox10" class="checkbox0" type="checkbox" name="check" value="10"><label class="checkbox_label" for="0checkbox10"><span>~</span><span>|</span></label></span>
+    <span>a<input id="0checkbox11" class="checkbox0" type="checkbox" name="check" value="11"><label class="checkbox_label" for="0checkbox11"><span>~</span><span>|</span></label></span>
+    <span>specific<input id="0checkbox12" class="checkbox0" type="checkbox" name="check" value="12"><label class="checkbox_label" for="0checkbox12"><span>~</span><span>|</span></label></span>
+    <span>discipline<input id="0checkbox13" class="checkbox0" type="checkbox" name="check" value="13"><label class="checkbox_label" for="0checkbox13"><span>~</span><span>|</span></label></span>
+    <span>there<input id="0checkbox14" class="checkbox0" type="checkbox" name="check" value="14"><label class="checkbox_label" for="0checkbox14"><span>~</span><span>|</span></label></span>
+    <span>are<input id="0checkbox15" class="checkbox0" type="checkbox" name="check" value="15"><label class="checkbox_label" for="0checkbox15"><span>~</span><span>|</span></label></span>
+    <span>thousands<input id="0checkbox16" class="checkbox0" type="checkbox" name="check" value="16"><label class="checkbox_label" for="0checkbox16"><span>~</span><span>|</span></label></span>
+    <span>of<input id="0checkbox17" class="checkbox0" type="checkbox" name="check" value="17"><label class="checkbox_label" for="0checkbox17"><span>~</span><span>|</span></label></span>
+    <span>examples<input id="0checkbox18" class="checkbox0" type="checkbox" name="check" value="18"><label class="checkbox_label" for="0checkbox18"><span>~</span><span>|</span></label></span>
+    <span>of<input id="0checkbox19" class="checkbox0" type="checkbox" name="check" value="19"><label class="checkbox_label" for="0checkbox19"><span>~</span><span>|</span></label></span>
+    <span>people<input id="0checkbox20" class="checkbox0" type="checkbox" name="check" value="20"><label class="checkbox_label" for="0checkbox20"><span>~</span><span>|</span></label></span>
+    <span>from<input id="0checkbox21" class="checkbox0" type="checkbox" name="check" value="21"><label class="checkbox_label" for="0checkbox21"><span>~</span><span>|</span></label></span>
+    <span>a<input id="0checkbox22" class="checkbox0" type="checkbox" name="check" value="22"><label class="checkbox_label" for="0checkbox22"><span>~</span><span>|</span></label></span>
+    <span>different<input id="0checkbox23" class="checkbox0" type="checkbox" name="check" value="23"><label class="checkbox_label" for="0checkbox23"><span>~</span><span>|</span></label></span>
+    <span>discipline<input id="0checkbox24" class="checkbox0" type="checkbox" name="check" value="24"><label class="checkbox_label" for="0checkbox24"><span>~</span><span>|</span></label></span>
+    <span>providing<input id="0checkbox25" class="checkbox0" type="checkbox" name="check" value="25"><label class="checkbox_label" for="0checkbox25"><span>~</span><span>|</span></label></span>
+    <span>solutions<input id="0checkbox26" class="checkbox0" type="checkbox" name="check" value="26"><label class="checkbox_label" for="0checkbox26"><span>~</span><span>|</span></label></span>
+    <span>to<input id="0checkbox27" class="checkbox0" type="checkbox" name="check" value="27"><label class="checkbox_label" for="0checkbox27"><span>~</span><span>|</span></label></span>
+    <span>people<input id="0checkbox28" class="checkbox0" type="checkbox" name="check" value="28"><label class="checkbox_label" for="0checkbox28"><span>~</span><span>|</span></label></span>
+    <span>in<input id="0checkbox29" class="checkbox0" type="checkbox" name="check" value="29"><label class="checkbox_label" for="0checkbox29"><span>~</span><span>|</span></label></span>
+    <span>another<input id="0checkbox30" class="checkbox0" type="checkbox" name="check" value="30"><label class="checkbox_label" for="0checkbox30"><span>~</span><span>|</span></label></span>
+    <span>discipline</span>
+    </span>
+</div>
+
+
+<script type="text/javascript">
+    function displaytext() {
+        document.getElementById('instructions_1').style.display = 'none';
+        document.getElementById('practice_1').style.display = 'block';  
+    };
+
+    var myAudio = document.getElementById("Player_1"),
+        btnPause = document.getElementById("btnPause");
+    var isPlaying = false;
+
+    function togglePlay() {
+      isPlaying ? myAudio.pause() : myAudio.play();
+
+    };
+
+    myAudio.onplaying = function() {
+      isPlaying = true;
+      document.getElementById('text_0').style.display='block';
+    };
+    btnPause.addEventListener('click', () => {
+        isPlaying = false;
+        document.getElementById('text_0').style.display='none';
+    });
+
+    function goFurther() {
+        window.location.href = '{% url 'training3' %}';
+    }
+
+    myAudio.onended=function () {
+        setTimeout(goFurther, 1000); 
+    };
+
+    function handler(lnk_obj){
+      lnk_obj.innerHTML = (lnk_obj.innerHTML == 'Pause') ? 'Continue' : 'Pause' ;
+    };
+
+
+
+</script>
+{% endblock %}

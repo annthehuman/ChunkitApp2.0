@@ -1,0 +1,30 @@
+.custom-file-upload {
+    border: 1px solid transparent;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: #fff;
+}
+
+.custom-file-upload:hover{
+    color: #fff;
+    background-color: #148EA1;
+    border-color: #148EA1;
+} 
+
+.custom-file-upload:focus-within{
+    color: #fff;
+    background-color: #138496;
+    border-color: #117a8b;
+    box-shadow: 0 0 0 0.2rem rgb(58 176 195 / 50%);
+} 
+
+.custom-file-upload:active{
+    color: #fff;
+    background-color: #138496;
+    border-color: #117a8b;
+    box-shadow: 0 0 0 0.2rem rgb(58 176 195 / 50%);
+} 

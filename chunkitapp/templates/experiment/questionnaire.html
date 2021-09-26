@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+{% extends 'experiment/base.html' %}
+
+
+{% block content %}
+
+<section class='questionnaire'>
+	<h1>Background questionnaire</h1>
+	<p class='paragraph'>Please fill in&nbsp;the form below. All information you provide will be&nbsp;handled confidentially.</p>
+	<form method="post"  class="questions-form" autocomplete="off">{% csrf_token %}
+		<ul>
+			<li><label><div class='control-label' id='age'>Age</div>
+			{{ form.age }}</label></li>
+			<li><label><div class='control-label'>Gender</div>
+			{{ form.sex }}</label></li>		
+		</ul>
+	<ul class='education'>
+		<li><label><div class='control-label'>Which of the options below indicate the highest level of education you have completed?
+			</div>{{ form.education}}</label></li>	
+		<li><label><div class='control-label'>Major subject or academic field
+		</div>{{ form.major }}</label></li>
+		<li><label><div class='control-label'>Native language(s)
+		</div>{{ form.native_language }}</label></li>
+		<li><label><div>Other languages
+		</div>{{ form.other_language }}</label></li>
+	</ul>
+	<ul class = 'withradio'>
+		<li><label><div class='control-label'>Have you been diagnosed with dyslexia?</div>
+		<div class='radio'>{{ form.dyslexia }}</div></label></li>
+		<li><label><div class='control-label'>Do you have any hearing difficulties?</div>
+		<div class='radio'>{{ form.hearing_diff }}</div></label></li>
+		<li><label><div class='control-label'>Do you have difficulty hearing when someone speaks in a whisper?</div>
+		<div class='radio'>{{ form.whisper }}</div></label></li>
+	</ul>
+	<ul>
+		<li><label><div>Any other comments?</div>
+		{{ form.comments }}</label></li>
+	</ul>
+	<button type="submit" class='submitquestionnaire'>Submit</button>
+</form>
+</section>
+
+{% endblock %}

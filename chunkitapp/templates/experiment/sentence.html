@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+{% extends 'experiment/base.html' %}
+
+
+{% block content %}
+<section>
+    <div id='sentence_instructions' style='display: block'>
+	    <h2>Sentence repetition task</h2>
+	    <p class='paragraph'>In&nbsp;this task, you will hear 24&nbsp;sentences in&nbsp;English. After listening, repeat the sentence exactly as&nbsp;you heard it&nbsp;by&nbsp;typing it&nbsp;in&nbsp;the space provided. The text box will activate when the sentence has stopped playing.</p>
+
+		<p class='paragraph'>Please listen carefully and repeat the sentences as&nbsp;accurately as&nbsp;you can. You will hear each sentence once only. If&nbsp;you don&rsquo;t remember some words, go&nbsp;with your best guess, or&nbsp;you can replace them with hyphens &quot;-&quot; or&nbsp;zeroes &quot;0&Prime;. Please note that you do&nbsp;not need to&nbsp;capitalize letters or&nbsp;insert punctuation marks (but you can if&nbsp;you want).</p>
+
+		<p class='paragraph'>The task starts with one practice sentence. Please use it&nbsp;to&nbsp;adjust your volume. You can replay the practice sentence if&nbsp;you want but not the subsequent sentences.</p>
+
+		<p class='paragraph'>Please do&nbsp;not refresh this page because unfortunately it&nbsp;means that you would have to&nbsp;start over.</p>
+    <a id='Proceed'>Proceed</a>
+    </div>
+    <audio preload="auto" id="sentence_audio_01"  style='display: none'>
+    	<source src="../../audio/sentence/sentence01.mp3"/>
+    </audio>
+    <div id='sentence01' style='display: none'>
+    	<h2>Practice sentence</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+
+		<p class='paragraph'>The task starts with one practice sentence. Please use it&nbsp;to&nbsp;adjust your volume. You can replay the practice sentence if&nbsp;you want but not the subsequent sentences.</p>
+	    <a id='Play_01' href="#" class='paragraph'>Play the sentence</a>
+		<form method="post" id='form01'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+    <audio preload="auto" id="sentence_audio_02"  style='display: none'>
+    	<source src="../../audio/sentence/sentence02.mp3"/>
+    </audio>
+    <div id='sentence02' style='display: none'>
+    	<h2>Test sentence 1</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_02' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form02'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+    <audio preload="auto" id="sentence_audio_03"  style='display: none'>
+    	<source src="../../audio/sentence/sentence03.mp3"/>
+    </audio>
+    <div id='sentence03' style='display: none'>
+    	<h2>Test sentence 2</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_03' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form03'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+	<audio preload="auto" id="sentence_audio_04"  style='display: none'>
+		<source src="../../audio/sentence/sentence04.mp3"/>
+	</audio>
+	<div id='sentence04' style='display: none'>
+		<h2>Test sentence 3</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_04' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form04'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_05"  style='display: none'>
+		<source src="../../audio/sentence/sentence05.mp3"/>
+	</audio>
+	<div id='sentence05' style='display: none'>
+		<h2>Test sentence 4</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_05' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form05'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_06"  style='display: none'>
+		<source src="../../audio/sentence/sentence06.mp3"/>
+	</audio>
+	<div id='sentence06' style='display: none'>
+		<h2>Test sentence 5</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_06' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form06'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_07"  style='display: none'>
+		<source src="../../audio/sentence/sentence07.mp3"/>
+	</audio>
+	<div id='sentence07' style='display: none'>
+		<h2>Test sentence 6</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_07' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form07'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_08"  style='display: none'>
+		<source src="../../audio/sentence/sentence08.mp3"/>
+	</audio>
+	<div id='sentence08' style='display: none'>
+		<h2>Test sentence 7</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_08' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form08'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_09"  style='display: none'>
+		<source src="../../audio/sentence/sentence09.mp3"/>
+	</audio>
+	<div id='sentence09' style='display: none'>
+		<h2>Test sentence 8</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_09' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form09'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_10"  style='display: none'>
+		<source src="../../audio/sentence/sentence10.mp3"/>
+	</audio>
+	<div id='sentence10' style='display: none'>
+		<h2>Test sentence 9</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_10' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form10'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_11"  style='display: none'>
+		<source src="../../audio/sentence/sentence11.mp3"/>
+	</audio>
+	<div id='sentence11' style='display: none'>
+		<h2>Test sentence 10</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_11' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form11'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_12"  style='display: none'>
+		<source src="../../audio/sentence/sentence12.mp3"/>
+	</audio>
+	<div id='sentence12' style='display: none'>
+		<h2>Test sentence 11</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_12' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form12'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_13"  style='display: none'>
+		<source src="../../audio/sentence/sentence13.mp3"/>
+	</audio>
+	<div id='sentence13' style='display: none'>
+		<h2>Test sentence 12</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_13' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form13'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_14"  style='display: none'>
+		<source src="../../audio/sentence/sentence14.mp3"/>
+	</audio>
+	<div id='sentence14' style='display: none'>
+		<h2>Test sentence 13</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_14' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form14'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_15"  style='display: none'>
+		<source src="../../audio/sentence/sentence15.mp3"/>
+	</audio>
+	<div id='sentence15' style='display: none'>
+		<h2>Test sentence 14</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_15' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form15'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_16"  style='display: none'>
+		<source src="../../audio/sentence/sentence16.mp3"/>
+	</audio>
+	<div id='sentence16' style='display: none'>
+		<h2>Test sentence 15</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_16' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form16'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_17"  style='display: none'>
+		<source src="../../audio/sentence/sentence17.mp3"/>
+	</audio>
+	<div id='sentence17' style='display: none'>
+		<h2>Test sentence 16</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_17' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form17'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_18"  style='display: none'>
+		<source src="../../audio/sentence/sentence18.mp3"/>
+	</audio>
+	<div id='sentence18' style='display: none'>
+		<h2>Test sentence 17</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_18' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form18'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_19"  style='display: none'>
+		<source src="../../audio/sentence/sentence19.mp3"/>
+	</audio>
+	<div id='sentence19' style='display: none'>
+		<h2>Test sentence 18</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_19' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form19'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_20"  style='display: none'>
+		<source src="../../audio/sentence/sentence20.mp3"/>
+	</audio>
+	<div id='sentence20' style='display: none'>
+		<h2>Test sentence 19</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_20' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form20'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_21"  style='display: none'>
+		<source src="../../audio/sentence/sentence21.mp3"/>
+	</audio>
+	<div id='sentence21' style='display: none'>
+		<h2>Test sentence 20</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_21' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form21'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_22"  style='display: none'>
+		<source src="../../audio/sentence/sentence22.mp3"/>
+	</audio>
+	<div id='sentence22' style='display: none'>
+		<h2>Test sentence 21</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_22' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form22'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_23"  style='display: none'>
+		<source src="../../audio/sentence/sentence23.mp3"/>
+	</audio>
+	<div id='sentence23' style='display: none'>
+		<h2>Test sentence 22</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_23' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form23'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+	<audio preload="auto" id="sentence_audio_24"  style='display: none'>
+		<source src="../../audio/sentence/sentence24.mp3"/>
+	</audio>
+	<div id='sentence24' style='display: none'>
+		<h2>Test sentence 23</h2>
+	    <p class='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
+	    <a id='Play_24' href="#" class='play paragraph'>Play the sentence</a>
+		<form method="post" id='form24'  class="practice-form" autocomplete="off">{% csrf_token %}
+			{{ form.text }}<br>
+			<button type="submit" class='submit'>Next</button>
+		</form>
+	</div>
+
+</section>
+<script type="text/javascript">
+	const btnProceed = document.querySelector('#Proceed'),
+		  divInstructions = document.querySelector('#sentence_instructions'),
+		  btnPlayFirst = document.querySelector('#Play_01'),
+		  divPractice = document.querySelector('#sentence01'),
+		  sentence = document.querySelector('#sentence_audio_01'),
+		  btnsSubmit = document.querySelectorAll('.submit'),
+		  btnsPlay = document.querySelectorAll('.play'),
+		  audios = document.querySelectorAll('audio');
+
+	let sentencePlayed = false;
+	btnProceed.addEventListener('click', () => {
+		divInstructions.style.display = 'none';
+		divPractice.style.display = 'block';
+	});
+	btnPlayFirst.addEventListener('click', () => {
+		if (sentencePlayed) {
+			sentence.pause();
+			sentence.currentTime = 0;
+			sentence.play();
+		} else {
+			sentencePlayed = true;
+			sentence.play();
+		}
+		btnPlayFirst.style.border = 'solid 2px #b4b4b4'
+	});
+
+	btnsPlay.forEach(btn => {
+		btn.addEventListener('click', (e) => {
+			const currentNumber = e.currentTarget.id.slice(-2),
+				  currentMedia = 'sentence_audio_'+currentNumber;
+			// console.log(e.currentTarget, currentNumber, currentMedia)
+			document.getElementById(currentMedia).play();
+			sentencePlayed = true
+			document.getElementById("Play_" + currentNumber).style.border = 'solid 2px #b4b4b4'
+		}, {once: true}); 
+	});
+
+	audios.forEach(audio => {
+		audio.addEventListener('ended', (e) => {
+			const number = e.currentTarget.id.slice(-2);
+		    document.getElementById('form'+number).childNodes[2].readOnly = false;
+		})
+	});
+	// const forms = document.querySelectorAll('form');
+	// forms.forEach(item => {
+    // postData(item);
+	// });
+	// console.log(currentNumber);
+	// function postData(form) {
+	btnsSubmit.forEach(btn => {
+		btn.addEventListener('click', (e) => {
+			e.preventDefault();
+			//get current sentence number
+			const textareaValue = e.currentTarget.parentElement.childNodes[2].value,
+				  sentenceNumber = e.currentTarget.parentElement.id.slice(-2),
+			      form = e.currentTarget.parentElement;
+			//if textarea if filled and audio is played sent post else red border for empty slot
+			if (textareaValue && sentencePlayed) {
+				e.currentTarget.parentElement.childNodes[2].style.border = 'solid 1px black'
+				const formData = new FormData(form);
+				formData.append('index', sentenceNumber);
+                // console.log(formData)
+				fetch('/text/', {
+					method: "POST",
+					// headers: {
+					//   'X-CSRFToken': object.csrfmiddlewaretoken
+					// },
+					body: formData
+				}).then(data => {
+				   if (!data.ok){
+					throw Error(data.status);
+					// console.log(1)
+				   }
+			    }).catch(() => {
+					var object = {};
+					var csrf = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+					object = {
+						text: textareaValue,
+			            index: sentenceNumber,
+					};
+					// console.log(JSON.stringify(object))
+					fetch('/data/', {
+					method: "POST",
+					headers: {
+						'X-CSRFToken': csrf,
+						"Content-Type": "application/json",
+						"X-Requested-With": "XMLHttpRequest"
+					},
+					body: JSON.stringify(object)
+					});
+				}).finally(() => {
+					form.reset();
+				});
+			    const k = +sentenceNumber + 1;
+			    if (k < 10) {
+			    	nextSentenceNumber = '0' + k;
+			    } else {
+			    	nextSentenceNumber = k;
+			    }
+			    // console.log(nextSentenceNumber)
+			    if (nextSentenceNumber <= 24){
+					document.getElementById("sentence" + nextSentenceNumber).style.display = 'block';
+					document.getElementById("sentence" + sentenceNumber).style.display = 'none';
+				} else {
+		            window.location.href = '{% url 'feedback' %}';
+				}
+				sentencePlayed = false;
+			} else if (!sentencePlayed)  {
+				document.getElementById("Play_" + sentenceNumber).style.border = '2px solid red'
+			} else if (!textareaValue) {
+				e.currentTarget.parentElement.childNodes[2].style.border = 'solid 2px red'}
+		});
+	});
+</script>
+{% endblock %}

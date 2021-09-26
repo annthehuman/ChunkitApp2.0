@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html lang="fi">
+
+
+{% extends 'experiment/base.html' %}
+{% load static%}
+
+{% block content %}
+
+<style type="text/css">
+	table {
+	  }
+	 table td {
+	 	border: 1px solid skyblue;
+	 	border-collapse: collapse;
+	 	text-align: center;
+	 }
+	 table tbody tr td:nth-child(2n) {
+	 	background-color:#e9ecf6;
+	 }
+
+	 a.save {
+	 	margin-bottom: 10px;
+	 	display: block;
+	 	width: 100px;
+	 }
+
+	.feedback {
+		display: block;
+		padding-left: 10px;
+	}
+
+</style>
+
+<section class='feedback'>
+<a class='save' href='{% static 'background.csv' %}' download>Save Table</a>
+	{{ data }}
+	<table>
+	{%  for i in table %}
+	<tr>
+	{% for j in i %}
+	<td>
+    {{ j }}
+    </td>
+    {% endfor %}
+    </tr>
+	{% endfor %}
+</table>
+</section>
+{% endblock %}

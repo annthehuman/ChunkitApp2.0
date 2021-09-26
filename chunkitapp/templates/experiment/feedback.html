@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+{% extends 'experiment/base.html' %}
+
+{% block content %}
+<section class='feedback'>
+    <h1>Feedback questionnaire</h1>
+    <p>Please answer the questions below. Your responses are important for us! </p>
+    <p>The questions in this section concern the chunking task. Assess the statements below.</p>
+<form method="post"  class="questions-form" autocomplete="off">{% csrf_token %}
+
+		<ul class='parent'>
+			<li><label><div class='control-label'>The task instructions were clear.</div>
+			<div>{{ form.instructions }}</label></li>
+			<li><label><div class='control-label'>I knew what I was doing.</div>
+				<div>{{ form.doing }}</div></label></li>
+			<li><label><div class='control-label'>The task was relatively simple.</div>
+				<div>{{ form.simple }}</div></label></li>			
+			<li><label><div class='control-label'>The task was very demanding. I feel tired now.</div>
+				<div>{{ form.demanding }}</div></label></li>
+			<li><label><div class='control-label'>The task put a lot of pressure on me. I was in a hurry all the time and even panicked several times.</div>
+				<div>{{ form.pessure }}</div></label></li>
+			<li><label><div class='control-label'>It was fun.</div>
+				<div>{{ form.fun }}</div></label></li>
+			<li><label><div class='control-label'>I think the task in some way reflects what I naturally do when I listen to speech.</div>
+				<div>{{ form.reflects }}</div></label></li>
+		</ul>
+		<ul class = 'parent'>
+			<li><label><div class='control-label'>How would you evaluate your performance in the task?</div>
+				<div>{{ form.performance }}</div></label></li>
+		</ul>
+		<ul class = 'parent'>
+			<li><label><div class='control-label'>I understood what the speaker was saying...</div>
+				<div>{{ form.understood }}</div></label></li>
+		</ul>
+	    <ul  class = 'parent'>
+			<li><label><div>Can you guess what the chunking task measured?</div>
+			{{ form.measured }}</label></li>
+			<li><label><div>Did you consciously adopt some strategy in marking boundaries between chunks?</div>
+			{{ form.strategy }}</label></li>
+			<li><label><div>Did you have an impression that the task gradually became easier?</div>
+			{{ form.impression }}</label></li>
+			<li><label><div>Do you have other comments?</p></div>
+			{{ form.comments }}</label></li>			
+		</ul>
+    <button type="submit" class='submitquestionnaire'>Submit</button>
+</form>
+</section>
+{% endblock %}

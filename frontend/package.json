@@ -1,0 +1,38 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack --mode development ./src/index.js --output-path ./static/frontend/",
+    "build": "webpack --mode production ./src/index.js --output-path ./static/frontend/",
+    "webpack": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.14.8",
+    "@babel/preset-env": "^7.14.9",
+    "@babel/preset-react": "^7.14.5",
+    "babel-loader": "^8.2.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "webpack": "^5.47.1",
+    "webpack-cli": "^4.7.2"
+  },
+  "dependencies": {
+    "bootstrap": "^4.6.0",
+    "css-loader": "^6.2.0",
+    "draftjs-to-html": "^0.9.1",
+    "html-to-draftjs": "^1.5.0",
+    "less-loader": "^10.0.1",
+    "react-draft-wysiwyg": "^1.14.7",
+    "react-router-dom": "^5.2.0",
+    "reactstrap": "^8.9.0",
+    "store": "^2.0.12",
+    "style-loader": "^3.2.1",
+    "styled-components": "^5.3.0"
+  }
+}
