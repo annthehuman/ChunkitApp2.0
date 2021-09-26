@@ -15,22 +15,17 @@ import os
 from django.utils import timezone
 import datetime
 
-
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status, generics
-
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .serializers import *
+# from .serializers import *
 
 
 
-class ExperementDataApi(generics.ListCreateAPIView):
-	queryset = experement_data.objects.all()
-	serializer_class = ExperementDataSerializer
+# class ExperementDataApi(generics.ListCreateAPIView):
+# 	queryset = experement_data.objects.all()
+# 	serializer_class = ExperementDataSerializer
 
-@api_view(['GET', 'POST'])
+
 def experement_data(request):
 	form = experementDataForm(request.POST)
 	if request.method == 'POST':
@@ -182,7 +177,7 @@ def trainingcompleted(request):
 def confirm(request):
     return render(request, 'experiment/challenge.html', {'order': request.session['order']})
 
-@api_view(['GET', 'POST'])
+
 def challenge(request):
 	##print(request.session)
 	return render(request, 'experiment/challenge.html', {})

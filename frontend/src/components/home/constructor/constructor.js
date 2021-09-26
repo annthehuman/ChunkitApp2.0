@@ -14,9 +14,15 @@ import { Link } from "react-router-dom";
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 
-const AppBlock = styled.div`
-    margin: 0 auto;
-    max-width: 70%;
+const ConstructorBlock = styled.div`
+    @media (max-width: 1200px) {
+        max-width: 80%;
+    }
+    @media (max-width: 1300px) {
+        max-width: 70%;
+    }
+    margin: 30px auto;
+    max-width: 50%;
 `
 
 export default class Constructor extends Component  {
@@ -25,21 +31,88 @@ export default class Constructor extends Component  {
         this.state = {
             activeTab: '1',
         }
-        this.toggle = this.toggle.bind(this)
+        this.toggle = this.toggle.bind(this);
+        this.appendForm = this.appendForm.bind(this)
+        this.onSubmit = this.onSubmit.bind(this);
+    }
+    componentDidMount() {
+        let store = require('store')
+        // console.log(store.get('tab'))
+        if (store.get('tab'))
+        {this.setState({ activeTab: store.get('tab') });}
+        // if (store.get('form'))
+        // {const f = document.getElementById('constructorForm')
+        
+        // }
     }
     toggle (tab) {
+      let store = require('store')
       if(this.state.activeTab !== tab) this.setState({ activeTab: tab });
+      store.set('tab', tab)
+    }
+    appendForm(...values){
+        let store = require('store')
+        const f = document.getElementById('constructorForm')
+        let child_name_array = []
+        f.childNodes.forEach(child => {
+            child_name_array.push(child.name)
+            })
+        const we_have_name = child_name_array.some(item => item == values[0]);
+        // console.log(we_have_name)
+        if (we_have_name){
+            const the_name = child_name_array.filter(item => item == values[0]),
+                  the_element = f.querySelector(`input[name="${the_name}"]`);
+            the_element.setAttribute('value', values[1]);
+        } else {
+            const i = document.createElement("input");
+            i.setAttribute('name', values[0]);
+            i.setAttribute('id', values[0]);
+            i.setAttribute('value', values[1]);
+            i.setAttribute('hidden', true);
+            f.append(i);
+            // store.set('form', f)
+        };
+        // const formData = new FormData(f);
+        // const formJSON = Object.fromEntries(formData.entries());
+        // store.set('form', formJSON)
+        console.log(f)
+        console.log(typeof(f))
+        // console.log(formJSON)
+    }
+    onSubmit(e) {
+        e.preventDefault();
+        const form = e.target
+        const formData = new FormData(form);
+        fetch('/experement_data/', {
+          method: "POST",
+          // headers: {
+          //   'X-CSRFToken': object.csrfmiddlewaretoken
+          // },
+          body: formData
+        }).then(data => {
+          if (!data.ok){
+            throw Error(data.status);
+          }
+          //console.log('так')
+        }).catch((data) => {
+          console.log(`Try again! Error: ${Error(data.status)}`)
+        }).finally(() => {
+          form.reset();
+        });
+        if (formData) {
+            this.props.history.push("/constructor/consent");
+          }
     }
     render () {
         return(
-            <div className='Constructor'>        
-            <Nav tabs>
+            <>        
+            <Nav tabs style={{textAlign:'center'}} className='justify-content-center'>
             <NavItem>
             <NavLink
                 className={classnames({ active: this.state.activeTab === '1' })}
-                onClick={() => { console.log(this.state.activeTab); this.toggle('1'); }}
+                onClick={() => {this.toggle('1'); }}
             >
-                The basics
+                Basics
             </NavLink>
             </NavItem>
             <NavItem>
@@ -47,7 +120,7 @@ export default class Constructor extends Component  {
                 className={classnames({ active: this.state.activeTab === '2' })}
                 onClick={() => { this.toggle('2'); }}
             >
-                HelloPage
+                Hello
             </NavLink>
             </NavItem>
             <NavItem>
@@ -107,39 +180,46 @@ export default class Constructor extends Component  {
             </NavLink>
             </NavItem>
             </Nav>
-            <TabContent activeTab={this.state.activeTab} componentdidmount={console.log(this.state.activeTab)}>
+            <ConstructorBlock>
+            <TabContent activeTab={this.state.activeTab}>
             <TabPane tabId="1">
-                <Inputs toggle = {this.toggle} active={this.state.activeTab} />
+                <Inputs appendForm={this.appendForm} toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
             <TabPane tabId="2">
-                <HelloPage toggle = {this.toggle} active={this.state.activeTab} />
+                <HelloPage appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
             <TabPane tabId="3">
-                <Consent toggle = {this.toggle} active={this.state.activeTab} />
+                <Consent appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
             <TabPane tabId="4">
-                <Outline toggle = {this.toggle} active={this.state.activeTab} />
+                <Outline appendForm={this.appendForm} toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
             <TabPane tabId="5">
-                <Background toggle = {this.toggle} active={this.state.activeTab} />
+                <Background appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
             <TabPane tabId="6">
-                <Practice toggle = {this.toggle} active={this.state.activeTab} />
+                <Practice appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
             <TabPane tabId="7">
-                <Experiment toggle = {this.toggle} active={this.state.activeTab} />
+                <Experiment appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
             <TabPane tabId="8">
-                <Feedback toggle = {this.toggle} active={this.state.activeTab} />
+                <Feedback appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
             <TabPane tabId="9">
-                <Goodbye toggle = {this.toggle} active={this.state.activeTab} />
+                <Goodbye appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPane>
         </TabContent>
-        <br/>        
-            <Button>Save Draft
-            </Button>
-            </div>
+        
+        <br/>
+        <form id='constructorForm'>        
+            <Button color="primary">Save Draft</Button>{' '}
+            <Button color="primary">Test Run</Button>{' '}
+            <Button>Save Final Version</Button>{' '}
+        </form>
+        </ConstructorBlock>
+            </>
         )
+
         }
 }

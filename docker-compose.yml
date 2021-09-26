@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  postgresdb:
+    build:
+      context: ./docker/postgress
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=passchunkitappdb
+    volumes:
+      - ./docker/postgress/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - '5432:5432'
+  
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - postgresdb
+

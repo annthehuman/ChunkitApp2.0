@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('create', views.ExperementDataApi.as_view()),
     path('noprolificid', views.noprolificid, name='noprolificid'),
     path('consent', views.consent, name='consent'),
     path('outline', views.outline, name='outline'),

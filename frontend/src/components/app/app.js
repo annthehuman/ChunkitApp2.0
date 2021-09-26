@@ -21,7 +21,7 @@ const AppBlock = styled.div`
 
 const App = () => {
     return(
-        <AppBlock>
+        <>
         <Router>
             <Route path='/' exact component={Home}/>
             <Route path='/constructor' exact component={Constructor}/>
@@ -34,7 +34,7 @@ const App = () => {
             <Route path='/constructor/feedback' component={Feedback}/>
             <Route path='/constructor/goodbye' component={Goodbye}/>
         </Router>
-        </AppBlock>
+        </>
     )
 }
 

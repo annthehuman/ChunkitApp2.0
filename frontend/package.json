@@ -25,9 +25,13 @@
   "dependencies": {
     "bootstrap": "^4.6.0",
     "css-loader": "^6.2.0",
+    "draftjs-to-html": "^0.9.1",
+    "html-to-draftjs": "^1.5.0",
     "less-loader": "^10.0.1",
+    "react-draft-wysiwyg": "^1.14.7",
     "react-router-dom": "^5.2.0",
     "reactstrap": "^8.9.0",
+    "store": "^2.0.12",
     "style-loader": "^3.2.1",
     "styled-components": "^5.3.0"
   }

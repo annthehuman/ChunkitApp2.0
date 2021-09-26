@@ -92,8 +92,8 @@ export default class Inputs extends Component {
         </Label>
       </FormGroup>
       <br/>
-      <Button onClick={() => {this.props.toggle(String(+this.props.active + 1))}}>Next</Button>
-
+      <Button color='light' className="float-right" onClick={() => {this.props.toggle(String(+this.props.active + 1))}}>Next <span className="fa fa-angle-right"></span></Button>
+      <div className='clearfix'></div>
     </Form>
     </>
     )
