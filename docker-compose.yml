@@ -18,6 +18,19 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./:/usr/src/app
+    ports:
+      - 8000:8000
     depends_on:
       - postgresdb
 
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    depends_on:
+      - web
+      - postgresdb
+    ports:
+      - "80:80"
+    volumes:
+      - ./static/:/static
