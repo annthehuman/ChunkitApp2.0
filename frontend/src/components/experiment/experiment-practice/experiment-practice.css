@@ -1,0 +1,42 @@
+.checkbox_label {
+    width: 40px;
+    height: 20px;
+    text-align: center;
+    line-height: 36px;
+    font-size: 30px;
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 0px;
+    margin-right: 20px;
+    user-select: none;
+  }
+  
+  
+  .checkbox_label > * {
+    position: absolute;
+    transition: opacity .1s ease;
+   }
+  
+  input + label > :first-child {
+      color: #b4b4b4;
+  
+  }
+  
+  input + label > :last-child {
+      color: red;
+      font-weight: 700;
+      font-size: 25px;
+  }
+  
+  input + label > :last-child {
+    opacity: 0;
+  }
+  
+  input:checked  + label > :first-child {
+    opacity: 0;
+  }
+  
+  input:checked  + label > :last-child {
+    opacity: 1;
+  }
+  

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+python manage.py collectstatic --noinput
+python manage.py migrate
+
+uwsgi --socet :9000 --workers 4 --master --enable-threads --module chunkitapp_project.wsgi

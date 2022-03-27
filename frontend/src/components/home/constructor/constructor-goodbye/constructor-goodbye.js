@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {  Input, FormGroup, Label, Form, Button } from 'reactstrap';
+import { FormGroup, Label, Button } from 'reactstrap';
 import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import draftToHtml from 'draftjs-to-html';
@@ -16,11 +16,22 @@ export default class Goodbye extends Component {
       this.onEditorStateChange = this.onEditorStateChange.bind(this)
   }
   onEditorStateChange(editorState) {
+    let store = require('store');
     this.setState({
       editorState,
     });
-    this.props.appendForm('goodbyeExample', draftToHtml(convertToRaw(editorState.getCurrentContent())))
+    this.props.appendForm('goodbyeEditor', draftToHtml(convertToRaw(editorState.getCurrentContent())))
+    store.set('goodbyeEditor', draftToHtml(convertToRaw(editorState.getCurrentContent())))
   };
+  componentDidMount() {
+    let store = require('store');
+    if (store.get('goodbyeEditor')){
+      const blocksFromHTML = convertFromHTML(store.get('goodbyeEditor')),
+            content = ContentState.createFromBlockArray(blocksFromHTML.contentBlocks, blocksFromHTML.entityMap);
+      this.setState({ editorState: store.get('goodbyeEditor') });
+      (this.onEditorStateChange(EditorState.createWithContent(content)))
+      }
+  }
   render () {
     return(
       <>

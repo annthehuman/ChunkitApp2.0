@@ -4,6 +4,40 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 from django.contrib.sessions.models import Session
 
+class experiment_links(models.Model):
+	experiment_link = models.TextField()
+	accessToken = models.TextField()
+
+class draft_data(models.Model):
+	accessToken = models.TextField()
+	newField = models.TextField()
+	nameExperement = models.TextField()
+	shuffleExtracts = models.TextField()
+	shuffleExtractsPractice = models.TextField()
+	nameExperementForParticipants = models.TextField()
+	ImitationTask = models.BooleanField()
+	UseQuestions = models.BooleanField()
+	UseProlific = models.BooleanField()
+	linkToProlific = models.TextField()
+	helloEditor = models.TextField()
+	consentEditor = models.TextField()
+	outlineEditor = models.TextField()
+	backgroundExample = models.TextField()
+	backgroundAddQ = models.TextField()
+	feedbackExample = models.TextField()
+	feedbackAddQ = models.TextField()
+	goodbyeEditor = models.TextField()
+	uploadPracticeAudio = models.FileField()
+	uploadPracticeTranscripts = models.FileField()
+	uploadExperementAudio = models.FileField()
+	uploadExperementTranscripts = models.FileField()
+	experimentInstructions = models.TextField()
+	practiceInstructions = models.TextField()
+	audiosPractice = models.TextField()
+	audiosExperement = models.TextField()
+	uploadPracticeTranscriptsData = models.TextField()
+	uploadExperimentTranscriptsData = models.TextField()
+
 class experement_data(models.Model):
 	name = models.TextField(default='')
 	number = models.IntegerField()
@@ -13,109 +47,55 @@ class experement_data(models.Model):
 
 
 class background(models.Model):
-	man = 'Male'
-	woman = 'Female'
-	other = 'Other'
-	gender_choices = (
-		(man, 'Male'),
-		(woman, 'Female'),
-		(other, 'Other'),
-		)
-	primary = 'Primary school'
-	low_sec = 'Lower secondary school'
-	upper_sec = 'Upper secondary school, upper secondary school graduate, or vocational education graduate'
-	polytech = 'Polytechnic degree'	
-	bachelor = 'University degree: BA or equivalent'
-	master = 'University degree: MA or equivalent'
-	ph_d = 'University degree: Ph.D. or equivalent'
-	none = ''
-	education_choices = (
-		(primary, 'Primary school'),
-		(low_sec, 'Lower secondary school'),
-		(upper_sec, 'Upper secondary school, upper secondary school graduate, or vocational education graduate'),
-		(polytech, 'Polytechnic degree'	),
-		(bachelor, 'University degree: BA or equivalent'),
-		(master, 'University degree: MA or equivalent'),
-		(ph_d, 'University degree: Ph.D. or equivalent'),
-		)
-	yes = 'Yes'
-	no = 'No'
-	yes_no = (
-		(yes, 'Yes'),
-		(no, 'No'),
-		)
-	session_key = models.CharField(max_length=40)
-	age = models.IntegerField(validators=[MaxValueValidator(100), MinValueValidator(1)])
-	sex = models.CharField(max_length=6, choices=gender_choices)
-	education = models.CharField(max_length=1000, choices=education_choices)
-	major = models.TextField(max_length=1000, default="none")
-	native_language = models.TextField(default='nothing')
-	other_language = models.TextField(default='nothing')
-	dyslexia = models.CharField(max_length=3, choices=yes_no)
-	hearing_diff = models.CharField(max_length=3, choices=yes_no)
-	whisper = models.CharField(max_length=3, choices=yes_no)
-	comments = models.TextField(default='nothing')
+	session_key = models.TextField()
+	Age = models.TextField()
+	Gender = models.TextField()
+	LevelEducation = models.TextField()
+	AcadmicField = models.TextField()
+	NativeLanguage = models.TextField()
+	OtherLanguage = models.TextField()
+	Dyslexsia = models.TextField()
+	HearingDiff = models.TextField()
+	Whisper = models.TextField()
+	Comments = models.TextField()
+	addedQ = models.TextField()
+	experiment_name = models.TextField(default='nothing')
+	prolific_id = models.CharField(max_length=100)
 
 class feedback(models.Model):
-	str_disagree ='Strongly disagree'
-	disagree ='Disagree'
-	neither ='Neutral'
-	agree ='Agree'
-	str_disagree ='Strongly agree'	
-	opinion_choices = (
-		(str_disagree, 'Strongly disagree'),
-		(disagree, 'Disagree'),
-		(neither, 'Neutral'),
-		(agree, 'Agree'),
-		(str_disagree, 'Strongly agree'),	
-		)
-	bad ='Poor'
-	ok ='Satisfactory'
-	good ='Good'
-	vgood ='Very good'
-	performance_choices = (
-		(bad, 'Poor'),
-		(ok, 'Satisfactory'),
-		(good, 'Good'),
-		(vgood, 'Very good'),
-		)
-	all_the_time = 'All the time'
-	most_of_the_time = 'Most of the time'
-	some_time = 'Some of the time'
-	very_little_time = 'Very little time'
-	not_at_all = 'Not at all'
-	understanding_choices = (
-		(all_the_time, 'all the time'),
-		(most_of_the_time, 'most of the time'),
-		(some_time, 'some of the time'),
-		(very_little_time, 'very little time'),
-		(not_at_all, 'not at all'),
-		)
-	session_key = models.CharField(max_length=40)
-	instructions = models.CharField(max_length=25, choices=opinion_choices)
-	doing = models.CharField(max_length=25, choices=opinion_choices)
-	simple = models.CharField(max_length=25, choices=opinion_choices)
-	demanding = models.CharField(max_length=25, choices=opinion_choices)
-	pessure = models.CharField(max_length=25, choices=opinion_choices)
-	fun = models.CharField(max_length=25, choices=opinion_choices)
-	reflects = models.CharField(max_length=25, choices=opinion_choices)
-	performance = models.CharField(max_length=25, choices=performance_choices)
-	understood = models.CharField(max_length=25, choices=understanding_choices)
-	measured = models.TextField(default='nothing')
-	strategy = models.TextField(default='nothing')
-	impression = models.TextField(default='nothing')
-	comments = models.TextField(default='nothing') 
+	session_key = models.TextField()
+	instructions = models.TextField()
+	doing = models.TextField()
+	simple = models.TextField()
+	demanding = models.TextField()
+	pessure = models.TextField()
+	fun = models.TextField()
+	reflects = models.TextField()
+	performance = models.TextField()
+	understood = models.TextField()
+	measured = models.TextField()
+	strategy = models.TextField()
+	impression = models.TextField()
+	comments = models.TextField()
+	addedQ = models.TextField()
+	experiment_name = models.TextField(default='nothing')
+	prolific_id = models.CharField(max_length=100)
 
 class sentence(models.Model):
 	text = models.TextField(default='nothing')
 	index = models.IntegerField()
 	session_key = models.CharField(max_length=40)
+	experiment_name = models.TextField(default='nothing')
+	prolific_id = models.CharField(max_length=100)
 
 class test(models.Model):
 	session_key = models.CharField(max_length=40)
 	checkbox = models.TextField(default='nothing')
 	index = models.IntegerField()
 	question = models.CharField(max_length=10)
+	experiment_name = models.TextField(default='nothing')
+	date = models.TextField(default='nothing')
+	prolific_id = models.CharField(max_length=100)
 
 class sessions(models.Model):
 	session_id = models.CharField(max_length=40)

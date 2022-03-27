@@ -1,14 +1,28 @@
-FROM python:3
+FROM python:3.9-alpine3.13
+LABEL maintainer='chunkitapp.com'
 
-WORKDIR /usr/src/app
+ENV PYTHONUNBUFFERD 1
 
-COPY requirements.txt .
-COPY entrypoint.sh .
+COPY ./requirements.txt /requirements.txt
+COPY ./ /app
+COPY ./scripts /scrpits
 
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-RUN chmod +x entrypoint.sh
+WORKDIR /app
+EXPOSE 8000
 
-COPY . .
 
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+RUN python -m venv /py && \
+    /py/bin/pip install --upgrade pip && \
+    /py/bin/pip install -r /requirements.txt && \
+    adduser --diabled-password --no-create-home app && \
+    mkdir -p /vol/web/static && \
+    mkdir -p /vol/web/media && \
+    chown -R app:app /vol && \
+    chmod -R 755 /vol && \
+    chmod -R +x /scripts
+
+ENV PATH="/scripts:/py/bin:$PATH"
+
+USER app
+
+CMD ["run.sh"]

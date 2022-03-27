@@ -5,6 +5,8 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('', views.index, name='frontend'),
+    path('authorized', views.index, name='authorized'),
+    path('password/reset/<uid>/<token>', views.index)
 ]
 print(urlpatterns)
 

@@ -1,8 +1,12 @@
-# from rest_framework import serializers
-# from .models import experement_data
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-# class ExperementDataSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         model = experement_data
-#         fields = ('number', 'name')
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    @classmethod
+    def get_token(cls, user):
+        token = super(MyTokenObtainPairSerializer, cls).get_token(user)
+
+        # Add custom claims
+        token['fav_color'] = user.fav_color
+        return token

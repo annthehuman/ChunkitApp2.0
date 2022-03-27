@@ -9,9 +9,9 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,12 +20,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)(u(b78l_bjgbkwl-z=qz!6!#o#t9$8mikqj$@n#qa536-!gvv'
-
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get('SECRET_KEY', 'kkkk')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = int(os.environ.get("DEBUG", default=0))
+DEBUG = bool(int(os.environ.get('DEBUG', 1)))
 
-ALLOWED_HOSTS = ['51.210.4.176', 'localhost', 'web']
+# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = []
+ALLOWED_HOSTS.extend(
+    filter(
+        None, #отфильтровывает все наны
+        os.environ.get('ALLOWED_HOSTS', '').split(',')
+    )
+)
+
 
 CORS_ORIGIN_ALLOW_ALL = False
 
@@ -44,26 +53,75 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chunkitapp',
     'frontend',
-    'psycopg2'
+    'psycopg2',
+    'djoser',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 REACT_ROUTES = [
     'constructor',
-    'constructor/hellopage',
-    'constructor/consent',
-    'constructor/outline',
-    'constructor/background',
-    'constructor/practice',
-    'constructor/experiment',
-    'constructor/feedback',
-    'constructor/goodbye'
+    'test',
+    'experiment/<name>',
+    'results/<name>',
+    'signup/',
+    'login/',
+    'reset_password'
 ]
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_RENDERER_CLASSES': (
-#         'rest_framework.renderers.JSONRenderer',
-#     )
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+}
+
+#setting up email server
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'info.chunkitapp@gmail.com'
+EMAIL_HOST_PASSWORD = 'chunkitapp2022!'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'username/reset/{uid}/{token}',
+    'ACTIVATION_URL': 'auth/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {},
+    'USER_CREATE_PASSWORD_RETYPE ': True,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -81,7 +139,7 @@ ROOT_URLCONF = 'chunkitapp_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,14 +160,11 @@ WSGI_APPLICATION = 'chunkitapp_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'chunk_db',
-        'USER': 'chunkadmin',
-        'PASSWORD': "passchunkitappdb",
-        'HOST': 'postgresdb',
-        'PORT': 5432
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 
 # Password validation
@@ -148,10 +203,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+# STATIC_URL = '/static/static/'
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / "frontend/static"
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = "vol/web/static"
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_ROOT = "vol/web/media"
+# MEDIA_URL = '/static/media/'
+MEDIA_URL = '/media/'

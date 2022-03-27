@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {  Input, FormGroup, Label, Form, Button } from 'reactstrap';
+import {  Input, FormGroup, Label,  Button } from 'reactstrap';
 import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import draftToHtml from 'draftjs-to-html';
@@ -34,7 +34,7 @@ export default class Outline extends Component {
     this.setState({
       editorState,
     });
-    this.props.appendForm('outlineExample', draftToHtml(convertToRaw(editorState.getCurrentContent())))
+    this.props.appendForm('outlineEditor', draftToHtml(convertToRaw(editorState.getCurrentContent())))
     console.log(draftToHtml(convertToRaw(editorState.getCurrentContent())))
     store.set('outlineEditor', draftToHtml(convertToRaw(editorState.getCurrentContent())))
     

@@ -1,36 +1,17 @@
-version: "3"
+version: "3.9"
 
 services:
-  postgresdb:
+  app:
     build:
-      context: ./docker/postgress
-      dockerfile: Dockerfile
-    environment:
-      - POSTGRES_PASSWORD=passchunkitappdb
+      context: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./docker/postgress/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - '5432:5432'
-  
-  web:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    volumes:
-      - ./:/usr/src/app
+      - ./:/app
+      - ./data/web:/vol/web
     ports:
       - 8000:8000
-    depends_on:
-      - postgresdb
-
-  nginx:
-    build:
-      context: ./docker/nginx
-      dockerfile: Dockerfile
-    depends_on:
-      - web
-      - postgresdb
-    ports:
-      - "80:80"
-    volumes:
-      - ./static/:/static
+    enviroment:
+      - SECRET_KEY=devsecterkey
+      - DEBUG=1

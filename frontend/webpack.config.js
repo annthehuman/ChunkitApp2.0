@@ -26,12 +26,22 @@ module.exports = {
         }, {
           test: /\.css$/,
           use: ["style-loader", "css-loader"]
-        }
+        },
+        {
+          test: /\.tsx?$/,
+          use: [                        {
+            loader: 'ts-loader',
+            options: {
+                configFile: path.resolve('./tsconfig.json'),
+            },
+        },],
+          exclude: /node_modules/,
+        },
       ]
     },
     resolve: {
       extensions: [
-        '', '.js', '.jsx', '.css'
+        '', '.js', '.jsx', '.css','.tsx', '.ts'
       ]
     }
   };

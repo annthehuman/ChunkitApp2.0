@@ -35,7 +35,7 @@ export default class Consent extends Component {
     this.setState({
       editorState,
     });
-    this.props.appendForm('consentExample', draftToHtml(convertToRaw(editorState.getCurrentContent())))
+    this.props.appendForm('consentEditor', draftToHtml(convertToRaw(editorState.getCurrentContent())))
     store.set('consentEditor', draftToHtml(convertToRaw(editorState.getCurrentContent())))
   };
 

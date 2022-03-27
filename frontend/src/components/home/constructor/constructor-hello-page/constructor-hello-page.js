@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import styled from 'styled-components';
-import {  Input, FormGroup, Label, Form, Button } from 'reactstrap';
+import {  Input, FormGroup, Label, Button } from 'reactstrap';
 import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import draftToHtml from 'draftjs-to-html';
@@ -34,7 +33,7 @@ export default class HelloPage extends Component {
       this.setState({
         editorState,
       });
-      this.props.appendForm('helloExample', draftToHtml(convertToRaw(editorState.getCurrentContent())))
+      this.props.appendForm('helloEditor', draftToHtml(convertToRaw(editorState.getCurrentContent())))
       store.set('helloEditor', draftToHtml(convertToRaw(editorState.getCurrentContent())))
     };
 
