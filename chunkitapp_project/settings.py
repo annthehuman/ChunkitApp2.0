@@ -84,7 +84,7 @@ REST_FRAMEWORK = {
 #setting up email server
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'info.chunkitapp@gmail.com'
-EMAIL_HOST_PASSWORD = 'chunkitapp2022!'
+EMAIL_HOST_PASSWORD = 'topebnknfisngvrw'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
