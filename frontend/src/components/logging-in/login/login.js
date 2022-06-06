@@ -5,6 +5,8 @@ import { Stack } from "@mui/material";
 import Logo from "../../../common_components/logo";
 import CustomHeader from "../../../common_components/header";
 import CommonInput from "../../../common_components/input";
+import { TextField } from "@mui/material";
+import CustomButton from "../../../common_components/button";
 class Login extends Component{
     constructor(props) {
         super(props);
@@ -51,48 +53,44 @@ class Login extends Component{
 
     render() {
         return (
-            <Stack  spacing={4} mt={'35px'} alignItems="center">
-            Login
+            <form onSubmit={this.handleSubmit}>
+            <Stack direction='column' spacing={2} mt={'35px'} alignItems="center">
                 <Logo/>
-                <CustomHeader text='ChunkitApp'/>
+                <CustomHeader text='ChunkitApp 2.0'/>
                 
-                <Form onSubmit={this.handleSubmit}>
-                <FormGroup>
-                    <CommonInput/>
-                    <br/>
-                    {/* <Label for="username">
-                        
-                    Username
-                    </Label>
-                    <Input
-                    id="username"
-                    name="username"
-                    placeholder="Insert name"
-                    type="text"
+                <TextField 
+                    name="username" 
+                    id="username" 
+                    sx={{ width:'244px' }}
+                    label="example@email.com" 
+                    variant="outlined" 
                     value={this.state.username}
                     onChange={this.handleChange}
-                    /> */}
-                </FormGroup>
-                <FormGroup>
-                    <Label for="examplePassword">
-                    Password
-                    </Label>
-                    <Input
-                    id="examplePassword"
-                    name="password"
-                    placeholder="Insert password"
-                    type="password"
+                    type='email'
+                    />
+
+                <TextField 
+                    name="password" 
+                    id="examplePassword" 
+                    sx={{ width:'244px' }}
+                    label="password" 
+                    variant="outlined" 
                     value={this.state.password}
                     onChange={this.handleChange}
+                    type='password'
                     />
-                </FormGroup>
+                
                 <Link to="/reset_password">
                 Forgot password?
                 </Link>
-                <br/>
-                <Button type="submit" value="Submit">Submit</Button>
-                </Form>
+                <Stack direction='row' spacing={2} mt={'82px'}>
+                <CustomButton text='Log In' theme='blue' type="submit" value="Submit" />
+                <Link to='/signup/'>
+                <CustomButton theme='black' text='Sign Up' type="button" value="Submit" />
+                </Link>
+                </Stack>
             </Stack>
+            </form>
         )
     }
 }

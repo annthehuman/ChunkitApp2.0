@@ -1,16 +1,20 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
 import { Link } from "react-router-dom";
-import { Input, FormGroup, Label, Button } from 'reactstrap';
-import Draft from './drafts'
+import Draft from './test'
 import CustomButton from '../../common_components/button';
 import CustomHeader from '../../common_components/header';
 import { Stack } from '@mui/material';
 import Logo from '../../common_components/logo';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CustomBigButton from '../../common_components/big-button';
+import { Grid } from '@mui/material';
+import CustomHat from '../../common_components/hat';
+
+
 const AppBlock = styled.div`
     margin: 0 auto;
-    width: 60%;
+    width: 100%;
 `
 
 const theme = createTheme({
@@ -70,29 +74,36 @@ export default class Home extends Component {
     <br/>
     <AppBlock>
     {this.state.autorized? 
-    <div id='panel' 
-    >
-    <Link to='constructor'>
-    <Button>Constructor</Button>
+    <>
+<Grid container
+    direction="column"
+    alignItems="center">
+<CustomHat/>
+
+<Grid container
+        direction="row"
+        justifyContent="center"
+        alignItems="center">
+    <Link to='drafts'>
+    <CustomBigButton theme='wight' side='left' text='Design & Run'/>
     </Link>
-    <Button className="float-right"  
-    onClick={() => {document.cookie = 'access_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    this.setState({autorized: false})}}
-    >Log out</Button>
-    <br/>
-    <br/>
-    <Draft history={this.props.history} links={this.props.links}/>
-    
-    </div>:
+    <Link to='results'>
+    <CustomBigButton theme='blue' side='right' text='Fetch & Analyse'/>
+    </Link>
+</Grid>
+    </Grid>
+    </>:
     <Stack direction="column" spacing={4} mt={'82px'} alignItems="center">
     <Logo/>
-    <CustomHeader text='ChunkitApp'/>
+    <CustomHeader text='ChunkitApp 2.0'/>
+    <Stack direction="row" spacing={2}  alignItems="center">
     <Link to='login/'>
     <CustomButton theme='blue' text='Log in'/>
     </Link>
     <Link to='signup/'>
     <CustomButton theme='black' text='Sing up'/>
     </Link>
+    </Stack>
     </Stack>}
     </AppBlock>
     </>

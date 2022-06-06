@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
+import CustomButton from '../../../common_components/button';
 import {  Input, FormGroup, Label, Button,  CustomInput } from 'reactstrap';
 
 export default class ExperimentBackground extends Component {
@@ -192,7 +193,7 @@ export default class ExperimentBackground extends Component {
                             }}
                   }): null}                
                     </div>
-                    <Button type='submit' name='ConfirmBackground' color="primary">Confirm</Button>
+                    <CustomButton type='submit' size='small' name='ConfirmBackground' theme="blue" text='Confirm'/>
                 </form>
             </>
          )}

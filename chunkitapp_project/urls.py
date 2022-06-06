@@ -18,6 +18,7 @@ from django.urls import path
 from django.urls import path, include
 from chunkitapp.views import UserActivationView
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('frontend.urls')),

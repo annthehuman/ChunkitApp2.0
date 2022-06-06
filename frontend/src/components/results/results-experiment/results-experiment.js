@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
-import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
-import classnames from 'classnames';
+import TabList from '@mui/lab/TabList';
+import TabContext from '@mui/lab/TabContext';
+import { Box } from '@mui/system';
 const ConstructorBlock = styled.div`
     @media (max-width: 1200px) {
         max-width: 100%;
@@ -15,12 +16,41 @@ const ConstructorBlock = styled.div`
 import ExperimentClearResults from './results-experiment_clear';
 import ExperimentRawResults from './results-experiment_raw';
 import ExperimentResultsPermutation from './results-experiment_perm';
+import { Tab } from '@mui/material';
+import { withStyles } from '@mui/styles';
+
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`vertical-tabpanel-${index}`}
+        aria-labelledby={`vertical-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            {children}
+          </Box>
+        )}
+      </div>
+    );
+  }
+
+  const CustomTab = withStyles({
+    root: {
+      textTransform: "none",
+      fontSize: '24px'
+    }
+  })(Tab);
 
 export default class ExperimentResults extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTabExperimentResults: 1,
+      activeTabExperimentResults: 0,
     }
     this.toggle = this.toggle.bind(this);
 }
@@ -31,57 +61,42 @@ componentDidMount() {
     {this.setState({ activeTabExperimentResults: store.get('activeTabExperimentResults') });}
     console.log(this.state.activeTabExperimentResults)
 }
-toggle (tab) {
+toggle (event, tab) {
+    console.log('tab', tab)
   let store = require('store')
-  if(this.state.activeTabExperimentResults !== tab) this.setState({ activeTabExperimentResults: tab });
-  store.set('activeTabExperimentResults', tab)
+  if(this.state.activeTabExperimentResults !== tab) this.setState({ activeTabExperimentResults: +tab });
+  store.set('activeTabExperimentResults', +tab)
 }
   
   render() {
     return(
     <>
-            <Nav tabs style={{textAlign:'center'}} className='justify-content-center'>
-            <NavItem>
-            <NavLink
-                className={classnames({ active: this.state.activeTabExperimentResults === 1 })}
-                onClick={() => {this.toggle(1); }}
-            >
-                Experiment raw results
-            </NavLink>
-            </NavItem>
-            <NavItem>
-            <NavLink
-                className={classnames({ active: this.state.activeTabExperimentResults === 2 })}
-                onClick={() => { this.toggle(2); }}
-            >
-                Experiment clear results
-            </NavLink>
-            </NavItem>
-            <NavItem>
-            <NavLink
-                className={classnames({ active: this.state.activeTabExperimentResults === 3 })}
-                onClick={() => { this.toggle(3); }}
-            >
-                Experiment permutation
-            </NavLink>
-            </NavItem>
-            </Nav>
-            <ConstructorBlock>
-            <TabContent activeTab={this.state.activeTabExperimentResults.toString()}>
-            <TabPane tabId="1">
-            { this.state.activeTabExperimentResults == 1 ?   <ExperimentRawResults draft_list={this.props.drafts_list} name={this.props.name} toggle = {this.toggle} active={this.state.activeTabExperimentResults} />: null }
-            </TabPane>
-            <TabPane tabId="2">
-            { this.state.activeTabExperimentResults == 2 ?  <ExperimentClearResults name={this.props.name} toggle = {this.toggle} active={this.state.activeTabExperimentResults} />:null}
-            </TabPane>
-            <TabPane tabId="3">
-            { this.state.activeTabExperimentResults == 3 ?  <ExperimentResultsPermutation name={this.props.name} toggle = {this.toggle} active={this.state.activeTabExperimentResults} />:null}
-            </TabPane>
-            
-        </TabContent>
-        
-        <br/>
-        </ConstructorBlock>
+        <TabContext value={this.state.activeTabExperimentResults}>
+            <Box mt={2} sx={{margin: '0px auto',
+                            width: '80%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            flexWrap: 'wrap'}}>
+            <TabList 
+                onChange={this.toggle}    
+                variant="scrollable"
+                scrollButtons="auto"
+                >
+                <CustomTab label="Experiment raw results" />
+                <CustomTab label="Experiment clear results"  />
+                <CustomTab label="Experiment permutation" />
+            </TabList>
+            </Box>
+            <TabPanel value={this.state.activeTabExperimentResults} index={0}>
+            { this.state.activeTabExperimentResults == 0 ?   <ExperimentRawResults draft_list={this.props.drafts_list} name={this.props.name} toggle = {this.toggle} active={this.state.activeTabExperimentResults} />: null }
+            </TabPanel>
+            <TabPanel value={this.state.activeTabExperimentResults} index={1}>
+            { this.state.activeTabExperimentResults == 1 ?  <ExperimentClearResults name={this.props.name} toggle = {this.toggle} active={this.state.activeTabExperimentResults} />:null}
+            </TabPanel>
+            <TabPanel value={this.state.activeTabExperimentResults} index={2}>
+            { this.state.activeTabExperimentResults == 2 ?  <ExperimentResultsPermutation name={this.props.name} toggle = {this.toggle} active={this.state.activeTabExperimentResults} />:null}
+            </TabPanel>
+            </TabContext>
     </>
   )}
 }

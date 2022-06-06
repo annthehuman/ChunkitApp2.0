@@ -1,4 +1,11 @@
 import React, { Component } from "react";
+import Logo from "../../../common_components/logo";
+import { Link } from "react-router-dom";
+import {  TextField, Typography } from "@mui/material";
+import CustomButton from "../../../common_components/button";
+import CustomHeader from "../../../common_components/header";
+import { Stack } from "@mui/material";
+
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 class Signup extends Component{
     constructor(props){
@@ -20,8 +27,8 @@ class Signup extends Component{
     }
 
     handleSubmit(event) {
-        // console.log('A username and password was submitted: ' + this.state.username + " " + 
-                // this.state.password + " " + this.state.email + " " + this.state.confirmPassword);
+        console.log('A username and password was submitted: ' + this.state.username + " " + 
+                this.state.password + " " + this.state.email + " " + this.state.confirmPassword);
         event.preventDefault();
         fetch('/auth/users/', {
             method: "POST",
@@ -30,12 +37,16 @@ class Signup extends Component{
                 'accept': 'application/json'
             },
             body: JSON.stringify({
-                username: this.state.username,
+                username: this.state.email,
                 password: this.state.password,
                 email: this.state.email
             })
             }).then(data => {
+                // data.json())
+            // .then(data =>{
+            //     console.log(data)
                 if (!data.ok){
+                    console.log(data.text())
                     alert(data.json())              
                     throw Error(data.json());
                 } else {
@@ -56,70 +67,62 @@ class Signup extends Component{
         return (
             <>
             <div style={{'width': '70%', 'margin': 'auto'}}>
+            <Stack direction='column' spacing={2} mt={'35px'} alignItems="center">
+                <Logo/>
+                <CustomHeader text='ChunkitApp 2.0'/>
             {!this.state.emailSended ?
             <>
-                <p>Login</p>
-                <Form onSubmit={this.handleSubmit}>
-                <FormGroup>
-                    <Label for="username">
-                    User name
-                    </Label>
-                    <Input
-                    name="username" 
-                    type="text" 
-                    placeholder="User name"
-                    value={this.state.username} 
-                    onChange={this.handleChange}
-                    required
-                    />
-                </FormGroup>
-                <FormGroup>
-                    <Label for="email">
-                    Email
-                    </Label>
-                    <Input
+                
+                
+                <form onSubmit={this.handleSubmit}>
+                <Stack direction='column' spacing={2} mt={'35px'} alignItems="center">
+                <TextField 
                     name="email" 
-                    type="email" 
-                    placeholder="Email"
-                    value={this.state.email} 
+                    id="email" 
+                    sx={{ width:'244px' }}
+                    label="example@email.com" 
+                    variant="outlined" 
+                    value={this.state.email}
                     onChange={this.handleChange}
-                    required
                     />
-                </FormGroup>
-                <FormGroup>
-                    <Label for="examplePassword">
-                    Password
-                    </Label>
-                    <Input
-                    id="examplePassword"
-                    name="password"
-                    placeholder="Insert password"
-                    type="password"
+                <TextField 
+                    name="password" 
+                    id="examplePassword" 
+                    sx={{ width:'244px' }}
+                    label="password" 
+                    variant="outlined" 
+                    type='password'
                     value={this.state.password}
                     onChange={this.handleChange}
-                    required
                     />
-                </FormGroup>
-                <FormGroup>
-                    <Label for="confirmPassword">
-                    Confirm password 
-                    </Label>
-                    <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    placeholder="Confirm password"
-                    type="password"
+                <TextField 
+                    error = {
+                        this.state.password != this.state.confirmPassword ? true : false
+                    }
+                    name="confirmPassword" 
+                    id="confirmPassword" 
+                    sx={{ width:'244px' }}
+                    label="confirm password" 
+                    variant="outlined" 
+                    type='password'
                     value={this.state.confirmPassword}
                     onChange={this.handleChange}
-                    required
-                    className={this.state.confirmNewPassword ? this.state.confirmNewPassword.length > 0 ? this.state.password == this.state.confirmPassword ? 'is-valid' : 'is-invalid':null : null}
                     />
-                </FormGroup>
-                <Button type="submit" value="Submit">Submit</Button>
-                </Form>
+                <CustomButton theme='black' text='Sign Up' type="submit" value="Submit" />
+                </Stack>
+                </form>
+                
+                
             </>
             :
-            <p>Now you have to confirm your email and you will be able to login! See you soon ;)</p>}
+            <>
+            <Typography>Thank you for registration!<br/>
+            Please сheck your email to confirm your account.</Typography>
+            <Link to='/login/'>
+            <CustomButton theme='blue' text='Log In'/>
+            </Link>
+            </>}
+            </Stack>
             </div>
             </>
         )

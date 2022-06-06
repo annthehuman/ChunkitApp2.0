@@ -1,18 +1,15 @@
 import React, {Component} from 'react';
-import styled from 'styled-components';
-import { Button } from 'reactstrap';
+import CustomButton from '../../../common_components/button';
 import { Link } from "react-router-dom";
-import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
-import classnames from 'classnames';
-// const AppBlock = styled.div`
-//     margin: 0 auto;
-//     max-width: 60%;
-// `
+
 
 export default class TextTab extends Component {
   constructor(props) {
     super(props);
-    // this.htmlDecode = this.htmlDecode.bind(this)
+    this.state = {
+        consentDontAgree: false
+    }
+    this.goodbye = this.goodbye.bind(this)
     }
     componentDidMount(){
         const input = this.props.textToTab
@@ -26,17 +23,37 @@ export default class TextTab extends Component {
         // console.log(e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue)
         // return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
         }
+    goodbye() {
+        this.setState({consentDontAgree: true})
+    }
     render() {
         return(
-        <>  <h3>{this.props.header}</h3>
+        <>  
+        {this.state.consentDontAgree ?
+            <>
+            <h3>Goodbye!</h3>
+            <p>
+                See you next time!
+            </p>
+            </>
+            :
+            <>
+            <h3>{this.props.header}</h3>
             <div id='htmlToText'>
             </div>
             {this.props.header=='Goodbye!' && this.props.link ?
             <a href={`${this.props.link}`}>
-            <Button color="success">Link back to Prolific</Button>
+            <CustomButton size='small' theme="blue" text='Link back to Prolific'/>
             </a>:null}
-            {this.props.nextPage? <Button type='button' onClick={this.props.nextPage} name='NextExperimentPage' color="primary">Continue</Button>: null}
+            {this.props.nextPage && this.props.header!='Informed consent'?
+            <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='Continue'/>: null}
+             {this.props.nextPage && this.props.header=='Informed consent'?
+             <>
+            <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='I agree'/>{'   '}
+            <CustomButton size='small' onClick={this.goodbye} name='NextExperimentPage' theme="blue" text="I don't agree"/>
+            </>: null}
             <div className='clearfix'></div>
+            </>}
         </>
      )}
 }

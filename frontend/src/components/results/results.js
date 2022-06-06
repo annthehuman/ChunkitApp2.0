@@ -1,20 +1,18 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
-import { TabContent, TabPane } from 'reactstrap';
-import { Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap';
-import {
-
-    UncontrolledDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    NavbarText
-  } from 'reactstrap';
 import FeedbackResults from './results-feedback';
 import ImitationResults from './results-imitation';
-import classnames from 'classnames';
 import BackgroundResults from './results-background';
 import ExperimentResults from './results-experiment';
+import { Box } from '@mui/system';
+import CustomHeader from '../../common_components/header';
+import CustomButton from '../../common_components/button';
+import { Grid } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { Tabs } from '@mui/material';
+import { Tab } from '@mui/material';
+import { Drawer } from '@mui/material';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 const ConstructorBlock = styled.div`
     @media (max-width: 1200px) {
         max-width: 100%;
@@ -25,21 +23,51 @@ const ConstructorBlock = styled.div`
     margin: 30px auto;
     max-width: 100%;
 `
+
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`vertical-tabpanel-${index}`}
+        aria-labelledby={`vertical-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            {children}
+          </Box>
+        )}
+      </div>
+    );
+  }
+
 export default class Results extends Component {
   constructor(props) {
     super(props);
     this.state = {
         activeTabTest: 1,
         collapsed: true,
-        drafts_list: []
+        drafts_list: [],
+        menu: false,
+        value: 0
     }
     this.toggle = this.toggle.bind(this);
     this.toggleNavbar = this.toggleNavbar.bind(this)
     this.getCookie = this.getCookie.bind(this)
+    this.toggleDrawer = this.toggleDrawer.bind(this)
+    this.handleChange = this.handleChange.bind(this)
 }
 toggleNavbar () {
     this.setState({collapsed: !this.state.collapsed})
 };
+
+handleChange = (event, newValue) => {
+    this.setState({value : newValue, menu: false})
+    // this.toggleDrawer('menu', false)
+}
 
 getCookie(name) {
     let cookieValue = null;
@@ -55,6 +83,16 @@ getCookie(name) {
     }
     return cookieValue;
 }
+toggleDrawer = (anchor, open) => (event) => {
+    console.log('menu closed')
+
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    console.log('menu closed', open)
+
+    this.setState({[anchor]: open });
+  };
 
 componentDidMount() {
     let store = require('store')
@@ -91,7 +129,7 @@ componentDidMount() {
           result.forEach(item => {
               console.log('name', item.nameExperementForParticipants, this.props.match.params.name)
               if(item.nameExperementForParticipants == this.props.match.params.name) {
-                this.setState({drafts_list: item},console.log('result result drafts_list', this.state.drafts_list))
+                this.setState({drafts_list: item})
               }
           })
           
@@ -107,122 +145,107 @@ toggle (tab) {
   store.set('tabTest', tab)
 }
   render() {
-    console.log('drafts_list', this.state.drafts_list)
+    console.log('drafts_list', typeof(this.state.drafts_list.pagesNeeded))
     return(
             <>
-            {this.state.drafts_list.ImitationTask ?
-            <>
-        <Navbar color="faded" light>
-        <NavbarToggler onClick={this.toggleNavbar} className="float-left"/>
-        <Collapse isOpen={!this.state.collapsed} navbar>
-        <Nav navbar style={{textAlign:'left'}} className="float-left">
-            <NavItem>
-            <NavLink
-                className={classnames({ active: this.state.activeTabTest === 1 })}
-                onClick={() => {this.toggle(1); }}
-            >
-                Experiment results
+            <Box mt={2} sx={{margin: '30px auto 15px auto',
+                             width: '80%',
+                             display: 'flex',
+                             justifyContent: 'space-between', 
+                             flexWrap: 'wrap'}}>
+            <Grid container
+                  direction='row'
+                  justifyContent="space-between"
+                  >
+                <Grid item>
+                <Grid container
+                  direction='row'
+                  justifyContent="space-between"
+                  >
+                {/* <IconButton onClick={this.toggleDrawer('menu', true)} aria-label="Menu">
+                    <MenuIcon />
+                </IconButton> */}
+                <CustomButton theme='trans' size='icon' onClick={this.toggleDrawer('menu', true)} title="Menu" aria-label="Menu" text={<MenuRoundedIcon style={{color: '#2D2D2D'}} />}/> {'    '}
+                <CustomHeader theme='small' text='Chunktapp 2.0'/>
+                </Grid>
+                </Grid>
+                <Grid 
+                    item
+                    >
+                    <Link to='/'>
+                    <CustomButton theme='white' text='Home' size='small'/>
+                    </Link>
+                    <Link to='/'>
+                    <CustomButton 
+                        onClick={() => {console.log('log out', this.props.history);document.cookie = 'access_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                        this.setState({autorized: false})}} 
+                        text='Log out' 
+                        theme='black'
+                        size='small'/>
+                    </Link>
+                </Grid>
+            </Grid>
+            </Box>
+    <div>
+          <Drawer
+            anchor='menu'
+            open={this.state.menu}
+            onClose={this.toggleDrawer('menu', false)}
+          >
 
-            </NavLink>
-            </NavItem>
-            <NavItem>
-            <NavLink
-                className={classnames({ active: this.state.activeTabTest === 2 })}
-                onClick={() => { this.toggle(2); }}
-            >
-                Background results
-            </NavLink>
-            </NavItem>
-            <NavItem>
-            <NavLink
-                className={classnames({ active: this.state.activeTabTest === 3 })}
-                onClick={() => { this.toggle(3); }}
-            >
-                Imitation results
-            </NavLink>
-            </NavItem>
-            <NavItem>
-            <NavLink
-                className={classnames({ active: this.state.activeTabTest === 4 })}
-                onClick={() => { this.toggle(4); }}
-            >
-                Feedback results
-            </NavLink>
-            </NavItem>
-            </Nav>
-        </Collapse>
-      </Navbar>        
-            
-            <ConstructorBlock>
-            <TabContent activeTab={this.state.activeTabTest.toString()}>
-            <TabPane tabId="1">
-            <ExperimentResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
-            </TabPane>
-            <TabPane tabId="2">
-            <BackgroundResults backlabels={this.state.drafts_list.backgroundExample} name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
-            </TabPane>
-            <TabPane tabId="3">
-            <ImitationResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
-            </TabPane>
-            <TabPane tabId="4">
-            <FeedbackResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
-            </TabPane>
-            
-        </TabContent>
-        
-        <br/>
-        </ConstructorBlock>
+          {this.state.drafts_list.pagesNeeded && this.state.drafts_list.pagesNeeded.indexOf('Imitation') != -1 ?
+            <Tabs
+                orientation="vertical"
+                variant="scrollable"
+                value={this.state.value}
+                onChange={this.handleChange}
+                sx={{ borderRight: 1, borderColor: 'divider' }}
+            > 
+            <Tab label="Experiment results" />
+            <Tab label="Background results"  />
+            <Tab label="Imitation results" />
+            <Tab label="Feedback results" />
+            </Tabs>
+            :
+            <Tabs
+            orientation="vertical"
+            variant="scrollable"
+            value={this.state.value}
+            onChange={this.handleChange}
+            aria-label="Vertical tabs example"
+            sx={{ borderRight: 1, borderColor: 'divider' }}
+            > 
+            <Tab label="Experiment results" />
+            <Tab label="Background results"  />
+            <Tab label="Feedback results" />
+            </Tabs>}
+          </Drawer>
+    </div>
+            {this.state.drafts_list.pagesNeeded && this.state.drafts_list.pagesNeeded.indexOf('Imitation') != -1 ?
+            <>
+      <TabPanel value={this.state.value} index={0}>
+        <ExperimentResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
+      </TabPanel>
+      <TabPanel value={this.state.value} index={1}>
+        <BackgroundResults backlabels={this.state.drafts_list.backgroundExample} name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
+      </TabPanel>
+      <TabPanel value={this.state.value} index={2}>
+        <ImitationResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
+      </TabPanel>
+      <TabPanel value={this.state.value} index={3}>
+        <FeedbackResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
+      </TabPanel>
         </>:
         <>
-                <Navbar color="faded" light>
-                <NavbarToggler onClick={this.toggleNavbar} className="float-left"/>
-                <Collapse isOpen={!this.state.collapsed} navbar>
-                <Nav navbar style={{textAlign:'left'}} className="float-left">
-                    <NavItem>
-                    <NavLink
-                        className={classnames({ active: this.state.activeTabTest === 1 })}
-                        onClick={() => {this.toggle(1); }}
-                    >
-                        Experiment results
-        
-                    </NavLink>
-                    </NavItem>
-                    <NavItem>
-                    <NavLink
-                        className={classnames({ active: this.state.activeTabTest === 2 })}
-                        onClick={() => { this.toggle(2); }}
-                    >
-                        Background results
-                    </NavLink>
-                    </NavItem>
-                    <NavItem>
-                    <NavLink
-                        className={classnames({ active: this.state.activeTabTest === 3 })}
-                        onClick={() => { this.toggle(3); }}
-                    >
-                        Feedback results
-                    </NavLink>
-                    </NavItem>
-                    </Nav>
-                </Collapse>
-              </Navbar>        
-                    
-                    <ConstructorBlock>
-                    <TabContent activeTab={this.state.activeTabTest.toString()}>
-                    <TabPane tabId="1">
-                    <ExperimentResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
-                    </TabPane>
-                    <TabPane tabId="2">
-                    <BackgroundResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
-                    </TabPane>
-                    <TabPane tabId="3">
-                    <FeedbackResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
-                    </TabPane>
-                    
-                </TabContent>
-                
-                <br/>
-                </ConstructorBlock>
+       <TabPanel value={this.state.value} index={0}>
+        <ExperimentResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
+      </TabPanel>
+      <TabPanel value={this.state.value} index={1}>
+        <BackgroundResults backlabels={this.state.drafts_list.backgroundExample} name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
+      </TabPanel>
+      <TabPanel value={this.state.value} index={2}>
+        <FeedbackResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
+      </TabPanel>
         </>}
     </>
   )}

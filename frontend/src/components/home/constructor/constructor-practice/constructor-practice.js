@@ -5,15 +5,39 @@ import {ExcelRenderer } from 'react-excel-renderer';
 import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import draftToHtml from 'draftjs-to-html';
-export default class Practice extends Component {
+import CustomBox from '../../../../common_components/box';
+import { Typography } from '@mui/material';
+import CustomButton from '../../../../common_components/button';
+import { Popover } from '@mui/material';
+import { withStyles } from '@mui/styles';
+import CustomHeader from '../../../../common_components/header';
+import { DataGrid } from '@mui/x-data-grid';
+import { Stack } from '@mui/material';
+import { Grid } from '@mui/material';
+
+const useStyles = theme => ({
+  root: { 
+    "& .MuiPopover-paper": {
+      borderRadius: '30px',
+   },}
+});
+
+class Practice extends Component {
     constructor(props) {
         super(props);
         this.state = {
-          cols: '',
+          columns: '',
           rows: '',
+          columnsTable: [{ field: 'id', headerName: '#', width: 55 },
+          {field: 'audioName', headerName: 'Audio name', width: 171},
+          {field: 'transcript', headerName: 'Transcript', width: 513}],
+          rowsTable: [{id: 1, audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.'},
+          {id: 2, audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.'},
+          {id: 3, audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't."} ],
           editorState: EditorState.createEmpty(),
           practiceTranscripts: "Upload transcripts table",
-          practiceAudio: "Upload audio zip"
+          practiceAudio: "Upload audio zip",
+          anchorElAudio: null,
         }
         this.onLoad = this.onLoad.bind(this)
         this.onLoadAudio = this.onLoadAudio.bind(this)
@@ -27,12 +51,37 @@ export default class Practice extends Component {
         this.setState({ editorState: store.get('practiceInstructions') });
         (this.onEditorStateChange(EditorState.createWithContent(content)))
         }
-      if (store.get('uploadPracticeTranscriptsData') && store.get('audiosPractice')){
-      if (store.get('uploadPracticeTranscriptsData').length > 0 && store.get('audiosPractice').length > 0){
-        console.log("(store.get('uploadPracticeTranscriptsData') && store.get('audiosPractice'))",(store.get('uploadPracticeTranscriptsData'), store.get('audiosPractice')))
-        this.setState({practiceTranscripts: store.get('uploadPracticeTranscripts'),
-                      practiceAudio: store.get('uploadPracticeAudio')})
+      
+      if (store.get('uploadPracticeTranscriptsData')){
+      if (store.get('uploadPracticeTranscriptsData').length > 0){
+        console.log("(store.get('uploadPracticeTranscriptsData')",(store.get('uploadPracticeTranscriptsData')))
+        this.setState({practiceTranscripts: store.get('uploadPracticeTranscripts')})
       }
+      if (store.get('audiosPractice')){
+        if (store.get('audiosPractice').length > 0){
+          console.log("store.get('audiosPractice'))",store.get('audiosPractice'))
+          this.setState({practiceAudio: store.get('uploadPracticeAudio')})
+        }}
+      store.get('UseQuestions') ?
+        this.setState({columnsTable: [{ field: 'id', headerName: '#', width: 2 },
+        {field: 'audioName', headerName: 'Audio name', width: 80},
+        {field: 'transcript', headerName: 'Transcript', width: 300},
+        {field: 'question', headerName: 'Question', width: 145},
+        {field: 'answer1', headerName: 'Answer1', width: 90},
+        {field: 'answer2', headerName: 'Answer2', width: 90}],
+        rowsTable: [{id: 1, audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.',
+      question: 'Is the fault in ourselves?', answer1: 'Yes', answer2: 'No'},
+        {id: 2, audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.',
+        question: 'Will my tongue tell the anger of my pancreas?', answer1: 'Yes', answer2: 'No'},
+        {id: 3, audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't.",
+        question: 'Is there method in this madness?', answer1: 'Yes', answer2: 'No'} ]})
+      :
+        this.setState({columnsTable: [{ field: 'id', headerName: '#', width: 55 },
+        {field: 'audioName', headerName: 'Audio name', width: 150},
+        {field: 'transcript', headerName: 'Transcript', width: 600}],
+        rowsTable: [{id: 1, audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.'},
+        {id: 2, audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.'},
+        {id: 3, audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't."} ]})
     }}
     onEditorStateChange(editorState) {
       let store = require('store');
@@ -44,16 +93,25 @@ export default class Practice extends Component {
     };
     onLoadAudio(e) {
       let file = e.target.value
+      let store = require('store');
       file = file.replace(/\\/g, '/').split('/').pop();
-      console.log(e.target.files[0])
-      e.target.previousElementSibling.innerHTML = file;
-      this.props.allInputsAReHere();
+      store.set('uploadPracticeAudio', file)
+      this.props.appendForm('uploadPracticeAudio',e.target,'file')
+      this.setState({practiceAudio: file})
+
+      let label = document.getElementById('uploadPracticeAudio')
+      let input = document.createElement('input')
+      input.setAttribute('name', 'uploadPracticeAudio');
+      input.onchange = this.onLoadAudio
+      input.setAttribute('type', 'file');
+      input.setAttribute('hidden', true);
+      input.setAttribute('accept', '.zip')
+      label.append(input)
     }
 
     onLoad(e){
       let store = require('store');
       let fileFile = e.target.files[0]
-      console.log('state',this.props)
       ExcelRenderer(fileFile, (err, resp) => {
         let realRows = []
         resp.rows.forEach(row =>{
@@ -71,39 +129,74 @@ export default class Practice extends Component {
         }
       });
       ExcelRenderer(fileFile)
-      const practiceFile = store.get('uploadPracticeTranscripts')
-      console.log('practice',typeof(practiceFile),practiceFile)
       let file = e.target.value
       file = file.replace(/\\/g, '/').split('/').pop();
-      console.log(e.target.files[0])
-      e.target.previousElementSibling.innerHTML = file;
-      this.props.allInputsAReHere();
+      store.set('uploadPracticeTranscripts', file)
+      this.setState({practiceTranscripts: file})
+      
+      this.props.appendForm('uploadPracticeTranscripts',e.target,'file')
+
+      let label = document.getElementById('uploadPracticeTranscripts')
+      let input = document.createElement('input')
+      input.setAttribute('name', 'uploadPracticeTranscripts');
+      input.onchange = this.onLoad
+      input.setAttribute('type', 'file');
+      input.setAttribute('hidden', true);
+      input.setAttribute('accept', '.xlsx, .xls, .csv')
+      label.append(input)
+      // console.log('label',label.children,React.cloneElement(<input/>))
+      
     }  
 
     render () {
       let store = require('store');
+      const { classes } = this.props;
         return(
-          
-            <>
-            <h1>Upload your practice extracts</h1>
-            <div>
+          <>
+            <CustomHeader text='Upload your practice extracts'/>
+            <div style={{paddingTop: '5px'}}>
             <p>The chunking task is intuitive and might take participants a few tries before their behaviour becomes consistent. In order not to contaminate the results, the segmentation behaviour during the practice extracts is not recorded. In this section, choose the number of practice extracts, and upload the following elements to the website: 
             </p>
             <ul>
-              <li>A zip of audio extracts in any format*.</li>
-              <li>The instructions for the task**.</li>
+              <li>Zip of audio extracts in any format.{'  '}            
+              <CustomButton onClick={(event) => this.setState({anchorElAudio: event.currentTarget})} text='i' theme='gray' size='icon' style={{marginBottom:'5px'}}/>
+              <Popover
+                id='popover'
+                className={classes.root}
+                open={Boolean(this.state.anchorElAudio)}
+                anchorEl={this.state.anchorElAudio}
+                onClose={() => this.setState({anchorElAudio: null})}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left'
+                }}
+              ><CustomBox theme='white'>
+                <Typography sx={{fontSize: '20px'}}>You should choose the sound format according to the purpose of your experiment. The MP3 format is compact but slightly degrades the signal. Thus, it will take no time to buffer and is well suited for experiments that do not require acoustical precision. For those that do, it is possible to upload the audio in WAV format which preserves the high sound quality but might take a while to load.</Typography>
+              </CustomBox>
+              </Popover></li>
+              
+              <li>The instructions for the task.{'  '}            
+              <CustomButton onClick={(event) => this.setState({anchorElAudio: event.currentTarget})} text='i' theme='gray' size='icon' style={{marginBottom:'5px'}}/>
+              <Popover
+                id='popover'
+                className={classes.root}
+                open={Boolean(this.state.anchorElAudio)}
+                anchorEl={this.state.anchorElAudio}
+                onClose={() => this.setState({anchorElAudio: null})}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left'
+                }}
+              ><CustomBox theme='white'>
+                <Typography sx={{fontSize: '20px'}}>What would you like your participants to do?</Typography>
+              </CustomBox>
+              </Popover></li>
               <li>Transcripts for the extracts in a table format according to the following example:</li>
             </ul>
-            <p>
-            *You should choose the sound format according to the purpose of your experiment. The MP3 format is compact but slightly degrades the signal. Thus, it will take no time to buffer and is well suited for experiments that do not require acoustical precision. For those that do, it is possible to upload the audio in WAV format which preserves the high sound quality but might take a while to load.
-            </p>
-            <p>
-            **What would you like your participants to do?
-            </p>
             </div>
       <FormGroup>
-      <Label for="outlineCastom" style={{marginBottom: '1rem'}}>Write the instructions for the task:</Label> 
-      <div>
+      <CustomHeader text='Instruction for the task'/>
+      <div style={{paddingTop: '5px', paddingBottom: '8px'}}>
       <Editor
         editorState={this.state.editorState}
         wrapperClassName="wrapper-class"
@@ -113,91 +206,68 @@ export default class Practice extends Component {
         editorStyle={{ margin: '0 1em 0 1em' }}
       />
       </div>
+      <CustomHeader text='Example of transcripts in a table format'/>
       </FormGroup>
-            <div>
-      {store.get('UseQuestions') ?
-        <Table striped>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Audio name</th>
-          <th>Transcript</th>
-          <th>Question</th>
-          <th>Answer1</th>
-          <th>Answer2</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>stim_001</td>
-          <td>The fault, dear Brutus, is not in our stars, but in ourselves.</td>
-          <td>Is the fault in ourselves?</td>
-          <td>Yes</td>
-          <td>No</td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>stim_014</td>
-          <td>My tongue will tell the anger of my heart, or else my heart concealing it will break.</td>
-          <td>Will my tongue tell the anger of my pancreas?</td>
-          <td>Yes</td>
-          <td>No</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>stim_145</td>
-          <td>Though this be madness, yet there is method in't.</td>
-          <td>Is there method in this madness?</td>
-          <td>Yes</td>
-          <td>No</td>
-        </tr>
-      </tbody>
-      </Table>
-      :
-      <Table striped>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Audio name</th>
-          <th>Transcript</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>stim_001</td>
-          <td>The fault, dear Brutus, is not in our stars, but in ourselves.</td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>stim_014</td>
-          <td>My tongue will tell the anger of my heart, or else my heart concealing it will break.</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>stim_145</td>
-          <td>Though this be madness, yet there is method in't.</td>
-        </tr>
-      </tbody>
-      </Table>
-    }
+            <div style={{backgroundColor: '#FFFFFF',height: '300px', width: '740px',paddingTop: '5px'}}>
+            <DataGrid
+            components={{
+              NoRowsOverlay: () => (
+                <Stack height="100%" alignItems="center" justifyContent="center">
+                  No experiment drafts yet
+                </Stack>
+              )}}
+            rows={this.state.rowsTable}
+            columns={this.state.columnsTable}
+            pageSize={3}
+            rowsPerPageOptions={[3]}
+            disableSelectionOnClick
+            sx={{
+              '& .MuiDataGrid-columnHeaderTitle': {
+                  textOverflow: "clip",
+                  whiteSpace: "break-spaces",
+                  lineHeight: 1,
+                  fontSize: '14px',
+                  lineHeight: '19px',
+              },
+              '& .MuiDataGrid-iconSeparator': {
+                display: 'none'
+              },
+              '& .MuiDataGrid-cell': {
+                textOverflow: "clip",
+                whiteSpace: "break-spaces",
+                lineHeight: 1,
+                fontSize: '14px',
+                lineHeight: '19px'
+              }
+            }}
+          />
+ 
     </div>
     <br/>
-    <FormGroup>
-      <Label  for="uploadPracticeTranscripts" className="custom-file-upload">
-      <span id="uploadPracticeTranscriptsSpan" className="fa fa-angle-double-up"></span>{' '}<span>{this.state.practiceTranscripts}</span>
-      <Input id='uploadPracticeTranscripts' onChange={this.onLoad} style={{display:'none'}} type="file" name="uploadPracticeTranscripts" />
-      </Label>{' '}
-      <Label className="custom-file-upload" for="uploadPracticeAudio">
-      <span id="uploadPracticeAudioSpan" className="fa fa-angle-double-up"></span>{' '}<span>{this.state.practiceAudio}</span>
-      <Input id='uploadPracticeAudio' onChange={this.onLoadAudio} style={{display:'none'}} type="file" name="uploadPracticeAudio" />
-      </Label>
-    </FormGroup>
-    <Button color='light' className="float-left"  onClick={() => {this.props.toggle(String(+this.props.active - 1))}}><span className="fa fa-angle-left"></span> Go back</Button>
-    <Button color='light' className="float-right"  onClick={() => {this.props.toggle(String(+this.props.active + 1))}}>Next <span className="fa fa-angle-right"></span></Button>
-    <div className='clearfix'></div>
-  </>
+    <Grid container
+          direction='row'
+          gap='10px'>
+    <CustomButton size='small' id='uploadPracticeTranscripts' text={this.state.practiceTranscripts} theme='green' component="label"> 
+    <input
+    name='uploadPracticeTranscripts' 
+    onChange={this.onLoad} 
+    type="file"
+    hidden
+    accept=".xlsx, .xls, .csv"
+    /></CustomButton>
+
+    <CustomButton size='small' id='uploadPracticeAudio' text={this.state.practiceAudio} theme='green' component="label"> 
+    <input
+    name='uploadPracticeAudio' 
+    type="file"
+    onChange={this.onLoadAudio} 
+    hidden
+    accept=".zip" 
+    /></CustomButton>
+</Grid>
+</>
   )
   }
 }
+
+export default withStyles(useStyles)(Practice)

@@ -1,17 +1,42 @@
-version: "3.9"
+version: '3.9'
 
 services:
+  db:
+    build:
+      context: .
+    volumes:
+      - ./data/db:/vol/web/data
+      - ./db.sqlite3:/vol/web/db.sqlite3
+    environment:
+      - SQLITE3_DB=db.sqlite3
+
   app:
     build:
       context: .
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+    restart: always
     volumes:
-      - ./:/app
-      - ./data/web:/vol/web
+      - static-data:/vol/web
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+    depends_on:
+      - db
+  
+  proxy:
+    build:
+      context: ./proxy
+    restart: always
+    depends_on:
+      - app
     ports:
-      - 8000:8000
-    enviroment:
-      - SECRET_KEY=devsecterkey
-      - DEBUG=1
+      - 80:8000
+    volumes:
+      - ./static/media/sentence/:/vol/static/media/sentence/
+      - static-data:/vol/static
+    environment:
+      - LISTEN_PORT=8000
+      - APP_HOST=app
+      - APP_PORT=9000
+
+volumes:
+  static-data:

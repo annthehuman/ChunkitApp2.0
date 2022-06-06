@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { Button } from 'reactstrap';
+import CustomButton from '../../../common_components/button';
 import './experiment-experiment.css'
 
 export default class ExperimentExperimentComponent extends Component {
@@ -52,7 +53,8 @@ export default class ExperimentExperimentComponent extends Component {
                 const tablelen = Object.keys(tableParts).length
                 let finalOrder = []
                 /////////TODO: if checked 1 три оставить, а остальные перемешать, то с trio, если без trio, перемешать все
-                if (shuffle == 'on') {
+                // console.log('order', tablelen > this.props.data.shuffleExtractsPractice, shuffle)
+                if (shuffle) {
                 let practice = [...Array(+this.props.data.shuffleExtractsPractice || 0).keys()]
                 
                 if (tablelen > this.props.data.shuffleExtractsPractice)
@@ -63,13 +65,13 @@ export default class ExperimentExperimentComponent extends Component {
                     }
                     finalOrder =  practice.concat(this.shuffle(order))}
                 // console.log('shuffle order',finalOrder) 
-                    console.log('order', finalOrder) 
+                    // console.log('order shuffled', finalOrder) 
                 } else {
                     for (var i = 0; i < tablelen; i++) {
                         finalOrder.push(i);
                         // console.log('order', i)
                     }
-                    console.log('order', finalOrder)
+                    // console.log('order', finalOrder)
                 }
                 // console.log('finalOrder', finalOrder, tablelen)
                 this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder})
@@ -127,7 +129,7 @@ export default class ExperimentExperimentComponent extends Component {
         }
         audioplay() {
             // console.log('current audio',this.state.partsOrder[this.state.partid], this.state.partid,this.state.tableParts[this.state.partid][0])
-            const currentAudioPath = `/media/Experement/${this.state.tableParts[this.state.partsOrder[this.state.partid]][0]}`,
+            const currentAudioPath = `/static/media/Experement/${this.state.tableParts[this.state.partsOrder[this.state.partid]][0]}`,
                   div = document.getElementById(`Experiment_${this.state.partsOrder[this.state.partid]}`);
             // console.log(currentAudioPath, div)
             let request = new XMLHttpRequest();
@@ -213,11 +215,13 @@ export default class ExperimentExperimentComponent extends Component {
         instruction(){
             // console.log(this.state.partid, this.state.partsOrder[this.state.partid])
             const instruction = document.getElementById('instructions_experiment'),
-                  div = document.getElementById(`Experiment_${this.state.partsOrder[this.state.partid]}`);
-            // console.log('div to none',div)
+                  div = document.getElementById(`Experiment_${this.state.partsOrder[this.state.partid]}`),
+                  question = document.getElementById(`Experiment_popup_${this.state.partsOrder[this.state.partid]}`);
+            console.log('to none',div, question)
+            const block_to_none = this.props.data.UseQuestions ? question : div
             this.state.partid+1 != this.state.totalParts ? (
             instruction.style.display = 'block',
-            div.style.display = 'none',
+            block_to_none.style.display = 'none',
             this.nextpart()):
             this.props.nextPage()
             // this.nextpart()
@@ -248,16 +252,36 @@ export default class ExperimentExperimentComponent extends Component {
             e.preventDefault();
             const form = e.target;
             const formData = new FormData(form);
-            
-            document.getElementById(`Experiment_popup_${this.state.partsOrder[this.state.partid]}`).style.display = 'none'
-            this.nextpart()
-            this.instruction()
-            console.log('t',e.target.id.split('_')[1])
-            formData.append('question', this.state.answer);
-            formData.append('index', e.target.id.split('_')[1]);
+            const user = this.getCookie('user');
             const csrf = this.getCookie('csrftoken');
+            
+            formData.append('question', this.state.answer);
             formData.append("csrfmiddlewaretoken", csrf);
+            formData.append('index', this.state.partsOrder[this.state.partid])
+            this.instruction()
+            formData.append('experiment_name', this.props.data.nameExperementForParticipants)
+            formData.append('session_key', user)
             console.log(...formData);
+            fetch('/data/', {
+                method: "POST",
+                // headers: {
+                //     'X-CSRFToken': csrf,
+                //     "Content-Type": "application/json",
+                //     "X-Requested-With": "XMLHttpRequest"
+                // },
+                body: formData
+                }).then(data => {
+                // let store = require('store')
+                // store.clearAll();
+                if (!data.ok){
+                    throw Error(data.status);
+                }
+                //console.log('так')
+                }).catch((data) => {
+                console.log(`Try again! Error: ${Error(data.status)}`)
+                }).finally(() => {
+                form.reset();
+                })
         }
 
         render() {
@@ -273,7 +297,7 @@ export default class ExperimentExperimentComponent extends Component {
                     {(this.props.data.experimentInstructions) ?<div id='instructionsExperimentText' dangerouslySetInnerHTML={{__html: this.props.data.experimentInstructions}}>
                     </div>:<div>No instructions provided</div>}
                 {/* <a href="#"  style='width: 44.08px; height: 22px; display: block'>Start</a> */}
-                    <Button onClick={() => {console.log(this),this.audioplay()}} color="info">Start</Button>
+                    <CustomButton onClick={() => {console.log(this),this.audioplay()}} theme="blue" size='small' text='Start'/>
                     <br/><br/>
                     <div className='clearfix'></div>
                 </div>
@@ -288,7 +312,7 @@ export default class ExperimentExperimentComponent extends Component {
                     
                         <form onSubmit={this.onload} key={`Experiment_post-form${i}`} id={`Experiment_post-form_${i}`}>
                         <div key={`Experiment_${i}`} id={`Experiment_${i}`} style={{display: 'none'}}>
-                        <Button color='light' onClick={() => {console.log('pause please'),this.pause()}} color="info">{(this.state.isPlaying)? 'Pause': 'Continue'}</Button>
+                        <CustomButton theme='blue' size='small' onClick={() => {console.log('pause please'),this.pause()}} text={(this.state.isPlaying)? 'Pause': 'Continue'}/>
                         <br/>
                         <span className='text' id={`textExperiment_${i}`} >
                                 <p key={`textExperiment${i}`} id={`textExperiment${i}`}>
@@ -307,8 +331,8 @@ export default class ExperimentExperimentComponent extends Component {
                         </div>
                         <div id={`Experiment_popup_${i}`} style={{display: 'none'}}>
                                 <p key={`questionExperiment${i}`} id={`questionExperiment${i}`}>{object[2]}</p>
-                                <Button onClick={this.getanswer} color="info" type="submit" name={`send${i}`} value ={object[3]}>{object[3]}</Button>{'  '}
-                                <Button onClick={this.getanswer} color="info" type="submit"  name={`send${i}`} value ={object[4]}>{object[4]}</Button>
+                                <CustomButton onClick={this.getanswer} theme="blue" size='small' type="submit" name={`send${i}`} value ={object[3]} text={object[3]}/>{'  '}
+                                <CustomButton onClick={this.getanswer} theme="blue" size='small' type="submit"  name={`send${i}`} value ={object[4]} text={object[4]}/>
                                 <br/><br/>
                         </div>
                         </form>

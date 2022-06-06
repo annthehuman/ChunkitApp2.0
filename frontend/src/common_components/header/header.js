@@ -3,8 +3,17 @@ import React, { Component } from "react";
 import { Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-
 const StyledHeader = styled(Typography)(({ theme }) => (
+  theme == 'small' ?
+  {
+    fontWeight: '700',
+    fontSize: '24px',
+    lineHeight: '28.13px',
+    fontFamily: [
+      'Roboto', 'sans-serif'
+    ].join(','),
+  }
+  :
     {
     fontWeight: '700',
     fontSize: '36px',
@@ -20,7 +29,8 @@ export default class CustomHeader extends Component {
 
   render() {return (
     <>
-      <StyledHeader>{this.props.text}</StyledHeader>
+    
+      <StyledHeader theme={this.props.theme} style={this.props.style}>{this.props.text}</StyledHeader>
     </>
   );}
 }

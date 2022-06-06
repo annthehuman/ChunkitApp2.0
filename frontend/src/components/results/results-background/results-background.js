@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import { Table, Button, Spinner  } from 'reactstrap';
 import { Link } from "react-router-dom";
-
+import { Box } from '@mui/system';
 import Papa from 'papaparse'
+import CustomButton from '../../../common_components/button';
 export default class BackgroundResults extends Component {
   constructor(props) {
     super(props);
@@ -34,7 +35,7 @@ export default class BackgroundResults extends Component {
       return result
     }).then(() => {
       store.set('background_results', 'loaded')
-      fetch(`/media/Experement/${this.props.name}/background.csv`)
+      fetch(`/static/media/Experement/${this.props.name}/background.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))
       .then(result => {
@@ -60,7 +61,7 @@ export default class BackgroundResults extends Component {
       }).catch(error => {
     console.log(error)
     }) : 
-    fetch(`/media/Experement/${this.props.name}/background.csv`)
+    fetch(`/static/media/Experement/${this.props.name}/background.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))
       .then(result => {
@@ -89,14 +90,15 @@ export default class BackgroundResults extends Component {
     let i = 0
     return(
     <>
-    <Link to={`/media/Experement/${this.props.name}/background.csv`} target="_blank" download>
-      <Button color="info" outline>Download Table</Button>
+    <Link to={`/static/media/Experement/${this.props.name}/background.csv`} target="_blank" download>
+      {/* <Button color="info" outline>Download Table</Button> */}
+      <CustomButton text='Download Table' theme='blue' size='small'/>
       <br/>
       <br/>
     </Link>
-
      {this.state.rows.length != 0 ? 
-     (<Table striped>
+     (
+     <Table striped>
      <thead>
        {this.state.head}
               </thead>

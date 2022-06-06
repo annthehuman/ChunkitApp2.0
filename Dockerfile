@@ -1,23 +1,28 @@
-FROM python:3.9-alpine3.13
+FROM python:3.9
 LABEL maintainer='chunkitapp.com'
 
 ENV PYTHONUNBUFFERD 1
 
 COPY ./requirements.txt /requirements.txt
 COPY ./ /app
-COPY ./scripts /scrpits
+COPY ./scripts /scripts
 
 WORKDIR /app
 EXPOSE 8000
 
 
-RUN python -m venv /py && \
-    /py/bin/pip install --upgrade pip && \
-    /py/bin/pip install -r /requirements.txt && \
-    adduser --diabled-password --no-create-home app && \
+RUN python3 -m venv /py && \
+    /py/bin/pip3 install --upgrade pip && \
+    /py/bin/pip3 install wheel && \
+    # apk add --update --no-cache --virtual .tmp-deps linux-headers && \
+    /py/bin/pip3 install -r /requirements.txt && \
+    adduser --disabled-password --no-create-home app && \
     mkdir -p /vol/web/static && \
     mkdir -p /vol/web/media && \
     chown -R app:app /vol && \
+    /py/bin/python3 manage.py makemigrations && \
+    /py/bin/python3 manage.py migrate && \
+    chown -R app:app /vol/web/db.sqlite3 && \
     chmod -R 755 /vol && \
     chmod -R +x /scripts
 

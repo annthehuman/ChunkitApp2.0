@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
+
 import styled from 'styled-components';
 import {  Input, FormGroup, Label, Button, CustomInput, Form } from 'reactstrap';
-
-
+import CustomButton from '../../../common_components/button';
+import { TextField } from '@mui/material';
 
 export default class ExperimentImitation extends Component {
     constructor(props) {
@@ -11,29 +12,29 @@ export default class ExperimentImitation extends Component {
             played: [],
             changed: []
         }
-        this.sentences = ['sentence02.mp3',
-                    'sentence03.mp3',
-                    'sentence04.mp3',]
-                    // 'sentence05.mp3',
-                    // 'sentence06.mp3',
-                    // 'sentence07.mp3',
-                    // 'sentence08.mp3',
-                    // 'sentence09.mp3',
-                    // 'sentence10.mp3',
-                    // 'sentence11.mp3',
-                    // 'sentence12.mp3',
-                    // 'sentence13.mp3',
-                    // 'sentence14.mp3',
-                    // 'sentence15.mp3',
-                    // 'sentence16.mp3',
-                    // 'sentence17.mp3',
-                    // 'sentence18.mp3',
-                    // 'sentence19.mp3',
-                    // 'sentence20.mp3',
-                    // 'sentence21.mp3',
-                    // 'sentence22.mp3',
-                    // 'sentence23.mp3',
-                    // 'sentence24.mp3']
+        this.sentences = ['sentence02.wav',
+                    'sentence03.wav',
+                    'sentence04.wav',]
+                    // 'sentence05.wav',
+                    // 'sentence06.wav',
+                    // 'sentence07.wav',
+                    // 'sentence08.wav',
+                    // 'sentence09.wav',
+                    // 'sentence10.wav',
+                    // 'sentence11.wav',
+                    // 'sentence12.wav',
+                    // 'sentence13.wav',
+                    // 'sentence14.wav',
+                    // 'sentence15.wav',
+                    // 'sentence16.wav',
+                    // 'sentence17.wav',
+                    // 'sentence18.wav',
+                    // 'sentence19.wav',
+                    // 'sentence20.wav',
+                    // 'sentence21.wav',
+                    // 'sentence22.wav',
+                    // 'sentence23.wav',
+                    // 'sentence24.wav']
         this.startImitation = this.startImitation.bind(this)
         this.playAudio = this.playAudio.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -65,7 +66,12 @@ export default class ExperimentImitation extends Component {
         }
         enableInput(e) {
             const input = document.getElementById(`input_form_${e.target.id.split('_')[2]}`)
-            input.readOnly = false
+            console.log('disable', input)
+            input.disabled = false
+            input.autoFocus = true
+            input.classList.remove("Mui-disabled");
+            input.parentElement.classList.remove("Mui-disabled");
+            console.log('disable', input)
         }
         startImitation() {
             const instruction = document.getElementById('sentence_instructions'),
@@ -126,29 +132,16 @@ export default class ExperimentImitation extends Component {
 				}).finally(() => {
 					form.reset();
 				});
-            let nextSentenceNumber = null
-            const k = +sentenceNumber + 1;
-            console.log(k)
-            if (k < 10) {
-                
-                nextSentenceNumber = '0' + k;
-                console.log(nextSentenceNumber)
-                if (nextSentenceNumber <= '04'){
-					document.getElementById("sentence_" + nextSentenceNumber).style.display = 'block';
-					document.getElementById("sentence_" + sentenceNumber).style.display = 'none';
-				} else {
-                    this.props.nextPage()
-				}
+            // let nextSentenceNumberStr = null
+            const nextSentenceNumber = +sentenceNumber + 1;
+            const nextSentenceNumberStr = nextSentenceNumber < 10 ? '0' + nextSentenceNumber : nextSentenceNumber
+            console.log(nextSentenceNumberStr, nextSentenceNumber, sentenceNumber,this.sentences.length, nextSentenceNumber <= this.sentences.length)
+            if ( nextSentenceNumber <= this.sentences.length){
+                document.getElementById("sentence_" + nextSentenceNumberStr).style.display = 'block';
+                document.getElementById("sentence_" + sentenceNumber).style.display = 'none';
             } else {
-                nextSentenceNumber = k;
-                if (nextSentenceNumber <= '04'){
-					document.getElementById("sentence_" + nextSentenceNumber).style.display = 'block';
-					document.getElementById("sentence_" + sentenceNumber).style.display = 'none';
-				} else {
-                    this.props.nextPage()
-				}
+                this.props.nextPage()
             }
-			    console.log(nextSentenceNumber)
 
         }
         render() {
@@ -164,32 +157,35 @@ export default class ExperimentImitation extends Component {
                     <p className='paragraph'>The task starts with one practice sentence. Please use it&nbsp;to&nbsp;adjust your volume. You can replay the practice sentence if&nbsp;you want but not the subsequent sentences.</p>
 
                     <p className='paragraph'>Please do&nbsp;not refresh this page because unfortunately it&nbsp;means that you would have to&nbsp;start over.</p>
-                <Button type='button' color="primary" onClick={this.startImitation}>Proceed</Button>
+                <CustomButton size='small' onClick={this.startImitation} text='Proceed' theme='blue'/>
                 </div>
                 <audio preload="auto" id="sentence_audio_01"  style={{display: 'none'}} onEnded={this.enableInput}>
-                    <source src="/media/sentence/sentence01.mp3"/>
+                    <source src="/static/media/sentence/sentence01.wav"/>
                 </audio>
                 <div id='sentence_01' style={{display: 'none'}}>
                     <h2>Practice sentence</h2>
                     <p className='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
 
                     <p className='paragraph'>The task starts with one practice sentence. Please use it&nbsp;to&nbsp;adjust your volume. You can replay the practice sentence if&nbsp;you want but not the subsequent sentences.</p>
-                    <Button type='button' onClick={this.playAudio} color="info" name='play_practice'>Play the sentence</Button>
+                    <CustomButton size='small' onClick={this.playAudio} name='play_practice' text='Play the sentence' theme='blue'/>
                     <br/>
                     <br/>
-                    <Form onSubmit={this.handleSubmit} method="post" id='form_01'  className="practice-form">
-                    <Input
+                    <form onSubmit={this.handleSubmit} method="post" id='form_01'  className="practice-form">
+                    <TextField 
                     id="input_form_01"
                     name="text"
-                    type="textarea"
-                    readOnly={true}
-                    // value={this.state.newPassword}
                     onChange={this.handleChange}
                     autoComplete="off"
+                    disabled={true}
+                    autoFocus={false}
+                    fullWidth
+                    label="Insert sentence here after audio played"
                     />
                     <br/>
-                        <Button type="submit" color="primary" className='submit'disabled={!this.state.played.includes('01') && !this.state.changed.includes('01')}>Next</Button>
-                    </Form>
+                    <br/>
+                    <CustomButton size='small' type="submit" disabled={!this.state.played.includes('01') && !this.state.changed.includes('01')} onClick={this.playAudio} text='Next' theme='blue'/>
+
+                    </form>
                 </div>
                 <>
                 {this.sentences.map((item, index) => {
@@ -201,28 +197,28 @@ export default class ExperimentImitation extends Component {
                         return(
                         <>
                         <audio preload="auto" id={`sentence_audio_${index}`}  style={{display: 'none'}} onEnded={this.enableInput}>
-                            <source src={`/media/sentence/${item}`}/>
+                            <source src={`/static/media/sentence/${item}`}/>
                         </audio>
                         <div id={`sentence_${index}`} style={{display: 'none'}}>
                             <h2>Sentence {+index-1}</h2>
                             <p className='paragraph'>Listen to&nbsp;the sentence and type it&nbsp;into the text box. Letter capitalization and punctuation marks do&nbsp;not matter.</p>
-
-                            <Button type='button' color="info"  onClick={this.playAudio} name={index}>Play the sentence</Button>
+                            <CustomButton size='small' onClick={this.playAudio} name={index} text='Play the sentence' theme='blue'/>
                             <br/>
                             <br/>
-                            <Form onSubmit={this.handleSubmit} method="post" id={`form_${index}`}  className="practice-form">
-                            <Input
+                            <form onSubmit={this.handleSubmit} method="post" id={`form_${index}`}  className="practice-form">
+                            <TextField 
                             id={`input_form_${index}`}
                             name='text'
-                            type="textarea"
-                            readOnly
-                            // value={this.state.newPassword}
                             onChange={this.handleChange}
                             autoComplete="off"
+                            disabled={true}
+                            fullWidth
+                            label="Insert sentence here after audio played"
                             />
                             <br/>
-                                <Button type="submit" color="primary"  className='submit' disabled={!(this.state.played.includes(index) && this.state.changed.includes(index))}>Next</Button>
-                            </Form>
+                            <br/>
+                            <CustomButton size='small' type="submit" disabled={!(this.state.played.includes(index) && this.state.changed.includes(index))} onClick={this.playAudio} text='Next' theme='blue'/>
+                            </form>
                         </div>
                         </>)
                     })

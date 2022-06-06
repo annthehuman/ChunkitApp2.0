@@ -36,7 +36,7 @@ export default class ExperimentResultsPermutation extends Component {
     if (!data.ok){
         throw Error(data.status);
     }
-    fetch(`/media/Experement/${this.props.name}/results_permutation.csv`)
+    fetch(`/static/media/Experement/${this.props.name}/results_permutation.csv`)
     .then(response => response.text())
     .then(data => Papa.parse(data))
     .then(result => {

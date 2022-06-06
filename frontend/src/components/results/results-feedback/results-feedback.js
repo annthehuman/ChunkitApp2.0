@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Table, Button, Spinner } from 'reactstrap';
 import { Link } from "react-router-dom";
+import CustomButton from '../../../common_components/button';
 
 import Papa from 'papaparse'
 
@@ -35,7 +36,7 @@ export default class FeedbackResults extends Component {
       return result
     }).then(() => {
       store.set('feedback_results', 'loaded')
-      fetch(`/media/Experement/${this.props.name}/feedback.csv`)
+      fetch(`/static/media/Experement/${this.props.name}/feedback.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))
       .then(result => {
@@ -61,7 +62,7 @@ export default class FeedbackResults extends Component {
       }).catch(error => {
     console.log(error)
     }) : 
-    fetch(`/media/Experement/${this.props.name}/feedback.csv`)
+    fetch(`/static/media/Experement/${this.props.name}/feedback.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))
       .then(result => {
@@ -90,8 +91,8 @@ export default class FeedbackResults extends Component {
     let i = 0
     return(
     <>
-    <Link to={`/media/Experement/${this.props.name}/feedback.csv`} target="_blank" download>
-      <Button color="info" outline>Download Table</Button>
+    <Link to={`/static/media/Experement/${this.props.name}/feedback.csv`} target="_blank" download>
+      <CustomButton text='Download Table' theme='blue' size='small'/>
       <br/>
       <br/>
     </Link>

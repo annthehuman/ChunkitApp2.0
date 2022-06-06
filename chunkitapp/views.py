@@ -24,17 +24,13 @@ import numpy as np
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
 # from .serializers import *
-
-
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework import permissions
-from .serializers import MyTokenObtainPairSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
-
+import shutil
 
 from Levenshtein import distance
+
 class UserActivationView(APIView):
     def get (self, request, uid, token):
         print('get')
@@ -97,12 +93,23 @@ def unpackArchive(experement_name):
 		path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values.get('uploadPracticeAudio')
 		directory_to_extract_to = settings.MEDIA_ROOT + '/Practice/' + experement_name
 		if list(os.walk(directory_to_extract_to)):
-			patoolib.cleanup_outdir(directory_to_extract_to, path_to_zip_file)
+			shutil.rmtree(directory_to_extract_to)
 		# print('os.walk(directory_to_extract_to)', os.walk(directory_to_extract_to))
 		# print('path_to_zip_file',path_to_zip_file, directory_to_extract_to)
 		if not os.path.exists(directory_to_extract_to):
 			os.makedirs(directory_to_extract_to)
 		patoolib.extract_archive(path_to_zip_file, outdir = directory_to_extract_to)
+		test = os.walk(directory_to_extract_to)
+		path, dirs, files = next(test)
+		if dirs:    
+			print('folder', dirs)
+			for dir in dirs:
+				if dir != '__MACOSX':
+					p = os.walk(directory_to_extract_to+dir)
+					pa, di, fi = next(test)
+					for file in fi:
+						print(file)
+						shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
 
 		onlyfilesPractice = [os.path.join(experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
 
@@ -110,11 +117,22 @@ def unpackArchive(experement_name):
 		path_to_zip_file =  settings.MEDIA_ROOT + '/' + draft_data_values.get('uploadExperementAudio')
 		directory_to_extract_to = settings.MEDIA_ROOT + '/Experement/' + experement_name
 		if list(os.walk(directory_to_extract_to)):
-			patoolib.cleanup_outdir(directory_to_extract_to, path_to_zip_file)
+			shutil.rmtree(directory_to_extract_to)
 		# print('path_to_zip_file',path_to_zip_file, directory_to_extract_to)
 		if not os.path.exists(directory_to_extract_to):
 			os.makedirs(directory_to_extract_to)
 		patoolib.extract_archive(path_to_zip_file, outdir = directory_to_extract_to)
+		test = os.walk(directory_to_extract_to)
+		path, dirs, files = next(test)
+		if dirs:    
+			print('folder', dirs)
+			for dir in dirs:
+				if dir != '__MACOSX':
+					p = os.walk(directory_to_extract_to+dir)
+					pa, di, fi = next(test)
+					for file in fi:
+						print(file)
+						shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
 
 		onlyfilesExperement = [os.path.join(experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
 	
@@ -144,6 +162,7 @@ def unpackArchive(experement_name):
 		uploadExperementTranscripts  = draft_data_values.get("uploadExperementTranscripts",0),
 		experimentInstructions  = draft_data_values.get("experimentInstructions",0),
 		practiceInstructions  = draft_data_values.get("practiceInstructions",0),
+		pagesNeeded = draft_data_values.get("pagesNeeded",0),
 		uploadPracticeTranscriptsData = transcripts_file_practice,
 		uploadExperimentTranscriptsData = transcripts_file_experement,
 		audiosPractice  = onlyfilesPractice,
@@ -156,7 +175,11 @@ def save_draft(request):
 	if request.method == 'POST':
 		
 		# print('req',request.FILES)
-		print('access_token', request.POST.get('accessToken'))
+		# print('access_token', request.POST.get('accessToken'))
+		pagesNeeded = ''
+		if (request.POST.get('pagesNeeded')):
+			pagesNeeded = request.POST.get('pagesNeeded').split(',')
+			# print('pagesNeeded', pagesNeeded)
 		background = dict(filter(lambda x: 'useBackground' in x[0],dict(request.POST).items()))
 		background_addQ = dict(filter(lambda x: 'BackgroundNew' in x[0] and not 'useBackground' in x[0],dict(request.POST).items()))
 		feedback = dict(filter(lambda x: 'useFeedback' in x[0],dict(request.POST).items()))
@@ -167,15 +190,19 @@ def save_draft(request):
 		names_dict = dict(zip(name_set, list(range(len(name_set)))))
 		model_columns = ['uploadPracticeAudio', 'uploadPracticeTranscripts', 'uploadExperementAudio', 'uploadExperementTranscripts']
 		row_number = names_dict.get(experement_name, '')
-		if request.POST.get('link'):
-			experiment_links.objects.create(
-				experiment_link = request.POST.get('link', ''),
-				accessToken = request.POST.get('accessToken', '')
-			)
+		links = list(filter(lambda x: request.POST.get('link', '') in x ,experiment_links.objects.all().values_list('experiment_link', flat = True)))
+		# print('links in bd', links, request.POST.get('link', ''))
+		if not links:
+			if request.POST.get('link'):
+				experiment_links.objects.create(
+					experiment_link = request.POST.get('link', ''),
+					accessToken = request.POST.get('accessToken', ''),
+					experiment_stopped = False
+				)
 
 		# print('back',feedback, feedback_addQ)
 		if form.is_valid():
-			print('valid', form)
+			# print('valid', form)
 			form = form.save(commit=False)
 			form.nameExperementForParticipants = experement_name
 			form.backgroundExample = background
@@ -185,14 +212,25 @@ def save_draft(request):
 			# form.accessToken = request.POST.get('accessToken')
 			# form.audiosPractice = onlyfilesPractice
 			# form.audiosExperement = onlyfilesExperement
-			if not request.FILES.get('uploadPracticeAudio') and row_number:
+			# print('practice files not found audio',request.FILES.get('uploadPracticeAudio'), row_number, not request.FILES.get('uploadPracticeAudio') and row_number)
+			# print('practice files not found transcripts',request.FILES.get('uploadPracticeTranscripts'), row_number, not request.FILES.get('uploadPracticeAudio') and row_number)
+			# print('ex files not found audio',request.FILES.get('uploadExperimentAudio'))
+			# print('ex files not found transcripts',request.FILES.get('uploadExperimentTranscripts'))
+			if pagesNeeded:
+				form.pagesNeeded = pagesNeeded
+			if not request.FILES.get('uploadPracticeAudio') and row_number and row_number >= 0:
+				# print('practice files not found', request.FILES.get('uploadPracticeAudio'))
 				form.uploadPracticeAudio = list(draft_data.objects.all().values_list('uploadPracticeAudio', flat = True))[row_number]
-			if not request.FILES.get('uploadPracticeTranscripts') and row_number:
+			if not request.FILES.get('uploadPracticeTranscripts') and row_number and row_number >= 0:
 				form.uploadPracticeTranscripts = list(draft_data.objects.all().values_list('uploadPracticeTranscripts', flat = True))[row_number]
-			if not request.FILES.get('uploadExperementAudio') and row_number:
+			if not request.FILES.get('uploadExperimentAudio') and row_number and row_number >= 0:
 				form.uploadExperementAudio = list(draft_data.objects.all().values_list('uploadExperementAudio', flat = True))[row_number]
-			if not request.FILES.get('uploadExperementTranscripts') and row_number:
+			else:
+				form.uploadExperementAudio = request.FILES.get('uploadExperimentAudio')
+			if not request.FILES.get('uploadExperimentTranscripts') and row_number and row_number >= 0:
 				form.uploadExperementTranscripts = list(draft_data.objects.all().values_list('uploadExperementTranscripts', flat = True))[row_number]
+			else:
+				form.uploadExperementTranscripts = request.FILES.get('uploadExperimentTranscripts')
 			form.save()
 			print('form', form.uploadExperementTranscripts)
 			# text_from_user_list = list(draft_data.objects.all().values_list())
@@ -247,7 +285,7 @@ def drafts_list(request):
 			draft_data_list.append(draft_data_values)
 		draft_data_list.append({'links': current_experiment_link})
 			# print(list(ex_data_model.objects.all().values_list()))
-		# print(draft_data_list)
+		print(draft_data_list)
 		# name_set = ','.join(name_set)
 			# print(list(ex_data_model.objects.all().values_list()))
 		return HttpResponse(json.dumps(draft_data_list))
@@ -274,6 +312,7 @@ def load_draft(request):
 		draft_data_values['uploadExperimentTranscriptsData'] = ast.literal_eval(draft_data_values['uploadExperimentTranscriptsData'].replace('nan', '0'))
 		draft_data_values['audiosPractice'] = ast.literal_eval(draft_data_values['audiosPractice'].replace('nan', '0'))
 		draft_data_values['audiosExperement'] = ast.literal_eval(draft_data_values['audiosExperement'].replace('nan', '0'))
+		draft_data_values['pagesNeeded'] = ast.literal_eval(draft_data_values['pagesNeeded'].replace('nan', '0'))
 		# print('uploadPracticeTranscriptsData',draft_data_values)
 		return HttpResponse(json.dumps(draft_data_values))
 
@@ -286,6 +325,29 @@ def delete_experiment(request):
 			response['answer'] = 'Sucsess!'
 		else:
 			response['answer'] = 'Error'
+		print(name_set)
+		return HttpResponse(json.dumps(response))
+
+def stop_experiment(request):
+	if request.method == 'GET':
+		print('GET',request.GET['name'])
+		links_set = list(experiment_links.objects.all().values_list('experiment_link', flat = True))
+		links_dict = dict(zip(links_set, list(range(len(links_set)))))
+		# print(names_dict)
+		model_columns = [f.name for f in experiment_links._meta.get_fields()]
+		row_number = links_dict[request.GET['name']]
+		links_data_values = {}
+		
+		for col_name in model_columns:
+			col_data = list(experiment_links.objects.all().values_list(col_name, flat = True))
+			# print(col_data[row_number])
+			links_data_values[col_name] = col_data[row_number]
+		name_set = experiment_links.objects.filter(experiment_link=request.GET['name']).delete()
+		experiment_links.objects.create(
+			experiment_link = links_data_values['experiment_link'],
+			accessToken = links_data_values['accessToken'],
+			experiment_stopped = True
+		)
 		print(name_set)
 		return HttpResponse(json.dumps(response))
 
@@ -329,21 +391,45 @@ def load_draft_to_test(request, draft_experement_name):
 			path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadPracticeAudio']
 			directory_to_extract_to = settings.MEDIA_ROOT + '/Practice/' + draft_experement_name
 			if list(os.walk(directory_to_extract_to)):
-				patoolib.cleanup_outdir(directory_to_extract_to, path_to_zip_file)
+				shutil.rmtree(directory_to_extract_to)
 			# print('path_to_zip_file',path_to_zip_file, directory_to_extract_to)
 			
 			patoolib.extract_archive(path_to_zip_file, outdir = directory_to_extract_to)
 		# print(x)
+			test = os.walk(directory_to_extract_to)
+			path, dirs, files = next(test)
+			if dirs:    
+				print('folder', dirs)
+				for dir in dirs:
+					if dir != '__MACOSX':
+						p = os.walk(directory_to_extract_to+dir)
+						pa, di, fi = next(test)
+						for file in fi:
+							print(file)
+							shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
 			onlyfilesPractice = [os.path.join(draft_experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
+
 		if draft_data_values['uploadExperementAudio']:
 			path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadExperementAudio']
 			directory_to_extract_to = settings.MEDIA_ROOT + '/Experement/' + draft_experement_name
 			if list(os.walk(directory_to_extract_to)):
-				patoolib.cleanup_outdir(directory_to_extract_to, path_to_zip_file)
+				shutil.rmtree(directory_to_extract_to)
 			# print('path_to_zip_file',path_to_zip_file, directory_to_extract_to)
 			
 			patoolib.extract_archive(path_to_zip_file, outdir = directory_to_extract_to)
 		# print(x)
+			test = os.walk(directory_to_extract_to)
+			path, dirs, files = next(test)
+			if dirs:    
+				print('folder', dirs)
+				for dir in dirs:
+					if dir != '__MACOSX':
+						p = os.walk(directory_to_extract_to+dir)
+						pa, di, fi = next(test)
+						for file in fi:
+							print(file)
+							shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
+
 			onlyfilesExperement = [os.path.join(draft_experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
 		return HttpResponse(json.dumps({'audiosPractice': onlyfilesPractice, 'audiosExperement':onlyfilesExperement}))
 
@@ -352,6 +438,7 @@ def load_experement(request, experement_name):
 	print('experement_name', experement_name)
 	if request.method == 'GET':
 		name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
+		name_set_new = list(draft_data.objects.filter(nameExperementForParticipants=experement_name).values_list())
 		names_dict = dict(zip(name_set, list(range(len(name_set)))))
 		# print(names_dict)
 		model_columns = [f.name for f in draft_data._meta.get_fields()]
@@ -359,13 +446,14 @@ def load_experement(request, experement_name):
 		draft_data_values = {}
 		for col_name in model_columns:
 			col_data = list(draft_data.objects.all().values_list(col_name, flat = True))
-			# print(col_data[row_number])
 			draft_data_values[col_name] = col_data[row_number]
-			# print(list(ex_data_model.objects.all().values_list()))
-		# print(json.dumps(draft_data_values))
-		# print(settings.MEDIA_URL+draft_data_values['uploadPracticeAudio'])
-		# print(settings.MEDIA_ROOT)backgroundExample = background
-			# form.feedbackExample = feedback
+		
+		# links_set = list(experiment_links.objects.all().values_list('experiment_link', flat = True))
+		link = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experement_name}.*').values_list())[-1]
+		# print('link set', name_set, draft_data_values)
+		# print()
+		# print(name_set_new)
+
 		draft_data_values['backgroundAddQ'] = ast.literal_eval(draft_data_values['backgroundAddQ'])
 		draft_data_values['feedbackAddQ'] = ast.literal_eval(draft_data_values['feedbackAddQ'])
 		draft_data_values['backgroundExample'] = ast.literal_eval(draft_data_values['backgroundExample'])
@@ -374,7 +462,9 @@ def load_experement(request, experement_name):
 		draft_data_values['uploadExperimentTranscriptsData'] = ast.literal_eval(draft_data_values['uploadExperimentTranscriptsData'])
 		draft_data_values['audiosPractice'] = ast.literal_eval(draft_data_values['audiosPractice'])
 		draft_data_values['audiosExperement'] = ast.literal_eval(draft_data_values['audiosExperement'])
-		# print(type(ast.literal_eval(draft_data_values['backgroundAddQ'])), type(draft_data_values['backgroundAddQ']))
+		draft_data_values['pagesNeeded'] = ast.literal_eval(draft_data_values['pagesNeeded'].replace('nan', '0'))
+		draft_data_values['experimentStopped'] = ast.literal_eval(link[-1])
+		print('draft_data_values',draft_data_values)
 		### TODO linux
 		# path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadPracticeAudio']
 		# directory_to_extract_to = settings.MEDIA_ROOT + '/' + draft_experement_name
@@ -468,7 +558,7 @@ def questionnaire(request):
 	form = backgroundForm(request.POST)
 	if request.method == 'POST':
 		backgroundDict = dict(filter(lambda x: 'BackgroundNew' in x[0],dict(request.POST).items()))
-		# print(background)
+		print(backgroundDict)
 		# print(form.is_valid(), form)
 		# print(request.POST.get('LevelEducation'))
 		background.objects.create(
@@ -487,6 +577,7 @@ def questionnaire(request):
 				experiment_name = request.POST.get('experiment_name', ''),
 				prolific_id = request.POST.get('prolific', '')
 			)
+		print(background.objects.all().values_list())
 			# newanswer = form.save(commit=False)
 			# newanswer.addedQ = backgroundDict
 			# newanswer.session_key = 0
@@ -704,7 +795,7 @@ def results(request, name):
 							z += 1
 		df = pd.DataFrame(table, index=row_names)
 		df.columns = [list(map(lambda x: x[:5], session_ids)), session_time]
-		df.to_csv('./media/Experement/'+experiment_name+'/results.csv', sep=',', encoding='utf-8')
+		df.to_csv(settings.MEDIA_ROOT + '/Experement/'+experiment_name+'/results.csv', sep=',', encoding='utf-8')
 		
 
 		useQ = list(draft_data.objects.all().values_list('UseQuestions', flat = True))[row_number]
@@ -716,7 +807,7 @@ def results(request, name):
 				print('inplace', df_raw)
 			if not useP:
 				df_raw = df_raw.drop(labels=('prolific_id'), axis=1)
-		df_raw.to_csv('./media/Experement/'+experiment_name+'/results_raw.csv', sep=',', encoding='utf-8')
+		df_raw.to_csv(settings.MEDIA_ROOT + '/Experement/'+experiment_name+'/results_raw.csv', sep=',', encoding='utf-8')
 		return HttpResponse('Success!')
 
 def backgroundRES(request, name):
@@ -756,7 +847,7 @@ def backgroundRES(request, name):
 					background_one_result[col_name] = col_data[index]
 			background_table.append(background_one_result)
 		df = pd.DataFrame(background_table)
-		df.to_csv('./media/Experement/'+current_experiment_name+'/background.csv', sep=',', encoding='utf-8')
+		df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/background.csv', sep=',', encoding='utf-8')
 	return HttpResponse("ok!")
 
 def feedbackRES(request, name):
@@ -797,7 +888,7 @@ def feedbackRES(request, name):
 			# print('col_name', col_name, index)
 		feedback_table.append(feedback_one_result)
 	df = pd.DataFrame(feedback_table)
-	df.to_csv('./media/Experement/'+current_experiment_name+'/feedback.csv', sep=',', encoding='utf-8')
+	df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/feedback.csv', sep=',', encoding='utf-8')
 	return HttpResponse("Ok!")
 
 
@@ -842,7 +933,7 @@ def sentenceRES(request, name):
 	# print(sentence_table)
 
 	# df = pd.DataFrame(sentence_table)
-	df.to_csv('./media/Experement/'+current_experiment_name+'/sentence.csv', sep=',', encoding='utf-8')
+	df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/sentence.csv', sep=',', encoding='utf-8')
 	return HttpResponse("Ok!")
 
 
@@ -866,7 +957,7 @@ def levi(request, name):
 			sentence_distance.setdefault(key[:5], []).append(distance(i, sentencies_goal[index]))
 	print('sentence_distance', sentence_distance)
 	df = pd.DataFrame.from_dict(sentence_distance, orient='index')
-	df.to_csv('./media/Experement/'+current_experiment_name+'/sentence_distance.csv', sep=',', encoding='utf-8')
+	df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/sentence_distance.csv', sep=',', encoding='utf-8')
 	# json.dumps(parsed, indent=4)  
 	return HttpResponse("Ok!")
 
@@ -898,7 +989,7 @@ def permutation(request, name):
 	#this is a table of all the results for the set; n of rows = n of participants; n of columns = n of possible boundary spaces.
 	#so all results (zeroes and ones) for one boundary spaces form one column
 	#CHANGE PATH HERE
-	p = './media/Experement/'+current_experiment_name+'/results.csv'
+	p = settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/results.csv'
 	with open(p, 'r') as f:
 		column_names = f.readline().split(',')
 		ncols = len(f.readline().split(','))
@@ -911,9 +1002,10 @@ def permutation(request, name):
 		print('len', len(row_names))
 		
 		
-	print('ncols', row_names, column_names)
+	
 
 	table = np.loadtxt(p, dtype='int', delimiter=',', skiprows=2, usecols=np.arange(1,ncols))
+	print('table', table)
 	observed_result = []
 	for row in table:
 		observed_result.append(sum(row))
@@ -1042,7 +1134,7 @@ def permutation(request, name):
 	# Benjamini = mpy.lsu(double_lower_p, q=0.05)
 	# df['Benjamini'] = Benjamini
 	print(df)
-	df.to_csv('./media/Experement/'+current_experiment_name+'/results_permutation.csv', sep=',', encoding='utf-8')
+	df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/results_permutation.csv', sep=',', encoding='utf-8')
 	timeend = datetime.datetime.now()
 	print("finished after ", timeend-timestart)
 

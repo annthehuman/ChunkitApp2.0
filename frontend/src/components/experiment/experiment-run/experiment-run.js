@@ -17,8 +17,10 @@ export default class ExperimentRun extends Component {
     super(props);
     this.state = {
         experimentData: '',
-        pageNumber: 1,
+        pageNumber: 0,
         prolificIsHere: true,
+        currentPage: 'Hello',
+        experimentStopped: false
     }
     this.nextPage = this.nextPage.bind(this);
 }
@@ -63,13 +65,20 @@ componentDidMount() {
             let search = window.location.search;
             let params = new URLSearchParams(search);
             const prolificCookie = this.getCookie('prolific')
-            console.log(params.get('PROLIFIC_PID'))
+            // console.log('this.state.experimentData.pagesNeeded', this.state.experimentData.pagesNeeded[0])
+            this.state.experimentData.pagesNeeded ? 
+                    store.get('pageNumber') ? 
+                    this.setState({currentPage: this.state.experimentData.pagesNeeded[+store.get('pageNumber')]}):
+                    this.setState({currentPage: this.state.experimentData.pagesNeeded[0]}):
+                null
             this.state.experimentData.UseProlific ? 
                 params.get('PROLIFIC_PID') ? 
                     Boolean(prolificCookie) ? 
                         this.setState({prolificIsHere: true}) : (document.cookie = `prolific=${params.get('PROLIFIC_PID')}; max-age=5400`, this.setState({prolificIsHere: true}))
                     :this.setState({prolificIsHere: false}) 
                 : console.log('no', this.state.experimentData.UseProlific)
+            
+
             // console.log('params', !(this.state.experimentData.UseProlific && Boolean(this.state.prolific)),Boolean(this.state.prolific) )
         })
     }).catch((data) => {
@@ -78,11 +87,11 @@ componentDidMount() {
     }
     nextPage () {
     let store = require('store');
-    
-    this.setState({pageNumber: +this.state.pageNumber+1}, function() {
+    !this.state.experimentData.pagesNeeded[+this.state.pageNumber] ?
+    this.setState({pageNumber: +this.state.pageNumber+1, currentPage: 'Goodbye'}) :
+    this.setState({pageNumber: +this.state.pageNumber+1, currentPage: this.state.experimentData.pagesNeeded[+this.state.pageNumber+1]}, function() {
         store.set('pageNumber', this.state.pageNumber)
-        store.get('pageNumber')
-        console.log('nextpage', this.state.pageNumber)
+        console.log('nextpage', this.state.pageNumber, this.state.currentPage, this.state.experimentData.pagesNeeded)
     })
     }
   render() {
@@ -90,119 +99,45 @@ componentDidMount() {
     return(
             <AppBlock>
             {this.state.experimentData ? 
-            this.state.experimentData.UseProlific ?
-            !(this.state.prolificIsHere) ? 
-            <>
-            <h3>Oops!</h3>
-            <p>Something went wrong! We didn't get your Prolific ID. Please try again or contact us.</p>
-            </>:
-            this.state.experimentData.ImitationTask ?
-                this.state.pageNumber == 1 ? 
-                <TextTab key='hello' nextPage={this.nextPage} header='Hello' textToTab={this.state.experimentData.helloEditor}/>
+                this.state.experimentData.experimentStopped ? 
+                <>
+                <h3>This experiment is finished.</h3>
+                <p>See you in our future experiments!</p>
+                </>
                 :
-                this.state.pageNumber == 2 ? 
-                <TextTab key='consent' nextPage={this.nextPage} header='Informed consent' textToTab={this.state.experimentData.consentEditor} />
-                : 
-                this.state.pageNumber == 3 ? 
-                <TextTab key='outline' nextPage={this.nextPage} header='Session outline' textToTab={this.state.experimentData.outlineEditor} />
-                :
-                this.state.pageNumber == 4 ? 
-                <ExperimentBackground nextPage={this.nextPage} data={this.state.experimentData}/>
-                :
-                this.state.pageNumber == 5 ? 
-                <ExperimentPractice nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 6 ? 
-                <ExperimentExperiment nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 7 ? 
-                <ExperimentImitation nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 8 ? 
-                <ExperimentFeedback nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 9 ? 
-                <TextTab header='Goodbye!' textToTab={this.state.experimentData.goodbyeEditor} link={this.state.experimentData.linkToProlific} />
-                : null 
-                :
-                this.state.pageNumber == 1 ? 
-                <TextTab key='hello' nextPage={this.nextPage} header='Hello' textToTab={this.state.experimentData.helloEditor}/>
-                :
-                this.state.pageNumber == 2 ? 
-                <TextTab key='consent' nextPage={this.nextPage} header='Informed consent' textToTab={this.state.experimentData.consentEditor} />
-                : 
-                this.state.pageNumber == 3 ? 
-                <TextTab key='outline' nextPage={this.nextPage} header='Session outline' textToTab={this.state.experimentData.outlineEditor} />
-                :
-                this.state.pageNumber == 4 ? 
-                <ExperimentBackground nextPage={this.nextPage} data={this.state.experimentData}/>
-                :
-                this.state.pageNumber == 5 ? 
-                <ExperimentPractice nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 6 ? 
-                <ExperimentExperiment nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 7 ? 
-                <ExperimentFeedback nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 8 ? 
-                <TextTab header='Goodbye!' textToTab={this.state.experimentData.goodbyeEditor} link={this.state.experimentData.linkToProlific} />
-                : null
-            :
-              this.state.experimentData.ImitationTask ?
-                this.state.pageNumber == 1 ? 
-                <TextTab key='hello' nextPage={this.nextPage} header='Hello' textToTab={this.state.experimentData.helloEditor}/>
-                :
-                this.state.pageNumber == 2 ? 
-                <TextTab key='consent' nextPage={this.nextPage} header='Informed consent' textToTab={this.state.experimentData.consentEditor} />
-                : 
-                this.state.pageNumber == 3 ? 
-                <TextTab key='outline' nextPage={this.nextPage} header='Session outline' textToTab={this.state.experimentData.outlineEditor} />
-                :
-                this.state.pageNumber == 4 ? 
-                <ExperimentBackground nextPage={this.nextPage} data={this.state.experimentData}/>
-                :
-                this.state.pageNumber == 5 ? 
-                <ExperimentPractice nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 6 ? 
-                <ExperimentExperiment nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 7 ? 
-                <ExperimentImitation nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 8 ? 
-                <ExperimentFeedback nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 9 ? 
-                <TextTab header='Goodbye!' textToTab={this.state.experimentData.goodbyeEditor} link={this.state.experimentData.linkToProlific} />
-                : null 
-                :
-                this.state.pageNumber == 1 ? 
-                <TextTab key='hello' nextPage={this.nextPage} header='Hello' textToTab={this.state.experimentData.helloEditor}/>
-                :
-                this.state.pageNumber == 2 ? 
-                <TextTab key='consent' nextPage={this.nextPage} header='Informed consent' textToTab={this.state.experimentData.consentEditor} />
-                : 
-                this.state.pageNumber == 3 ? 
-                <TextTab key='outline' nextPage={this.nextPage} header='Session outline' textToTab={this.state.experimentData.outlineEditor} />
-                :
-                this.state.pageNumber == 4 ? 
-                <ExperimentBackground nextPage={this.nextPage} data={this.state.experimentData}/>
-                :
-                this.state.pageNumber == 5 ? 
-                <ExperimentPractice nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 6 ? 
-                <ExperimentExperiment nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 7 ? 
-                <ExperimentFeedback nextPage={this.nextPage} data={this.state.experimentData} />
-                :
-                this.state.pageNumber == 8 ? 
-                <TextTab header='Goodbye!' textToTab={this.state.experimentData.goodbyeEditor} link={this.state.experimentData.linkToProlific} />
-                : null
+                    this.state.experimentData.UseProlific && !(this.state.prolificIsHere) ? 
+                        <>
+                        <h3>Oops!</h3>
+                        <p>Something went wrong! We didn't get your Prolific ID. Please try again or contact us.</p>
+                        </>
+                    :
+                        this.state.currentPage == "Hello" ? 
+                        <TextTab key='hello' nextPage={this.nextPage} header='Hello' textToTab={this.state.experimentData.helloEditor}/>
+                        :
+                        this.state.currentPage == "Consent" ? 
+                        <TextTab key='consent' nextPage={this.nextPage} header='Informed consent' textToTab={this.state.experimentData.consentEditor} />
+                        : 
+                        this.state.currentPage == "Outline" ? 
+                        <TextTab key='outline' nextPage={this.nextPage} header='Session outline' textToTab={this.state.experimentData.outlineEditor} />
+                        :
+                        this.state.currentPage == "Background" ? 
+                        <ExperimentBackground nextPage={this.nextPage} data={this.state.experimentData}/>
+                        :
+                        this.state.currentPage == "Practice" ? 
+                        <ExperimentPractice nextPage={this.nextPage} data={this.state.experimentData} />
+                        :
+                        this.state.currentPage == "Experiment" ? 
+                        <ExperimentExperiment nextPage={this.nextPage} data={this.state.experimentData} />
+                        :
+                        this.state.currentPage == "Imitation" ? 
+                        <ExperimentImitation nextPage={this.nextPage} data={this.state.experimentData} />
+                        :
+                        this.state.currentPage == "Feedback" ? 
+                        <ExperimentFeedback nextPage={this.nextPage} data={this.state.experimentData} />
+                        :
+                        this.state.currentPage == "Goodbye" ? 
+                        <TextTab header='Goodbye!' textToTab={this.state.experimentData.goodbyeEditor} link={this.state.experimentData.linkToProlific} />
+                        : null 
             :
             <Spinner
               color="primary"

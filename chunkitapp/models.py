@@ -7,6 +7,7 @@ from django.contrib.sessions.models import Session
 class experiment_links(models.Model):
 	experiment_link = models.TextField()
 	accessToken = models.TextField()
+	experiment_stopped = models.TextField()
 
 class draft_data(models.Model):
 	accessToken = models.TextField()
@@ -37,6 +38,9 @@ class draft_data(models.Model):
 	audiosExperement = models.TextField()
 	uploadPracticeTranscriptsData = models.TextField()
 	uploadExperimentTranscriptsData = models.TextField()
+	pagesNeeded = models.TextField(default=['Hello', 'Consent', 'Outline', 
+										'Background', 'Practice', 'Experiment', 
+										'Imitation', 'Feedback', 'Goodbye'])
 
 class experement_data(models.Model):
 	name = models.TextField(default='')

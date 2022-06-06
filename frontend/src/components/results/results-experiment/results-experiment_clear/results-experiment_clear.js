@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { Table,Button,Spinner } from 'reactstrap';
 import { Link } from "react-router-dom";
 import Papa from 'papaparse'
+import CustomButton from '../../../../common_components/button';
 
 export default class ExperimentClearResults extends Component {
   constructor(props) {
@@ -14,7 +15,7 @@ export default class ExperimentClearResults extends Component {
     this.onSubmit = this.onSubmit.bind(this);
 }
   componentDidMount() {
-    fetch(`/media/Experement/${this.props.name}/results.csv`)
+    fetch(`/static/media/Experement/${this.props.name}/results.csv`)
    .then(response => response.text())
    .then(data => Papa.parse(data))
    .then(result => {
@@ -54,8 +55,8 @@ export default class ExperimentClearResults extends Component {
     let i = 0
     return(
     <>
-    <Link to={`/media/Experement/${this.props.name}/results.csv`} target="_blank" download>
-      <Button color="info" outline>Download Table</Button>
+    <Link to={`/static/media/Experement/${this.props.name}/results.csv`} target="_blank" download>
+      <CustomButton text='Download Table' theme='blue' size='small'/>
       <br/>
       <br/>
     </Link>

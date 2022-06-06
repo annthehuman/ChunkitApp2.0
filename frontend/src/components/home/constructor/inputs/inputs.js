@@ -1,196 +1,394 @@
-import React, {Component} from 'react';
-import { Button, FormGroup, Label, Input, FormText, InputGroup } from 'reactstrap';
+import React, { Component } from 'react';
+import { Button, Label, Input, FormText, InputGroup } from 'reactstrap';
+import CustomBox from '../../../../common_components/box';
+import { TextField } from '@mui/material';
+import { Grid } from '@mui/material';
+import { FormGroup } from '@mui/material';
+import { FormControlLabel } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
+import CustomButton from '../../../../common_components/button';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import styled from 'styled-components';
+import CustomHeader from '../../../../common_components/header';
+
+const StyledAccordion = styled(Accordion)(() => (
+  {
+  width: '650px'
+}));
+
+const StyledAccordionSummary = styled(AccordionSummary)(() => (
+  {
+  backgroundColor: '#F8F8F8'
+}));
+
 
 export default class Inputs extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-          initialValue: 0,
-          useProlific: false,
-          nameExperiment: '',
-          shuffle: false
-        }
-        this.onCheck = this.onCheck.bind(this)
-        this.onChange = this.onChange.bind(this)
-        this.copyURL = this.copyURL.bind(this)
+  constructor(props) {
+    super(props);
+    this.state = {
+      initialValue: 0,
+      useProlific: false,
+      nameExperiment: '',
+      shuffle: false,
+      linkToProlific: '',
+      accordionExpanded: false,
+      pagesOrder: {'Hello': 0, 'Consent': 1, 'Outline': 2, 'Background': 3, 'Practice': 4, 
+                   'Experiment': 5, 'Imitation': 6, 'Feedback': 7, 'Goodbye': 8}
     }
-    componentDidMount() {
-      let store = require('store');
-      console.log('store', store)
-      if (store.get('ImitationTask')){
-        document.getElementById('ImitationTask').checked = store.get('ImitationTask')}
-        // document.getElementById('sentences').checked = store.get('sentences')}
-      if (store.get('UseQuestions')){
-        document.getElementById('UseQuestions').checked = store.get('UseQuestions')}
-      
-      if (store.get('UseProlific')){
-        this.setState({useProlific: store.get('UseProlific')}, () => {
-          if (this.state.useProlific && store.get('linkToProlific')) {
-            document.getElementById('linkToProlific').value = store.get('linkToProlific')}
-          }
-        )
-        document.getElementById('UseProlific').checked = store.get('UseProlific')}
-      
-      // if (this.state.useProlific && store.get('linkToProlific')){
-      //   document.getElementById('linkToProlific').value = store.get('linkToProlific')}
-      if (store.get('nameExperement')){
-          document.getElementById('nameExperement').value = store.get('nameExperement')}
-      if (store.get('nameExperementForParticipants')){
-          document.getElementById('nameExperementForParticipants').value = store.get('nameExperementForParticipants')
-          this.setState({nameExperiment: store.get('nameExperementForParticipants')})}
-      if (store.get('shuffleExtracts')){
-        this.setState({shuffle: store.get('shuffleExtracts')}, () => {
-          if (this.state.shuffle && store.get('shuffleExtractsPractice')){
-            document.getElementById('shuffleExtractsPractice').value = store.get('shuffleExtractsPractice')}
-        })
-        document.getElementById('shuffleExtracts').checked = store.get('shuffleExtracts')}
-      
-      
+    this.onCheck = this.onCheck.bind(this)
+    this.onChange = this.onChange.bind(this)
+    this.copyURL = this.copyURL.bind(this)
+    this.onCheckPages = this.onCheckPages.bind(this)
   }
-    
-    onCheck(){
-      let store = require('store')
-      const papa = document.getElementById('basics'),
-            checks = papa.querySelectorAll('input[type="checkbox"]'),
-            feedback_info = {};
-      console.log(checks)
-      checks.forEach(check => {
-        feedback_info[check.name] = check.checked
-        store.set(check.name, check.checked)
-        })                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-      // this.props.appendForm('basics', JSON.stringify(feedback_info))
-      
+  componentDidMount() {
+    let store = require('store');
+    if (store.get('UseProlific')) {
+      this.setState({ useProlific: store.get('UseProlific'), 
+                      linkToProlific: `http://${window.location.hostname}/experiment/${store.get('nameExperementForParticipants')}`})
+      document.getElementById('UseProlific').checked = store.get('UseProlific')
+      // this.props.appendForm('UseProlific', store.get('UseProlific'))
     }
-    onChange(e) {
-      let store = require('store')
-      console.log('change'+e.target.name)
-      store.set(e.target.name, e.target.value)
-      e.target.name == 'nameExperementForParticipants' ?
-      this.setState({nameExperiment: e.target.value}):null
-      // this.props.appendForm(e.target.name, e.target.value)
+    if (store.get('nameExperement')) {
+      document.getElementById('nameExperement').value = store.get('nameExperement')
+      // this.props.appendForm('nameExperement', store.get('nameExperement'))
     }
-    copyURL() {
-      const url = document.getElementById('urltoStudy');
-      url.select();
-      url.setSelectionRange(0, 99999); /* For mobile devices */
+    if (store.get('nameExperementForParticipants')) {
+      document.getElementById('nameExperementForParticipants').value = store.get('nameExperementForParticipants')
+      this.setState({ nameExperiment: store.get('nameExperementForParticipants') })
+      // this.props.appendForm('nameExperementForParticipants', store.get('nameExperementForParticipants'))
+    }
+    if (store.get('shuffleExtracts')) {
+      this.setState({ shuffle: store.get('shuffleExtracts') }, () => {
+        if (this.state.shuffle && store.get('shuffleExtractsPractice')) {
+          document.getElementById('shuffleExtractsPractice').value = store.get('shuffleExtractsPractice')
+        }
+      })
+      document.getElementById('shuffleExtracts').checked = store.get('shuffleExtracts')
+      // this.props.appendForm('shuffleExtracts', store.get('shuffleExtracts'))
+      // this.props.appendForm('shuffleExtractsPractice', store.get('shuffleExtractsPractice'))
+    }
+    if (store.get('pagesNeeded')) {
+      store.get('pagesNeeded').length > 0 ? this.setState({accordionExpanded: true}) : null
+      store.get('pagesNeeded').forEach(item => {
+        document.getElementById(`pageNeeded_${item}`).checked = true
+        store.set(`pageNeeded_${item}`, true)
+      })
+      // this.props.appendForm('pagesNeeded', store.get('pagesNeeded'))
+    }
+    if (store.get('UseQuestions')){
+      document.getElementById('UseQuestions').checked = store.get('UseQuestions')}
+      // this.props.appendForm('UseQuestions', store.get('UseQuestions'))
+  }
 
-      /* Copy the text inside the text field */
-      navigator.clipboard.writeText(url.value);
+  onCheck(e) {
+    let store = require('store')
+    store.set(e.target.name, e.target.checked)
+    console.log(e.target.name, e.target.checked)
+    this.props.appendForm(e.target.name, e.target.checked)
+  }
+  onCheckPages(e){
+    let store = require('store')
+    
+    let pagesNeeded = store.get('pagesNeeded')
+    store.set(e.target.name, e.target.checked)
+    // console.log('e', store.get('pagesNeeded'), (!Boolean(pagesNeeded)))
+    //если никаких пейджес не отмечено
+    if (!Boolean(pagesNeeded)) {
+      store.set('pagesNeeded', [e.target.name.split('_')[1]])
+      this.props.appendForm('pagesNeeded', [e.target.name.split('_')[1]])}
+    //если пейджес отмечено
+    else {
+      if (e.target.checked) {
+        console.log('e.target.checked', e.target.checked, pagesNeeded.indexOf(e.target.name.split('_')[1]))
+        if (pagesNeeded.indexOf(e.target.name.split('_')[1]) == -1) {
+        let newP = store.get('pagesNeeded').concat(e.target.name.split('_')[1]).sort((a, b) => {
+          if (this.state.pagesOrder[a] > this.state.pagesOrder[b]) {
+            return 1;
+          }
+          if (this.state.pagesOrder[a] < this.state.pagesOrder[b]) {
+            return -1;
+          }
+          return 0;})
+        store.set('pagesNeeded',newP)
+        this.props.appendForm('pagesNeeded', newP)
+        console.log('e.target.checked newP', newP)
+        }
+      } else {
+        if (pagesNeeded.indexOf(e.target.name.split('_')[1]) != -1) {
+          pagesNeeded.splice(pagesNeeded.indexOf(e.target.name.split('_')[1]), 1)
+          store.set('pagesNeeded',pagesNeeded)
+          this.props.appendForm('pagesNeeded', pagesNeeded)
+          console.log('e.target.checked pagesNeeded.indexOf(e.target.name.split()[1]) != -1', pagesNeeded.indexOf(e.target.name.split('_')[1]) != -1)
+        }
+      }
     }
-    render() {
-      let store = require('store') 
-    return(
+    //если никаких пейджес не отмечено
+    // if (!Boolean(pagesNeeded)) {
+    //   store.set('pagesNeeded', [e.target.name.split('_')[1]]), store.set(e.target.name, e.target.checked)
+    //   this.props.appendForm('pagesNeeded', [e.target.name.split('_')[1]])}
+    // //если пейджес отмечено
+    // else {
+    //   //добавляем отмеченное в список страниц в нужном порядке
+    //   let newP = store.get('pagesNeeded').concat(e.target.name.split('_')[1]).sort((a, b) => {
+    //     if (this.state.pagesOrder[a] > this.state.pagesOrder[b]) {
+    //       return 1;
+    //     }
+    //     if (this.state.pagesOrder[a] < this.state.pagesOrder[b]) {
+    //       return -1;
+    //     }
+    //     return 0;})
+    // //если отмечено
+    // e.target.checked ? 
+    // //и если есть в списке, то не делаем ничего
+    // pagesNeeded.indexOf(e.target.name.split('_')[1]) != -1 ? 
+    // null :
+    // //если нет в списке, то перезаписываем в сторе новым списком newP
+    // (store.set('pagesNeeded', newP), store.set(e.target.name, e.target.checked), this.props.appendForm('pagesNeeded', newP)):
+    // //если не отмечено, то удаляем из списка
+    // (console.log('pagesNeeded.indexOf(e.target.name.split()[1])',pagesNeeded.indexOf(e.target.name.split('_')[1])),
+    // pagesNeeded.indexOf(e.target.name.split('_')[1]) != -1 ?
+    // null:
+    // pagesNeeded.pop(pagesNeeded.indexOf(e.target.name.split('_')[1])),
+    // store.set('pagesNeeded', pagesNeeded),
+    // store.set(e.target.name, e.target.checked),
+    // this.props.appendForm('pagesNeeded', pagesNeeded))}
+    // this.props.appendForm('pagesNeeded', store.get('pagesNeeded').concat(e.target.name.split('_')[1]))
+  }
+
+  onChange(e) {
+    let store = require('store')
+    console.log('change' + e.target.name)
+    store.set(e.target.name, e.target.value)
+    e.target.name == 'nameExperementForParticipants' ?
+      this.setState({ nameExperiment: e.target.value, 
+        linkToProlific: `http://${window.location.hostname}/experiment/${e.target.value}`}) : null
+    this.props.appendForm(e.target.name, e.target.value)
+  }
+  copyURL() {
+    console.log('copied')
+    const url = document.getElementById('urltoStudy');
+    url.select();
+    url.setSelectionRange(0, 99999); /* For mobile devices */
+    
+    navigator.clipboard.writeText(url.value);
+  }
+  render() {
+    let store = require('store')
+    return (
       <>
-    <h1>The basics</h1>
-    <div id='basics'>
-      <FormGroup>
-        <Label for="nameExperement">Insert the name of the experiment</Label>
-        <Input
-          required 
-          id='nameExperement'
-          type='text'
-          placeholder='Name of the experiment'
-          name='nameExperement'
-          onChange={this.onChange}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label for="nameExperementForParticipants">Insert the name of the experiment as it will show to the participants</Label>
-        <Input
-          required 
-          id='nameExperementForParticipants'
-          type='text'
-          placeholder='Name of the experiment as it will show to the participants'
-          name='nameExperementForParticipants'
-          onChange={this.onChange}
-        />
-      </FormGroup>
-      <FormGroup check>
-        <Label check>
-          <Input onClick={() => {this.onCheck(); this.state.shuffle ? this.setState({shuffle: false}): this.setState({shuffle: true})}} type="checkbox" id='shuffleExtracts' name='shuffleExtracts'/>{' '}
-          Do you need to shuffle extracts in experiment?
-        </Label>
-      </FormGroup>
-      <br/>
-      <div>
-        { this.state.shuffle ?
-      <>
-      <FormGroup>
-        <Label for="shuffleExtractsPractice">Number of practice extracts</Label>
-        <Input
-          required 
-          id='shuffleExtractsPractice'
-          type='text'
-          placeholder="Number of extracts in the begining of the experiment which will not be shuffled. If you don't need one, insert 0"
-          name='shuffleExtractsPractice'
-          onChange={this.onChange}
-        />
-      </FormGroup>
-      </>:
-      null
-    }
-      </div>
-      <FormGroup check>
-        <Label check>
-          <Input onClick={this.onCheck} type="checkbox" id='ImitationTask' name='ImitationTask'/>{' '}
-          Will you use the Elicited Imitation task?
-        </Label>
-        <FormText>This part is not customizable. The sentences come from Ortega et al., 1999 but are re-recorded with a male non-native English speaker. In this version of the test, we kept 24 sentences.</FormText>
-      </FormGroup>
-      <br/>
-      <FormGroup check>
-        <Label check>
-          <Input onClick={this.onCheck} type="checkbox" id='UseQuestions' name='UseQuestions'/>{' '}
-          Will you use comprehension questions?
-        </Label>
-      </FormGroup>
-      <br/>
-      <FormGroup check>
-        <Label check>
-          <Input 
-          onClick={() => {this.onCheck(); this.state.useProlific ? this.setState({useProlific: false}): this.setState({useProlific: true})}} 
-          type="checkbox" id='UseProlific' name='UseProlific'/>{' '}
-          Do you need to integrate your experiment with Prolific?
-        </Label>
-      </FormGroup>
-      <br/>
-      <div>
-        { this.state.useProlific ?
-      <>
-      <Label for="urltoStudy">URL of your study</Label>
-      <br/>
-      <InputGroup>
-        <Input
-          required 
-          id='urltoStudy'
-          type='text'
-          name='urltoStudy'
-          readOnly
-          value = {`http://${window.location.hostname}/experiment/${this.state.nameExperiment}`}
-        />
-        <Button id='copyButton' color='info' onClick={this.copyURL}> Copy </Button>
-      </InputGroup>
-      <br/>
-      <FormGroup>
-        <Label for="linkToProlific">Link back to Prolific</Label>
-        <Input
-          required 
-          id='linkToProlific'
-          type='text'
-          placeholder='Link back to Prolific'
-          name='linkToProlific'
-          onChange={this.onChange}
-        />
-      </FormGroup>
-      </>:
-      null
-    }
-      </div>
-      <br/>
-      <Button color='light' className="float-right" onClick={() => {this.props.toggle(String(+this.props.active + 1))}}>Next <span className="fa fa-angle-right"></span></Button>
-      <div className='clearfix'></div>
-    </div>
-    </>
+      <CustomHeader text='Basic information'/>
+      <Grid container
+            direction="column"
+            justifyContent="flex-start">
+      <Grid container
+              justifyContent="flex-start"
+              alignItems="center"
+              mt={'15px'}
+              mr={'62px'}
+              >
+        <TextField 
+            name="nameExperement" 
+            id="nameExperement" 
+            sx={{ width:'300px', marginRight: '50px'}}
+            label="Name of the experiment" 
+            variant="outlined"
+            onChange={this.onChange}
+            type='text'
+            required
+            value={store.get('nameExperement') ? store.get('nameExperement') : ''}
+            inputProps={{style: {fontSize: '20px'}}}
+            />
+        <TextField 
+            name="nameExperementForParticipants" 
+            id="nameExperementForParticipants" 
+            sx={{ width:'300px' }}
+            label="Public name of the experiment" 
+            variant="outlined" 
+            onChange={this.onChange}
+            type='text'
+            required
+            inputProps={{style: {fontSize: '20px'}}}
+            value={store.get('nameExperementForParticipants') ? store.get('nameExperementForParticipants') : ''}
+            />
+          </Grid>
+        <FormGroup style={{marginTop: '15px'}}>
+          <FormControlLabel control={<Checkbox 
+                                        type='checkbox'
+                                        id='shuffleExtracts' 
+                                        name='shuffleExtracts'
+                                        onClick={(e) => { this.onCheck(e); 
+                                          this.state.shuffle ? 
+                                          this.setState({ shuffle: false }) : 
+                                          this.setState({ shuffle: true }) }}
+                                        checked={store.get('shuffleExtracts')?store.get('shuffleExtracts'):''}
+                                        />} 
+                            label={<Typography style={{fontSize: '20px'}}>Shuffle extracts</Typography>} />
+          {this.state.shuffle ?
+              <>
+                <TextField 
+                  name="shuffleExtractsPractice" 
+                  id="shuffleExtractsPractice" 
+                  sx={{ width:'300px' }}
+                  label="Number of practice extracts" 
+                  variant="outlined" 
+                  onChange={this.onChange}
+                  type='text'
+                  required
+                  inputProps={{style: {fontSize: '20px'}}}
+                  />
+              </> :
+              null
+            }
+        <FormControlLabel control={<Checkbox 
+                            type='checkbox'
+                            id='UseQuestions' 
+                            name='UseQuestions'
+                            onClick={(e) => this.onCheck(e)}
+                            checked={store.get('UseQuestions')}
+                            />} 
+                label={<Typography style={{fontSize: '20px'}}>Comperhension questions</Typography>} />
+        <FormControlLabel control={<Checkbox 
+                            type='checkbox'
+                            id='UseProlific' 
+                            name='UseProlific'
+                            onClick={(e) => { this.onCheck(e); 
+                              this.state.useProlific ? 
+                              this.setState({ useProlific: false, linkToProlific: '' }) : 
+                              this.setState({ useProlific: true, linkToProlific: `http://${window.location.hostname}/experiment/${this.state.nameExperiment}`  })}}
+                            checked={store.get('UseProlific')}
+                            />} 
+                label={<Typography style={{fontSize: '20px'}}>Integration with Prolific</Typography>} />
+        {this.state.useProlific ?
+              <>
+              <Grid container
+                    direction='row'
+                    alignItems="center">
+              <TextField 
+                  name="urltoStudy" 
+                  id="urltoStudy" 
+                  sx={{ width:'300px', marginRight: '13px'}}
+                  label="URL of your study"
+                  value={this.state.nameExperiment ? this.state.linkToProlific: ''}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  type='text'
+                  inputProps={{style: {fontSize: '20px'}}}
+                  />
+                <CustomButton id='copyButton' theme='white' size='icon' onClick={this.copyURL} text={<ContentCopyIcon/>}/>
+                <TextField 
+                  sx={{ width:'300px', marginLeft: '13px'}}
+                  label="Link back to Prolific"
+                  name='linkToProlific'
+                  onChange={this.onChange}
+                  type='text'
+                  id="linkToProlific"
+                  inputProps={{style: {fontSize: '20px'}}}
+                  value={store.get('linkToProlific') ? store.get('linkToProlific') : ''}
+                  />
+                </Grid>
+                <br/>
+              </> :
+              null
+            }
+        </FormGroup>
+
+        <Accordion
+          style={{width: '650px'}}
+          expanded={this.state.accordionExpanded}
+          onChange={() => {console.log('expanded changed', !this.state.accordionExpanded),this.setState({accordionExpanded: !this.state.accordionExpanded})}}
+          >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+          style={{backgroundColor: '#F8F8F8'}}
+        >
+          <Typography style={{fontSize: '20px'}}>Check parts of experiment you need:</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+        <FormControlLabel control={<Checkbox 
+                            type='checkbox'
+                            id='pageNeeded_Hello' 
+                            name='pageNeeded_Hello'
+                            onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                            checked={Boolean(store.get('pageNeeded_Hello'))}
+                            />} 
+                label={<Typography style={{fontSize: '20px'}}>Hello page</Typography>} />
+        <FormControlLabel control={<Checkbox 
+                    type='checkbox'
+                    id='pageNeeded_Consent' 
+                    name='pageNeeded_Consent'
+                    onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                    checked={Boolean(store.get('pageNeeded_Consent'))}
+                    />} 
+                 label={<Typography style={{fontSize: '20px'}}>Consent page</Typography>} />
+        <FormControlLabel control={<Checkbox 
+                            type='checkbox'
+                            id='pageNeeded_Outline' 
+                            name='pageNeeded_Outline'
+                            onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                            checked={Boolean(store.get('pageNeeded_Outline'))}
+                            />} 
+                label={<Typography style={{fontSize: '20px'}}>Outline page</Typography>} />
+        <FormControlLabel control={<Checkbox 
+                    type='checkbox'
+                    id='pageNeeded_Background' 
+                    name='pageNeeded_Background'
+                    onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                    checked={Boolean(store.get('pageNeeded_Background'))}
+                    />} 
+                 label={<Typography style={{fontSize: '20px'}}>Background questionarrie page</Typography>}/>
+        <FormControlLabel control={<Checkbox 
+                            type='checkbox'
+                            id='pageNeeded_Practice' 
+                            name='pageNeeded_Practice'
+                            onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                            checked={Boolean(store.get('pageNeeded_Practice'))}
+                            />} 
+                label={<Typography style={{fontSize: '20px'}}>Practice page</Typography>} />
+        <FormControlLabel control={<Checkbox 
+                    type='checkbox'
+                    id='pageNeeded_Experiment' 
+                    name='pageNeeded_Experiment'
+                    onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                    checked={Boolean(store.get('pageNeeded_Experiment'))}
+                    />} 
+                 label={<Typography style={{fontSize: '20px'}}>Experiment page</Typography>} />
+        <FormControlLabel control={<Checkbox 
+                            type='checkbox'
+                            id='pageNeeded_Imitation' 
+                            name='pageNeeded_Imitation'
+                            onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                            checked={Boolean(store.get('pageNeeded_Imitation'))}
+                            />} 
+                label={<Typography style={{fontSize: '20px'}}>Elicited Imitation task</Typography>} />
+        <FormControlLabel control={<Checkbox 
+                    type='checkbox'
+                    id='pageNeeded_Feedback' 
+                    name='pageNeeded_Feedback'
+                    onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                    checked={Boolean(store.get('pageNeeded_Feedback'))}
+                    />} 
+                 label={<Typography style={{fontSize: '20px'}}>Feedback questionarrie page</Typography>} />
+        <FormControlLabel control={<Checkbox 
+                    type='checkbox'
+                    id='pageNeeded_Goodbye' 
+                    name='pageNeeded_Goodbye'
+                    onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
+                    checked={Boolean(store.get('pageNeeded_Goodbye'))}
+                    />} 
+                 label={<Typography style={{fontSize: '20px'}}>Goodbye page</Typography>} />
+        </AccordionDetails>
+      </Accordion>
+
+        </Grid>
+      </>
     )
-    }
+  }
 }
