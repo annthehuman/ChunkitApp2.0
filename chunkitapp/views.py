@@ -105,8 +105,9 @@ def unpackArchive(experement_name):
 			print('folder', dirs)
 			for dir in dirs:
 				if dir != '__MACOSX':
-					p = os.walk(directory_to_extract_to+dir)
-					pa, di, fi = next(test)
+					p = os.walk(os.path.join(directory_to_extract_to,dir))
+					print(os.path.join(directory_to_extract_to,dir))
+					pa, di, fi = next(p)
 					for file in fi:
 						print(file)
 						shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
@@ -128,8 +129,8 @@ def unpackArchive(experement_name):
 			print('folder', dirs)
 			for dir in dirs:
 				if dir != '__MACOSX':
-					p = os.walk(directory_to_extract_to+dir)
-					pa, di, fi = next(test)
+					p = os.walk(os.path.join(directory_to_extract_to,dir))
+					pa, di, fi = next(p)
 					for file in fi:
 						print(file)
 						shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
@@ -402,8 +403,8 @@ def load_draft_to_test(request, draft_experement_name):
 				print('folder', dirs)
 				for dir in dirs:
 					if dir != '__MACOSX':
-						p = os.walk(directory_to_extract_to+dir)
-						pa, di, fi = next(test)
+						p = os.walk(os.path.join(directory_to_extract_to,dir))
+						pa, di, fi = next(p)
 						for file in fi:
 							print(file)
 							shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
@@ -424,8 +425,8 @@ def load_draft_to_test(request, draft_experement_name):
 				print('folder', dirs)
 				for dir in dirs:
 					if dir != '__MACOSX':
-						p = os.walk(directory_to_extract_to+dir)
-						pa, di, fi = next(test)
+						p = os.walk(os.path.join(directory_to_extract_to,dir))
+						pa, di, fi = next(p)
 						for file in fi:
 							print(file)
 							shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
