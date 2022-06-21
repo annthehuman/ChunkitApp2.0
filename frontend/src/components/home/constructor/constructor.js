@@ -472,8 +472,8 @@ export default class Constructor extends Component  {
                     </Link>
                     <Link to='/'>
                     <CustomButton 
-                        onClick={() => {console.log('log out', this.props.history);document.cookie = 'access_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                        this.setState({autorized: false})}} 
+                        onClick={() => {document.cookie = 'access_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                        this.setState({autorized: false}); window.location.reload()}} 
                         text='Log out' 
                         theme='black'
                         size='small'/>
@@ -509,24 +509,24 @@ export default class Constructor extends Component  {
                         appendForm={this.appendForm}  toggle={this.toggle} active={this.state.activeTab} />
             </TabPanel>
             <TabPanel value="3">
-                <EditorPage editorName='consent' header='Informed consent page' label='Text of your informed consent.'
-                        textSample='<p>This experimental session is part of the researchproject carried out at <strong>[insert your university name]</strong>.
-                        By agreeing, you certify your willingness to participate in the study and give us your consent to use the responses for research purposes (preprocessing, analysis, publication, archiving and sharing).
+                <EditorPage editorName='consent' header='Informed consent page' label='Inset the text of your informed consent form here.'
+                        textSample='<p>This experimental session is part of the research project carried out at <strong>[insert your university name]</strong>.
+                        By agreeing, you certify your willingness to participate in the study and give us your consent to use the responses for research purposes (preprocessing, analysis, publication, archiving, and sharing).
                         All your responses will be recorded automatically. Your participation in the study will be completely anonymous.
                         </p>
-                        <p>The duration of the experiment is approximately <strong>[insert amount of minutes]</strong> minutes with a possibility to take short breaks (2-3 minutes). 
+                        <p>The duration of the experiment is approximately <strong>[insert amount of minutes]</strong> minutes with a possibility to take short breaks (2-3 minutes).
                         However, please make sure to complete the experiment within <strong>[insert amount of time]</strong>.</p>
                         <p> If you exceed this time limit, you will not be compensated.</p>
                         <p>Please make sure that you are closely following task instructions. If you are not, unfortunately, we will not be able to compensate for your time.</p>'
                         appendForm={this.appendForm}  toggle={this.toggle} active={this.state.activeTab} />
             </TabPanel>
             <TabPanel value="4">
-                    <EditorPage editorName='outline' header='Session outline page' label='Text that will detail the experimental procedure.'
+                    <EditorPage editorName='outline' header='Session outline page' label='Insert the text explaining the outline of your experiment to participants here.'
                         textSample='<div>This experiment session consists of several tasks listed below. It is essential that you complete each of them. Once you finish one task, you will be automatically guided to the next one. The approximate duration of each task is mentioned in parentheses. The main task takes the longest. We recommend that during this task you take a short break.</div>
                         <ul>
-                          <li>Background questionnaire (~ <strong>[insert amount of minutes]</strong> min.)</li>
-                          <li>Main task (~ <strong>[insert amount of minutes]</strong> min. plus breaks)</li>
-                          <li>Feedback questionnaire (~ <strong>[insert amount of minutes]</strong> min.)</li>
+                          <li>Background questionnaire (~ <strong>[insert duration here]</strong> min.)</li>
+                          <li>Main task (~ <strong>[insert duration here]</strong> min. plus breaks)</li>
+                          <li>Feedback questionnaire (~ <strong>[insert duration here]</strong> min.)</li>
                         </ul>
                         <div>We kindly remind you to plug in your headphones.</div>'
                         appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />

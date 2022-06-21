@@ -52,7 +52,8 @@ export default class CustomButton extends Component {
                     name={this.props.name}
                     startIcon={this.props.startIcon}
                     endIcon={this.props.endIcon}
-                    id={this.props.id}>
+                    id={this.props.id}
+                    onMouseOver={this.props.onMouseOver}>
                       {this.props.text}
                       {this.props.children}
       </StyledButton>

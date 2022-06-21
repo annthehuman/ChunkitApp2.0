@@ -28,7 +28,6 @@ urlpatterns = [
     path('feedback_results/<name>', views.feedbackRES, name='feedback_results'),
     path('sentence_results/<name>', views.sentenceRES, name='sentence_results'),
     path('levi/<name>', views.levi, name='levi'),
-    path('experement_data/', views.experement_data, name='experement_data'),
     path('save_draft/', views.save_draft, name='save_draft'),
     path('load_draft/', views.load_draft, name='load_draft'),
     path('drafts_list/', views.drafts_list, name='drafts_list'),

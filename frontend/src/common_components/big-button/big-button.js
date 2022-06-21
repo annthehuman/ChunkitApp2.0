@@ -21,7 +21,8 @@ const StyledBigButton = styled(Button)(({ theme, side }) => (
     'Roboto', 'sans-serif'
   ].join(','),
   '&:hover': {
-    backgroundColor: theme == 'blue' ? '#2D2D2D': '#6083FF',
+    backgroundColor: '#2D2D2D',
+    color: '#FFFFFF',
   },
   '&:active': {
   },
