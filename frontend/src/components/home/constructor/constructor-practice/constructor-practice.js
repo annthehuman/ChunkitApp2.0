@@ -38,6 +38,7 @@ class Practice extends Component {
           practiceTranscripts: "Upload transcripts table",
           practiceAudio: "Upload audio zip",
           anchorElAudio: null,
+          anchorElInst: null
         }
         this.onLoad = this.onLoad.bind(this)
         this.onLoadAudio = this.onLoadAudio.bind(this)
@@ -159,7 +160,12 @@ class Practice extends Component {
             </p>
             <ul>
               <li>Zip of audio extracts in any format.{'  '}            
-              <CustomButton onClick={(event) => this.setState({anchorElAudio: event.currentTarget})} text='i' theme='gray' size='icon' style={{marginBottom:'5px'}}/>
+              <CustomButton onClick={(event) => this.setState({anchorElAudio: event.currentTarget})}
+                            onMouseOver={(event) => this.setState({anchorElAudio: event.currentTarget})}
+                            text='i' 
+                            theme='gray' 
+                            size='icon' 
+                            style={{marginBottom:'5px'}}/>
               <Popover
                 id='popover'
                 className={classes.root}
@@ -170,28 +176,33 @@ class Practice extends Component {
                   vertical: 'bottom',
                   horizontal: 'left'
                 }}
-              ><CustomBox theme='white'>
+              ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}}  theme='white'>
                 <Typography sx={{fontSize: '20px'}}>You should choose the sound format according to the purpose of your experiment. The MP3 format is compact but slightly degrades the signal. Thus, it will take no time to buffer and is well suited for experiments that do not require acoustical precision. For those that do, it is possible to upload the audio in WAV format which preserves the high sound quality but might take a while to load.</Typography>
               </CustomBox>
               </Popover></li>
               
               <li>The instructions for the task.{'  '}            
-              <CustomButton onClick={(event) => this.setState({anchorElAudio: event.currentTarget})} text='i' theme='gray' size='icon' style={{marginBottom:'5px'}}/>
+              <CustomButton onClick={(event) => this.setState({anchorElInst: event.currentTarget})} 
+                            onMouseOver={(event) => this.setState({anchorElInst: event.currentTarget})}
+                            text='i' 
+                            theme='gray' 
+                            size='icon' 
+                            style={{marginBottom:'5px'}}/>
               <Popover
                 id='popover'
                 className={classes.root}
-                open={Boolean(this.state.anchorElAudio)}
-                anchorEl={this.state.anchorElAudio}
-                onClose={() => this.setState({anchorElAudio: null})}
+                open={Boolean(this.state.anchorElInst)}
+                anchorEl={this.state.anchorElInst}
+                onClose={() => this.setState({anchorElInst: null})}
                 anchorOrigin={{
                   vertical: 'bottom',
                   horizontal: 'left'
                 }}
-              ><CustomBox theme='white'>
+              ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px', width: '300px'}} theme='white'>
                 <Typography sx={{fontSize: '20px'}}>What would you like your participants to do?</Typography>
               </CustomBox>
               </Popover></li>
-              <li>Transcripts for the extracts in a table format according to the following example:</li>
+              <li>Transcripts for the extracts in a table format according to the following below.</li>
             </ul>
             </div>
       <FormGroup>

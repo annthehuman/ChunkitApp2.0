@@ -14,7 +14,16 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import styled from 'styled-components';
+import { Popover } from '@mui/material';
+import { withStyles } from '@mui/styles';
 import CustomHeader from '../../../../common_components/header';
+
+const useStyles = theme => ({
+  root: { 
+    "& .MuiPopover-paper": {
+      borderRadius: '30px',
+   },}
+});
 
 const StyledAccordion = styled(Accordion)(() => (
   {
@@ -27,7 +36,7 @@ const StyledAccordionSummary = styled(AccordionSummary)(() => (
 }));
 
 
-export default class Inputs extends Component {
+class Inputs extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,6 +46,8 @@ export default class Inputs extends Component {
       shuffle: false,
       linkToProlific: '',
       accordionExpanded: false,
+      anchorElShuffle: null,
+      anchorElName: null,
       pagesOrder: {'Hello': 0, 'Consent': 1, 'Outline': 2, 'Background': 3, 'Practice': 4, 
                    'Experiment': 5, 'Imitation': 6, 'Feedback': 7, 'Goodbye': 8}
     }
@@ -179,6 +190,7 @@ export default class Inputs extends Component {
   }
   render() {
     let store = require('store')
+    const { classes } = this.props;
     return (
       <>
       <CustomHeader text='Basic information'/>
@@ -214,7 +226,27 @@ export default class Inputs extends Component {
             required
             inputProps={{style: {fontSize: '20px'}}}
             value={store.get('nameExperementForParticipants') ? store.get('nameExperementForParticipants') : ''}
-            />
+            />{'   '}
+            <CustomButton onClick={(event) => this.setState({anchorElName: event.currentTarget})} 
+                                onMouseOver={(event) => this.setState({anchorElName: event.currentTarget})}
+                                text='i' 
+                                theme='gray' 
+                                size='icon' 
+                                style={{marginBottom:'5px', marginLeft: '10px'}}/>
+                  <Popover
+                    className={classes.root}
+                    id='popover'
+                    open={Boolean(this.state.anchorElName)}
+                    anchorEl={this.state.anchorElName}
+                    onClose={() => this.setState({anchorElName: null})}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left'
+                    }}
+                  ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}} theme='white'>
+                    <Typography sx={{fontSize: '20px'}}>You can let your participants see the name of the experiment as something innocent without giving away the actual purpose</Typography>
+                  </CustomBox>
+                  </Popover>
           </Grid>
         <FormGroup style={{marginTop: '15px'}}>
           <FormControlLabel control={<Checkbox 
@@ -229,7 +261,10 @@ export default class Inputs extends Component {
                                         />} 
                             label={<Typography style={{fontSize: '20px'}}>Shuffle extracts</Typography>} />
           {this.state.shuffle ?
-              <>
+              <Grid container
+              justifyContent="flex-start"
+              alignItems="center"
+              direction='row'>
                 <TextField 
                   name="shuffleExtractsPractice" 
                   id="shuffleExtractsPractice" 
@@ -241,7 +276,27 @@ export default class Inputs extends Component {
                   required
                   inputProps={{style: {fontSize: '20px'}}}
                   />
-              </> :
+                  <CustomButton onClick={(event) => this.setState({anchorElShuffle: event.currentTarget})} 
+                                onMouseOver={(event) => this.setState({anchorElShuffle: event.currentTarget})}
+                                text='i' 
+                                theme='gray' 
+                                size='icon' 
+                                style={{marginBottom:'5px', marginLeft: '10px'}}/>
+                  <Popover
+                    className={classes.root}
+                    id='popover'
+                    open={Boolean(this.state.anchorElShuffle)}
+                    anchorEl={this.state.anchorElShuffle}
+                    onClose={() => this.setState({anchorElShuffle: null})}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left'
+                    }}
+                  ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}} theme='white'>
+                    <Typography sx={{fontSize: '20px'}}>If you want to present the extracts in random order, you need to indicate how many extracts will be kept in practice. Practice extracts are just played, the data for them is not recorded.</Typography>
+                  </CustomBox>
+                  </Popover>
+              </Grid> :
               null
             }
         <FormControlLabel control={<Checkbox 
@@ -251,7 +306,12 @@ export default class Inputs extends Component {
                             onClick={(e) => this.onCheck(e)}
                             checked={store.get('UseQuestions')}
                             />} 
-                label={<Typography style={{fontSize: '20px'}}>Comperhension questions</Typography>} />
+                label={<Typography style={{fontSize: '20px'}}>Include comprehension questions after each extract
+                </Typography>} />
+        <Grid container
+              justifyContent="flex-start"
+              alignItems="center"
+              direction='row'>
         <FormControlLabel control={<Checkbox 
                             type='checkbox'
                             id='UseProlific' 
@@ -262,7 +322,28 @@ export default class Inputs extends Component {
                               this.setState({ useProlific: true, linkToProlific: `http://${window.location.hostname}/experiment/${this.state.nameExperiment}`  })}}
                             checked={store.get('UseProlific')}
                             />} 
-                label={<Typography style={{fontSize: '20px'}}>Integration with Prolific</Typography>} />
+                label={<Typography style={{fontSize: '20px'}}>Integrate the experiment with Prolific</Typography>} />
+        <CustomButton onClick={(event) => this.setState({anchorElProlific: event.currentTarget})} 
+                                onMouseOver={(event) => this.setState({anchorElProlific: event.currentTarget})}
+                                text='i' 
+                                theme='gray' 
+                                size='icon' 
+                                style={{marginBottom:'9px'}}/>
+        <Popover
+          className={classes.root}
+          id='popover'
+          open={Boolean(this.state.anchorElProlific)}
+          anchorEl={this.state.anchorElProlific}
+          onClose={() => this.setState({anchorElProlific: null})}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+        ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}} theme='white'>
+          <Typography sx={{fontSize: '20px'}}>If you want, you can host this study on Prolific for easier data collection. <a href='https://researcher-help.prolific.co/hc/en-gb/articles/360009220993' target="_blank">More info here</a></Typography>
+        </CustomBox>
+        </Popover>
+        </Grid>
         {this.state.useProlific ?
               <>
               <Grid container
@@ -309,7 +390,7 @@ export default class Inputs extends Component {
           id="panel1a-header"
           style={{backgroundColor: '#F8F8F8'}}
         >
-          <Typography style={{fontSize: '20px'}}>Check parts of experiment you need:</Typography>
+          <Typography style={{fontSize: '20px'}}>What would you like to include in your experiment? Check here.</Typography>
         </AccordionSummary>
         <AccordionDetails>
         <FormControlLabel control={<Checkbox 
@@ -319,7 +400,7 @@ export default class Inputs extends Component {
                             onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
                             checked={Boolean(store.get('pageNeeded_Hello'))}
                             />} 
-                label={<Typography style={{fontSize: '20px'}}>Hello page</Typography>} />
+                label={<Typography style={{fontSize: '20px'}}>Welcome to participants</Typography>} />
         <FormControlLabel control={<Checkbox 
                     type='checkbox'
                     id='pageNeeded_Consent' 
@@ -327,7 +408,7 @@ export default class Inputs extends Component {
                     onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
                     checked={Boolean(store.get('pageNeeded_Consent'))}
                     />} 
-                 label={<Typography style={{fontSize: '20px'}}>Consent page</Typography>} />
+                 label={<Typography style={{fontSize: '20px'}}>Informed consent</Typography>} />
         <FormControlLabel control={<Checkbox 
                             type='checkbox'
                             id='pageNeeded_Outline' 
@@ -335,7 +416,7 @@ export default class Inputs extends Component {
                             onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
                             checked={Boolean(store.get('pageNeeded_Outline'))}
                             />} 
-                label={<Typography style={{fontSize: '20px'}}>Outline page</Typography>} />
+                label={<Typography style={{fontSize: '20px'}}>Outline for the experiment</Typography>} />
         <FormControlLabel control={<Checkbox 
                     type='checkbox'
                     id='pageNeeded_Background' 
@@ -343,7 +424,7 @@ export default class Inputs extends Component {
                     onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
                     checked={Boolean(store.get('pageNeeded_Background'))}
                     />} 
-                 label={<Typography style={{fontSize: '20px'}}>Background questionarrie page</Typography>}/>
+                 label={<Typography style={{fontSize: '20px'}}>Background questionnaire</Typography>}/>
         <FormControlLabel control={<Checkbox 
                             type='checkbox'
                             id='pageNeeded_Practice' 
@@ -351,7 +432,7 @@ export default class Inputs extends Component {
                             onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
                             checked={Boolean(store.get('pageNeeded_Practice'))}
                             />} 
-                label={<Typography style={{fontSize: '20px'}}>Practice page</Typography>} />
+                label={<Typography style={{fontSize: '20px'}}>Practice session</Typography>} />
         <FormControlLabel control={<Checkbox 
                     type='checkbox'
                     id='pageNeeded_Experiment' 
@@ -359,7 +440,7 @@ export default class Inputs extends Component {
                     onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
                     checked={Boolean(store.get('pageNeeded_Experiment'))}
                     />} 
-                 label={<Typography style={{fontSize: '20px'}}>Experiment page</Typography>} />
+                 label={<Typography style={{fontSize: '20px'}}>Experimental task</Typography>} />
         <FormControlLabel control={<Checkbox 
                             type='checkbox'
                             id='pageNeeded_Imitation' 
@@ -367,7 +448,7 @@ export default class Inputs extends Component {
                             onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
                             checked={Boolean(store.get('pageNeeded_Imitation'))}
                             />} 
-                label={<Typography style={{fontSize: '20px'}}>Elicited Imitation task</Typography>} />
+                label={<Typography style={{fontSize: '20px'}}>Elicited imitation task (EIT)</Typography>} />
         <FormControlLabel control={<Checkbox 
                     type='checkbox'
                     id='pageNeeded_Feedback' 
@@ -375,7 +456,7 @@ export default class Inputs extends Component {
                     onClick={(e) => {this.onCheckPages(e); this.props.allInputsAReHere();}}
                     checked={Boolean(store.get('pageNeeded_Feedback'))}
                     />} 
-                 label={<Typography style={{fontSize: '20px'}}>Feedback questionarrie page</Typography>} />
+                 label={<Typography style={{fontSize: '20px'}}>Feedback questionnaire</Typography>} />
         <FormControlLabel control={<Checkbox 
                     type='checkbox'
                     id='pageNeeded_Goodbye' 
@@ -392,3 +473,4 @@ export default class Inputs extends Component {
     )
   }
 }
+export default withStyles(useStyles)(Inputs)

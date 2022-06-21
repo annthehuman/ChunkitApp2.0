@@ -153,8 +153,10 @@ export default class Background extends Component {
     let store = require('store');
     return(
       <>
-        <CustomHeader text='Background questions'/>
-        <Typography sx={{fontSize: '20px', marginTop: '10px', marginBottom: '10px'}}>Please mark the questions that will be on the questionnaire or add your own.</Typography> 
+        <CustomHeader text='Background questionnaire'/>
+        <Typography sx={{fontSize: '20px', marginTop: '10px', marginBottom: '10px'}}>
+          Check the questions that you want to include in the questionnaire or add your own.
+        </Typography> 
         <div id='background'>
         <Grid container
         direction='row'
@@ -408,7 +410,7 @@ export default class Background extends Component {
             value={store.get(`BackgroundNew_${item.question_type}_Qestion${item.id}`)}
             size="small" 
             sx={{ width:'700px', marginRight: '90px'}}
-            label={`Insert text of the ${type} question`}
+            label={"Insert the question"}
             variant="outlined"
             type='text'
             onChange={this.onChange}

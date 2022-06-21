@@ -1,19 +1,25 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "reactstrap";
+import { Stack, Typography } from "@mui/material";
+import CustomHeader from "../../../common_components/header";
+import CustomButton from "../../../common_components/button";
 
 
 class Authorized extends Component{
     render() {
         return (
             <div style={{'width': '70%', 'margin': 'auto'}}>
-
-                You are authourized! 
-                <br/>
-                <br/>
-                <Link to='/login/'>
-                    Now you can login
-                </Link>
+                A!
+            {/* <Stack direction='column' spacing={2} mt={'35px'} alignItems="center">
+                <Logo/>
+                <CustomHeader text='ChunkitApp 2.0'/>
+                <Stack direction='column' spacing={2} alignItems="center">
+                    <Typography>You are authourized!</Typography>
+                    <Link to='/login/'>
+                    <CustomButton theme='blue' text='Now you can login'/>
+                    </Link>
+                </Stack>
+                </Stack> */}
             </div>
         )
     }

@@ -111,8 +111,8 @@ toggle (event, tab) {
                     </Link>
                     <Link to='/'>
                     <CustomButton 
-                        onClick={() => {console.log('log out', this.props.history);document.cookie = 'access_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                        this.setState({autorized: false})}} 
+                        onClick={() => {document.cookie = 'access_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                        this.setState({autorized: false});window.location.reload()}} 
                         text='Log out' 
                         theme='black'
                         size='small'/>

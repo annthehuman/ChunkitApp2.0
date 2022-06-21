@@ -102,7 +102,12 @@ class EditorPage extends Component {
                                                     />}
                                         label={<Typography style={{fontSize: '20px'}}>Use sample</Typography>}
                                         />
-                      <CustomButton onClick={(event) => this.setState({anchorEl: event.currentTarget})} text='i' theme='gray' size='icon' style={{marginBottom:'5px'}}/>
+                      <CustomButton onClick={(event) => this.setState({anchorEl: event.currentTarget})} 
+                                    onMouseOver={(event) => this.setState({anchorEl: event.currentTarget})}
+                                    text='i' 
+                                    theme='gray' 
+                                    size='icon' 
+                                    style={{marginBottom:'5px'}}/>
                       <Popover
                         className={classes.root}
                         id='popover'
@@ -113,7 +118,7 @@ class EditorPage extends Component {
                           vertical: 'bottom',
                           horizontal: 'left'
                         }}
-                      ><CustomBox theme='white' header='Text sample'>
+                      ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}} theme='white' header='Text sample'>
                         <Typography sx={{fontSize: '20px'}} dangerouslySetInnerHTML={{__html: this.props.textSample}}></Typography>
                       </CustomBox>
                       </Popover>
