@@ -245,17 +245,17 @@ export default class Draft extends Component {
         // Do something with the result
         let rows = []
         let i = 0
-        result.map(({nameExperementForParticipants, ImitationTask, UseQuestions, UseProlific}) => {
-          console.log('links_set', links_set)
+        result.map(({nameExperementForParticipants, pagesNeeded, UseQuestions, UseProlific}) => {
+          console.log('nameExperementForParticipants, ImitationTask, UseQuestions, UseProlifi', nameExperementForParticipants, pagesNeeded.indexOf('Imitation') != -1, UseQuestions, UseProlific)
           let experiment_link = Array.from(links_set).filter(link => link.split('/')[link.split('/').length-1].indexOf(nameExperementForParticipants) != -1)
           experiment_link = experiment_link[experiment_link.length - 1]
           i += 1
-          ImitationTask = ImitationTask ? 'Yes' : 'No'
+          let ImitationTask = pagesNeeded.indexOf('Imitation') != -1 ? 'Yes' : 'No'
           UseQuestions = UseQuestions ? 'Yes' : 'No'
           UseProlific = UseProlific ? 'Yes' : 'No'
           let stop_value = experiment_link && experiment_link.length > 0 ? nameExperementForParticipants : undefined
           // console.log('link',experiment_link.length > 0, stop_value)
-          rows.push({id: i, experimentName: nameExperementForParticipants, imitationTask: ImitationTask, 
+          rows.push({id: i, experimentName: String(nameExperementForParticipants).replace(/_/g, ' '), imitationTask: ImitationTask, 
             questions: UseQuestions, prolific: UseProlific, link: experiment_link,
              load: nameExperementForParticipants, stop: stop_value, delete:nameExperementForParticipants})})
         this.setState({rows: rows})

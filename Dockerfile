@@ -23,7 +23,7 @@ RUN python3 -m venv /py && \
     /py/bin/python3 manage.py makemigrations && \
     /py/bin/python3 manage.py migrate && \
     chown -R app:app /vol/web/db.sqlite3 && \
-    chmod -R 755 /vol && \
+    chmod -R 777 /vol && \
     chmod -R +x /scripts
 
 ENV PATH="/scripts:/py/bin:$PATH"

@@ -225,7 +225,7 @@ class Inputs extends Component {
             type='text'
             required
             inputProps={{style: {fontSize: '20px'}}}
-            value={store.get('nameExperementForParticipants') ? store.get('nameExperementForParticipants') : ''}
+            value={store.get('nameExperementForParticipants') ? String(store.get('nameExperementForParticipants')).replace(/_/g, ' ') : ''}
             />{'   '}
             <CustomButton onClick={(event) => this.setState({anchorElName: event.currentTarget})} 
                                 onMouseOver={(event) => this.setState({anchorElName: event.currentTarget})}

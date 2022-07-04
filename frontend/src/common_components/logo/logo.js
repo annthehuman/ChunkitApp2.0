@@ -17,7 +17,7 @@ export default class Logo extends Component {
           width: '129px',
         }}
         alt="University of Helsinki logo"
-        src="../../../static/static/logo/image 1.png"
+        src="../../../static/static/logo/Logo.svg"
       />
       </Link>
     );}

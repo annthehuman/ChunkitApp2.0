@@ -62,7 +62,7 @@ export default class Feedback extends Component {
           checks = papa.querySelectorAll('input[type="checkbox"]'),
           feedbackExpample = store.get('feedbackExample'),
           feedbackAddQ = store.get('feedbackAddQ');
-    if (feedbackExpample){
+    if (!store.get('addQFeedback') && feedbackExpample){
     let item = this.state.additional_quesion_list
     Object.keys(feedbackExpample).forEach(function (key){
       if (feedbackExpample[key][0] == 'true') {
@@ -85,7 +85,6 @@ export default class Feedback extends Component {
     }
     checks.forEach(check => {
         if (store.get(check.name)) {
-          console.log((store.get(check.name)))
           check.checked = store.get(check.name)
         }
     })
@@ -116,16 +115,15 @@ export default class Feedback extends Component {
   onChange(e) {
     let store = require('store');
     const qName = e.target.name
-    console.log('target'+e.target.name)
     store.set(qName, e.target.value)
     this.props.appendForm(qName, e.target.value)
-    let addedQ = store.get('feedbackAddQ')
+    let addedQ = store.get('feedbackAddQ') ? store.get('feedbackAddQ') : new Object()
+    console.log('feedbackAddQ addedQ', addedQ)
     addedQ[qName] = [e.target.value]
     store.set('feedbackAddQ', addedQ)
   }
   addQuestion(type){
     let store = require('store');
-    
     const item = this.state.additional_quesion_list,
           id = this.state.additional_quesion_id+1,
           question_type = type,
@@ -137,11 +135,10 @@ export default class Feedback extends Component {
     this.props.appendForm(`useFeedbackNew_${question_type}_Qestion${id}`, true)
     this.setState({additional_quesion_list: item,
                     additional_quesion_id: id}, function(){
-                      console.log(this.state.additional_quesion_id)
                       store.set('addQFeedback', this.state.additional_quesion_list)
                     })
     
-    console.log(this.state.additional_quesion_list)
+    // console.log('addQFeedback', this.state.additional_quesion_list)
   }
 //   componentDidUpdate() {
 //     this.onCheck()

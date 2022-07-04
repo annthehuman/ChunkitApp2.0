@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html>
 <head>
   <meta charset="utf-8">
@@ -8,13 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/png">
 </head>
 <body>
 <div id="root">
     <!-- React will load here -->
 </div>
 </body>
-{% load static %}
 
 <script src='/static/static/frontend/main.js'></script>
 </html>

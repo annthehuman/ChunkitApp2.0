@@ -52,6 +52,9 @@ export default class TestImitation extends Component {
         enableInput(e) {
             const input = document.getElementById(`input_form_${e.target.id.split('_')[2]}`)
             input.disabled = false
+            input.autoFocus = true
+            input.classList.remove("Mui-disabled");
+            input.parentElement.classList.remove("Mui-disabled");
         }
         startImitation() {
             const instruction = document.getElementById('sentence_instructions'),
@@ -66,7 +69,6 @@ export default class TestImitation extends Component {
                 audio.play()
                 let newPlayed = this.state.played
                 newPlayed.push(e.target.name)
-                console.log(newPlayed)
                 this.setState({played: newPlayed})
             } else {
                 if (!this.state.played.includes(e.target.name)) {
@@ -74,9 +76,7 @@ export default class TestImitation extends Component {
                 audio.play()
                 let newPlayed = this.state.played
                 newPlayed.push(e.target.name)
-                console.log(newPlayed)
                 this.setState({played: newPlayed})
-                console.log(this.state.played)
             }
             }
         }

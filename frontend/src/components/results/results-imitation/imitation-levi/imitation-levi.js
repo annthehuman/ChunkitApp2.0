@@ -3,6 +3,7 @@ import { Table, Button } from 'reactstrap';
 import { Link } from "react-router-dom";
 import {  Spinner } from 'reactstrap';
 import Papa from 'papaparse'
+import CustomButton from '../../../../common_components/button';
 
 export default class ImitationLevi extends Component {
   constructor(props) {
@@ -37,7 +38,7 @@ export default class ImitationLevi extends Component {
       return result
     }).then(() => {
       store.set('levi', 'loaded')
-      fetch(`/media/Experement/${this.props.name}/sentence_distance.csv`)
+      fetch(`/static/media/Experement/${this.props.name}/sentence_distance.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))
       .then(result => {
@@ -63,7 +64,7 @@ export default class ImitationLevi extends Component {
       }).catch(error => {
     console.log(error)
     }) : 
-    fetch(`/media/Experement/${this.props.name}/sentence_distance.csv`)
+    fetch(`/static/media/Experement/${this.props.name}/sentence_distance.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))
       .then(result => {
@@ -102,11 +103,10 @@ export default class ImitationLevi extends Component {
     let i = 0
     return(
     <>
-    <Link to={`/media/Experement/${this.props.name}/sentence_distance.csv`} target="_blank" download>
-      <Button color="info" outline>Download Table</Button>
-      <br/>
-      <br/>
+    <Link to={`/static/media/Experement/${this.props.name}/sentence_distance.csv`} target="_blank" download>
+      <CustomButton theme='blue' size='small' text="Download Table"/>
     </Link>
+
     {this.state.rows.length != 0 ? 
      (<Table striped>
      <thead>

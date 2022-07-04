@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import {  TextField, Typography } from "@mui/material";
 import CustomButton from "../../../common_components/button";
 import CustomHeader from "../../../common_components/header";
-import { Stack } from "@mui/material";
+import { Stack, InputAdornment, IconButton } from "@mui/material";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Visibility from "@mui/icons-material/Visibility";
 
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 class Signup extends Component{
     constructor(props){
         super(props);
@@ -15,17 +16,39 @@ class Signup extends Component{
             password: "",
             email:"",
             confirmPassword:"",
-            emailSended: false
+            emailSended: false,
+            showPassword: false,
+            passValid: true,
+            errorSingup: []
         };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleClickShowPassword = this.handleClickShowPassword.bind(this);
+        this.handleClickShowConfirmPassword = this.handleClickShowConfirmPassword.bind(this);
+        this.handleMouseDownPassword = this.handleMouseDownPassword.bind(this);
     }
 
     handleChange(event) {
         this.setState({[event.target.name]: event.target.value});
     }
 
+    handleClickShowPassword(){
+        this.setState({
+          showPassword: !this.state.showPassword,
+        });
+    };
+
+    handleClickShowConfirmPassword(){
+        this.setState({
+          showConfirmPassword: !this.state.showConfirmPassword,
+        });
+    };
+    
+    handleMouseDownPassword(event){
+        event.preventDefault();
+    };
+    
     handleSubmit(event) {
         console.log('A username and password was submitted: ' + this.state.username + " " + 
                 this.state.password + " " + this.state.email + " " + this.state.confirmPassword);
@@ -42,20 +65,13 @@ class Signup extends Component{
                 email: this.state.email
             })
             }).then(data => {
-                // data.json())
-            // .then(data =>{
-            //     console.log(data)
-                if (!data.ok){
-                    console.log(data.text())
-                    alert(data.json())              
-                    throw Error(data.json());
-                } else {
-                const result =  data.json() 
-                return result}
-            }).then(result => {
-                console.log('такen', result)
-                // localStorage.setItem('access_token', result.auth_token)
-                // document.cookie = `access_token=${result.auth_token}`
+                 if (!data.ok){
+                    data.json()
+                    .then(data =>{
+                        console.log(data)
+                     this.setState({errorSingup: data});})
+                     throw Error(data.status);
+                 }
             }).then(() => {
                 this.setState({emailSended: true})
             }).catch((data) => {
@@ -90,28 +106,56 @@ class Signup extends Component{
                     id="examplePassword" 
                     sx={{ width:'244px' }}
                     label="password" 
-                    variant="outlined" 
-                    type='password'
+                    variant="outlined"
                     value={this.state.password}
                     onChange={this.handleChange}
+                    type={this.state.showPassword ? 'text' : 'password'}
+                    InputProps={{endAdornment:
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={this.handleClickShowPassword}
+                            onMouseDown={this.handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }}
                     />
                 <TextField 
-                    error = {
-                        this.state.password != this.state.confirmPassword ? true : false
-                    }
+                    error = {!this.state.passValid}
                     name="confirmPassword" 
                     id="confirmPassword" 
                     sx={{ width:'244px' }}
                     label="confirm password" 
-                    variant="outlined" 
-                    type='password'
+                    variant="outlined"
                     value={this.state.confirmPassword}
                     onChange={this.handleChange}
+                    onBlur={() => this.setState({passValid: this.state.password == this.state.confirmPassword})}
+                    type={this.state.showConfirmPassword ? 'text' : 'password'}
+                    InputProps={{endAdornment:
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={this.handleClickShowConfirmPassword}
+                            onMouseDown={this.handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {this.state.showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }}
                     />
+                {
+                Object.values(this.state.errorSingup).map(values => {
+                return(
+                <Typography sx={{color: '#D21502'}}>{values}
+                </Typography>)
+                })}
                 <CustomButton theme='black' text='Sign Up' type="submit" value="Submit" />
                 </Stack>
                 </form>
-                
                 
             </>
             :

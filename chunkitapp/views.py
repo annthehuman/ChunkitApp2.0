@@ -89,8 +89,9 @@ def unpackArchive(experement_name):
                                         draft_data_values.get(
                                             'uploadPracticeAudio'))
         directory_to_extract_to = os.path.join(settings.MEDIA_ROOT,
-                                               '/Practice/',
+                                               'Practice',
                                                experement_name)
+
         if list(os.walk(directory_to_extract_to)):
             shutil.rmtree(directory_to_extract_to)
 
@@ -123,7 +124,7 @@ def unpackArchive(experement_name):
                                         draft_data_values.get(
                                             'uploadExperementAudio'))
         directory_to_extract_to = os.path.join(settings.MEDIA_ROOT,
-                                               '/Experement/', experement_name)
+                                               'Experement', experement_name)
         if list(os.walk(directory_to_extract_to)):
             shutil.rmtree(directory_to_extract_to)
 
@@ -804,7 +805,10 @@ def results(request, name):
                             z += 1
         df = pd.DataFrame(table, index=row_names)
         df.columns = [list(map(lambda x: x[:5], session_ids)), session_time]
-        df.to_csv(settings.MEDIA_ROOT + '/Experement/'+experiment_name+'/results.csv', sep=',', encoding='utf-8')
+        outdir = settings.MEDIA_ROOT +'/Experement/'+experiment_name
+        if not os.path.exists(outdir):
+            os.mkdir(outdir)
+        df.to_csv(os.path.join(outdir, 'results.csv'), sep=',', encoding='utf-8')
         
 
         useQ = list(draft_data.objects.all().values_list('UseQuestions', flat = True))[row_number]
@@ -816,7 +820,7 @@ def results(request, name):
                 print('inplace', df_raw)
             if not useP:
                 df_raw = df_raw.drop(labels=('prolific_id'), axis=1)
-        df_raw.to_csv(settings.MEDIA_ROOT + '/Experement/'+experiment_name+'/results_raw.csv', sep=',', encoding='utf-8')
+        df_raw.to_csv(os.path.join(outdir, 'results_raw.csv'), sep=',', encoding='utf-8')
         return HttpResponse('Success!')
 
 def backgroundRES(request, name):
@@ -856,7 +860,10 @@ def backgroundRES(request, name):
                     background_one_result[col_name] = col_data[index]
             background_table.append(background_one_result)
         df = pd.DataFrame(background_table)
-        df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/background.csv', sep=',', encoding='utf-8')
+        outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+        if not os.path.exists(outdir):
+            os.mkdir(outdir)
+        df.to_csv(os.path.join(outdir, 'background.csv'), sep=',', encoding='utf-8')
     return HttpResponse("ok!")
 
 def feedbackRES(request, name):
@@ -897,14 +904,17 @@ def feedbackRES(request, name):
             # print('col_name', col_name, index)
         feedback_table.append(feedback_one_result)
     df = pd.DataFrame(feedback_table)
-    df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/feedback.csv', sep=',', encoding='utf-8')
+    outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    df.to_csv(os.path.join(outdir,'feedback.csv'), sep=',', encoding='utf-8')
     return HttpResponse("Ok!")
 
 
 
 def sentenceRES(request, name):
     current_experiment_name = name.split('=')[1]
-    print(name)
+    print('sentence', name)
     name_set = list(s.objects.all().values_list('experiment_name', flat = True))
     names_dict = list(filter(lambda x: x[0]  == current_experiment_name,list(zip(name_set, list(range(len(name_set)))))))
     sentence_table = {}
@@ -939,10 +949,13 @@ def sentenceRES(request, name):
     #             col_data = col_data[:5]
     #         sentence_one_result[col_name] = col_data
     #     sentence_table.append(sentence_one_result)
-    # print(sentence_table)
 
     # df = pd.DataFrame(sentence_table)
-    df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/sentence.csv', sep=',', encoding='utf-8')
+    outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    print('sentence', outdir, sentence_table)
+    df.to_csv(os.path.join(outdir,'sentence.csv'), sep=',', encoding='utf-8')
     return HttpResponse("Ok!")
 
 
@@ -966,7 +979,10 @@ def levi(request, name):
             sentence_distance.setdefault(key[:5], []).append(distance(i, sentencies_goal[index]))
     print('sentence_distance', sentence_distance)
     df = pd.DataFrame.from_dict(sentence_distance, orient='index')
-    df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/sentence_distance.csv', sep=',', encoding='utf-8')
+    outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    df.to_csv(os.path.join(outdir,'sentence_distance.csv'), sep=',', encoding='utf-8')
     # json.dumps(parsed, indent=4)  
     return HttpResponse("Ok!")
 
@@ -1146,12 +1162,15 @@ def permutation(request, name):
     ones_indexes = np.where(df['Benjamini'] == 1)
     print('ones', type(ones_indexes), ones_indexes)
     print(np.array(ones_indexes).tolist()[0])
-    final_number = None
+    final_numbers = []
     if ones_indexes:
-        final_number = np.min(df['observed result'][np.array(ones_indexes).tolist()[0]])
-    print('ones', final_number)
-    df['final_number'] = final_number
-    df.to_csv(settings.MEDIA_ROOT + '/Experement/'+current_experiment_name+'/results_permutation.csv', sep=',', encoding='utf-8')
+        final_numbers = df['observed result'][np.array(ones_indexes).tolist()[0]]
+    print('ones', final_numbers)
+    df['Final Numbers'] = final_numbers
+    outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    df.to_csv(os.path.join(outdir,'results_permutation.csv'), sep=',', encoding='utf-8')
     timeend = datetime.datetime.now()
     print("finished after ", timeend-timestart)
 

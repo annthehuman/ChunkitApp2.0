@@ -27,8 +27,4 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),
     path('auth/activate/<uid>/<token>', UserActivationView.as_view()),
-    
-
 ]
-
-print('url', urlpatterns)

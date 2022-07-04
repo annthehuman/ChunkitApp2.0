@@ -10,7 +10,8 @@ import { Typography } from "@mui/material";
 class SendEmailResetPassword extends Component{
     constructor(props) {
         super(props);
-        this.state = {email: ""};
+        this.state = {email: "",
+                      email_send: false};
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -37,7 +38,7 @@ class SendEmailResetPassword extends Component{
             if (!data.ok){
                 throw Error(data.status);
             } else {
-                console.log(data)
+                this.setState({email_send: true})
             }
             }).catch((data) => {
             console.log(`Try again! Error: ${Error(data.status)}`)
@@ -50,6 +51,8 @@ class SendEmailResetPassword extends Component{
             <Stack direction='column' spacing={2} mt={'35px'} alignItems="center">
                 <Logo/>
                 <CustomHeader text='ChunkitApp 2.0'/>
+                {!this.state.email_send ? 
+            
                 <form onSubmit={this.handleSubmit}>
                 <Stack direction='column' spacing={2} alignItems="center">
                     <Typography>Email to send link to reset password</Typography>
@@ -65,8 +68,11 @@ class SendEmailResetPassword extends Component{
                 
                 <CustomButton theme='blue' text='Submit' type="submit" value="Submit"/>
                 </Stack>
-                </form>
-                </Stack>
+                </form>:
+
+                <Typography>Check your email to reset password</Typography>
+                }
+            </Stack>
             </div>
         )
     }

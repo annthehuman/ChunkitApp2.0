@@ -14,27 +14,27 @@ export default class ExperimentImitation extends Component {
         }
         this.sentences = ['sentence02.wav',
                     'sentence03.wav',
-                    'sentence04.wav',]
-                    // 'sentence05.wav',
-                    // 'sentence06.wav',
-                    // 'sentence07.wav',
-                    // 'sentence08.wav',
-                    // 'sentence09.wav',
-                    // 'sentence10.wav',
-                    // 'sentence11.wav',
-                    // 'sentence12.wav',
-                    // 'sentence13.wav',
-                    // 'sentence14.wav',
-                    // 'sentence15.wav',
-                    // 'sentence16.wav',
-                    // 'sentence17.wav',
-                    // 'sentence18.wav',
-                    // 'sentence19.wav',
-                    // 'sentence20.wav',
-                    // 'sentence21.wav',
-                    // 'sentence22.wav',
-                    // 'sentence23.wav',
-                    // 'sentence24.wav']
+                    'sentence04.wav',
+                    'sentence05.wav',
+                    'sentence06.wav',
+                    'sentence07.wav',
+                    'sentence08.wav',
+                    'sentence09.wav',
+                    'sentence10.wav',
+                    'sentence11.wav',
+                    'sentence12.wav',
+                    'sentence13.wav',
+                    'sentence14.wav',
+                    'sentence15.wav',
+                    'sentence16.wav',
+                    'sentence17.wav',
+                    'sentence18.wav',
+                    'sentence19.wav',
+                    'sentence20.wav',
+                    'sentence21.wav',
+                    'sentence22.wav',
+                    'sentence23.wav',
+                    'sentence24.wav']
         this.startImitation = this.startImitation.bind(this)
         this.playAudio = this.playAudio.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -66,12 +66,10 @@ export default class ExperimentImitation extends Component {
         }
         enableInput(e) {
             const input = document.getElementById(`input_form_${e.target.id.split('_')[2]}`)
-            console.log('disable', input)
             input.disabled = false
             input.autoFocus = true
             input.classList.remove("Mui-disabled");
             input.parentElement.classList.remove("Mui-disabled");
-            console.log('disable', input)
         }
         startImitation() {
             const instruction = document.getElementById('sentence_instructions'),
@@ -86,7 +84,6 @@ export default class ExperimentImitation extends Component {
                 audio.play()
                 let newPlayed = this.state.played
                 newPlayed.push(e.target.name)
-                console.log(newPlayed)
                 this.setState({played: newPlayed})
             } else {
                 if (!this.state.played.includes(e.target.name)) {
@@ -94,9 +91,7 @@ export default class ExperimentImitation extends Component {
                 audio.play()
                 let newPlayed = this.state.played
                 newPlayed.push(e.target.name)
-                console.log(newPlayed)
                 this.setState({played: newPlayed})
-                console.log(this.state.played)
             }
             }
         }
