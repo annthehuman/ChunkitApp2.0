@@ -59,6 +59,8 @@ export default class Constructor extends Component  {
             'practiceInstructions': 'Instructions for Practice','uploadExperimentAudio': 'Audios for Experiment',
             'uploadExperimentTranscripts': 'Transcripts for Experiment','experimentInstructions':'Instructions for Experiment'}
         }
+        this.toggleBack = this.toggleBack.bind(this);
+        this.toggleNext = this.toggleNext.bind(this);
         this.toggle = this.toggle.bind(this);
         this.appendForm = this.appendForm.bind(this)
         this.onSubmit = this.onSubmit.bind(this);
@@ -162,22 +164,24 @@ export default class Constructor extends Component  {
     }
     console.log('what',formSum, formData)
     }
-
     toggle (event, tab) {
+        let store = require('store')
+        if(this.state.activeTab !== tab) {
+            this.setState({ activeTab: tab })
+            store.set('tab', tab)
+          }
+      }
+  
+    toggleBack () {
       let store = require('store')
-    //   console.log('tab', event.target.name, this.state.activeTab,typeof(+this.state.activeTab - 1 ), tab, typeof(tab))
-      
-      if(this.state.activeTab !== tab) {
-        event.target.name == 'Back' ? 
-          (this.setState({ activeTab: String(+this.state.activeTab - 1 )}),
-          store.set('tab', String(+this.state.activeTab - 1))):
-          event.target.name == 'Next' ? 
-          (this.setState({ activeTab: String(+this.state.activeTab + 1 )}),
-          store.set('tab', String(+this.state.activeTab + 1))):
-          (this.setState({ activeTab: tab }),
-          store.set('tab', tab))
-        }
+      this.setState({ activeTab: String(+this.state.activeTab - 1 )})
+      store.set('tab', String(+this.state.activeTab - 1))
     }
+    toggleNext () {
+        let store = require('store')
+        this.setState({ activeTab: String(+this.state.activeTab + 1 )})
+        store.set('tab', String(+this.state.activeTab + 1))
+      }
     appendForm(...values){
         // console.log('load append form', values)
         const f = document.getElementById('constructorForm')
@@ -234,17 +238,14 @@ export default class Constructor extends Component  {
         {this.appendForm('nameExperement', store.get('nameExperement'))}
         if(store.get('nameExperementForParticipants') && store.get('nameExperementForParticipants').length > 0) 
         {this.appendForm('nameExperementForParticipants', store.get('nameExperementForParticipants'))}
-        if (store.get('shuffleExtracts')) {
-
-          }
-          if (store.get('pagesNeeded')) {
-            store.get('pagesNeeded').length > 0 ? this.setState({accordionExpanded: true}) : null
-            store.get('pagesNeeded').forEach(item => {
-              document.getElementById(`pageNeeded_${item}`).checked = true
-              store.set(`pageNeeded_${item}`, true)
-            })
-            // this.props.appendForm('pagesNeeded', store.get('pagesNeeded'))
-          }
+        if (store.get('pagesNeeded')) {
+        store.get('pagesNeeded').length > 0 ? this.setState({accordionExpanded: true}) : null
+        store.get('pagesNeeded').forEach(item => {
+            document.getElementById(`pageNeeded_${item}`).checked = true
+            store.set(`pageNeeded_${item}`, true)
+        })
+        // this.props.appendForm('pagesNeeded', store.get('pagesNeeded'))
+        }
           if (store.get('UseQuestions')){
             document.getElementById('UseQuestions').checked = store.get('UseQuestions')}
         store.each((value, key) => {
@@ -326,6 +327,8 @@ export default class Constructor extends Component  {
             store.clearAll();
             if (!data.ok){
                 throw Error(data.status);
+            } else {
+                this.props.history.push("/drafts");
             }
             //console.log('так')
             }).catch((data) => {
@@ -333,10 +336,10 @@ export default class Constructor extends Component  {
             }).finally(() => {
             form.reset();
             });
-            if (formData) {
-                this.props.history.push("/");
-                this.componentDidMount()
-            }
+            // if (formData) {
+            //     this.componentDidMount()
+            //     this.props.history.push("/drafts");
+            // }
         } else if (this.state.submitButton == 'TestRun') {
             console.log(this.state.submitButton)
             const form = e.target
@@ -544,7 +547,7 @@ export default class Constructor extends Component  {
                 <Feedback appendForm={this.appendForm} allInputsAReHere={this.allInputsAReHere} toggle = {this.toggle} active={this.state.activeTab} />
             </TabPanel>
             <TabPanel value="9">
-                <EditorPage editorName='goodbye' header='Goodbye' label='Goodbye message.'
+                <EditorPage editorName='goodbye' header='Goodbye' label='Text your goodbye message here.'
                         textSample=''
                         appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPanel>
@@ -574,8 +577,8 @@ export default class Constructor extends Component  {
             direction='row'
             style={{gap: '5px', padding: '0 24px 24px 24px' }}
             justifyContent="flex-end">
-        {this.state.activeTab != '1' ? <CustomButton size='small' type='button' name='Back' onClick={this.toggle} theme='white' text='Back' startIcon={<ArrowBackIosIcon />} style={{border: '1px solid #6083FF'}}/> : null}
-        {this.state.activeTab != '9' ?<CustomButton size='small' type='button' name='Next' onClick={this.toggle} theme='blue' text='Next' endIcon={<ArrowForwardIosIcon />}/> : null}
+        {this.state.activeTab != '1' ? <CustomButton size='small' type='button' name='Back' onClick={this.toggleBack} theme='white' text='Back' startIcon={<ArrowBackIosIcon />} style={{border: '1px solid #6083FF'}}/> : null}
+        {this.state.activeTab != '9' ?<CustomButton size='small' type='button' name='Next' onClick={this.toggleNext} theme='blue' text='Next' endIcon={<ArrowForwardIosIcon />}/> : null}
         </Grid>
         </Stack>
         {/* <Button type='submit' onClick={this.getButton} name='SaveDraft' color="primary">Save Draft</Button>{' '}

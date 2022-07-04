@@ -24,7 +24,13 @@ export default class TextTab extends Component {
             {this.props.header=='Goodbye' && Boolean(store.get('linkToProlific'))?
             <a href={`${store.get('linkToProlific')}`}>
             <CustomButton size='small' text='Link back to Prolific'/>
-            </a>:null}
+            </a>:
+            this.props.header=='Informed consent' ?
+            <>
+           <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='I agree'/>{'   '}
+           <CustomButton size='small' onClick={this.goodbye} name='NextExperimentPage' theme="blue" text="I disagree"/>
+           </>
+            :null}
             <div className='clearfix'></div>
         </>
      )}

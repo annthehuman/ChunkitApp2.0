@@ -63,7 +63,7 @@ export default class Background extends Component {
           checks = papa.querySelectorAll('input[type="checkbox"]'),
           backgroundExample = store.get('backgroundExample'),
           backgroundAddQ = store.get('backgroundAddQ');
-    if (backgroundExample){
+    if (!store.get('addedQuestionsBackground') && backgroundExample){
     let item = this.state.additional_quesion_list
     Object.keys(backgroundExample).forEach((key) => {
       if (backgroundExample[key][0] == 'true') {
@@ -78,10 +78,9 @@ export default class Background extends Component {
       }
       // console.log('backgroundExample key','addedQuestionsBackground', item, backgroundExample[key]);
     });
-    
     store.set('addedQuestionsBackground', item)
     }
-    console.log('backgroundAddQ', backgroundAddQ)
+    // console.log('backgroundAddQ', backgroundAddQ)
     if (backgroundAddQ) {
       Object.keys(backgroundAddQ).forEach((key) => {
         store.set(key, backgroundAddQ[key][0])
@@ -90,7 +89,6 @@ export default class Background extends Component {
     }
     checks.forEach(check => {
       if (store.get(check.name)) {
-        // console.log((store.get(check.name)))
         check.checked = store.get(check.name)
       }
     })
@@ -126,7 +124,6 @@ export default class Background extends Component {
   onChange(e) {
     let store = require('store');
     const qName = e.target.name
-    console.log('target'+e.target.name)
     store.set(qName, e.target.value)
     this.props.appendForm(qName, e.target.value)
     let addedQ = store.get('backgroundAddQ')
@@ -141,12 +138,14 @@ export default class Background extends Component {
           question_type = type,
           isChecked = true;
     item.push({ question_type, id, isChecked})
-    store.set('addedQuestionsBackground', item)
+    // store.set('addedQuestionsBackground', item)
     store.set(`useBackgroundNew_${question_type}_Qestion${id}`, true)
     this.props.appendForm(`useBackgroundNew_${question_type}_Qestion${id}`, true)
     // this.props.appendForm('addedQuestionsBackground', item)
     this.setState({additional_quesion_list: item,
-                    additional_quesion_id: id})
+                    additional_quesion_id: id}, function(){
+                      store.set('addedQuestionsBackground', item)
+                    })
     // console.log(this.state.additional_quesion_list)
   }
   render () {

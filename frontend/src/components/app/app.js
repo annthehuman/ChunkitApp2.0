@@ -14,6 +14,7 @@ import Constructor from '../home/constructor/constructor';
 import TestRun from '../home/test/test-run';
 import ExperimentRun from '../experiment/experiment-run';
 import ResultsHome from '../results/results-home';
+import Guide from '../home/guide';
 const AppBlock = styled.div`
     margin: 0 auto;
     max-width: 800px;
@@ -45,6 +46,7 @@ export default class App extends Component {
             <Route exact path={"/reset_password"} component={SendEmailResetPassword}/>
             <Route exact path={"/password/reset/:uid/:token"} component={PasswordReset}/>
             <Route exact path={"/drafts"} component={Draft}/>
+            <Route exact path={"/guide"} component={Guide}/>
         </Router>
         </>
     )

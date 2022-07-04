@@ -55,6 +55,8 @@ export default class TestRun extends Component {
         activeTabName: store.get('pagesNeeded') ? store.get('pagesNeeded')[0] : 'Hello'
     }
     this.toggle = this.toggle.bind(this);
+    this.toggleBack = this.toggleBack.bind(this);
+    this.toggleNext = this.toggleNext.bind(this);
 }
 componentDidMount() {
     // let store = require('store')
@@ -71,24 +73,26 @@ componentDidMount() {
     // }
 }
 toggle (event, tab) {
+    let store = require('store')
+    if(this.state.activeTabName !== tab) {
+        this.setState({ activeTabNumber: this.state.pagesNeeded.indexOf(tab), activeTabName: tab})
+        store.set('tabTest', tab)
+      }
+  }
+
+toggleBack () {
   let store = require('store')
-  console.log('toggle', tab, this.state.activeTabNumber)
-  if(this.state.activeTabName != tab) {
-    event.target.name == 'Back' ?
-    (this.setState({ activeTabNumber: +this.state.activeTabNumber - 1, activeTabName: this.state.pagesNeeded[+this.state.activeTabNumber - 1]}),
-    store.set('tabTest', +this.state.activeTabNumber - 1)):
-    event.target.name == 'Next' ? 
-    (this.setState({ activeTabNumber: +this.state.activeTabNumber + 1, activeTabName: this.state.pagesNeeded[+this.state.activeTabNumber + 1]}),
-    store.set('tabTest', +this.state.activeTabNumber + 1)):
-    (this.setState({ activeTabNumber: this.state.pagesNeeded.indexOf(tab), activeTabName: tab}),
-    store.set('tabTest', tab))
-//       this.setState({ activeTabNumber: tab, activeTabName: tab});
-//   store.set('tabTest', tab)
+  this.setState({ activeTabNumber: +this.state.activeTabNumber - 1, activeTabName: this.state.pagesNeeded[+this.state.activeTabNumber - 1]})
+  store.set('tabTest', +this.state.activeTabNumber - 1)
 }
-}
+toggleNext () {
+    let store = require('store')
+    this.setState({ activeTabNumber: +this.state.activeTabNumber + 1, activeTabName: this.state.pagesNeeded[+this.state.activeTabNumber + 1]})
+    store.set('tabTest', +this.state.activeTabNumber + 1)
+  }
   render() {
     let store = require('store')
-    console.log('pages', this.state.pagesNeeded, this.state.activeTabNumber, this.state.activeTabName == 'Consent')
+    console.log('pages', this.state.pagesNeeded, this.state.pagesNeeded.length, this.state.activeTabNumber, this.state.activeTabName == 'Consent')
     return(
             <>
             <>
@@ -184,8 +188,8 @@ toggle (event, tab) {
             direction='row'
             style={{gap: '5px', padding: '0 24px 24px 24px' }}
             justifyContent="flex-end">
-        {this.state.activeTabNumber != 0 ? <CustomButton size='small' type='button' name='Back' onClick={this.toggle} theme='white' text='Back' startIcon={<ArrowBackIosIcon />} style={{border: '1px solid #6083FF'}}/> : null}
-        {this.state.activeTabNumber != this.state.pagesNeeded.length ?<CustomButton size='small' type='button' name='Next' onClick={this.toggle} theme='blue' text='Next' endIcon={<ArrowForwardIosIcon />}/> : null}
+        {this.state.activeTabNumber != 0 ? <CustomButton size='small' type='button' name='Back' onClick={this.toggleBack} theme='white' text='Back' startIcon={<ArrowBackIosIcon />} style={{border: '1px solid #6083FF'}}/> : null}
+        {this.state.activeTabNumber != this.state.pagesNeeded.length-1 ?<CustomButton size='small' type='button' name='Next' onClick={this.toggleNext} theme='blue' text='Next' endIcon={<ArrowForwardIosIcon />}/> : null}
         </Grid>
         </Stack>
       

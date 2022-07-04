@@ -68,7 +68,8 @@ REACT_ROUTES = [
     'signup/',
     'login/',
     'reset_password',
-    'drafts'
+    'drafts',
+    'guide'
 ]
 
 REST_FRAMEWORK = {

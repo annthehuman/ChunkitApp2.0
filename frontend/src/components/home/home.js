@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Draft from './test'
 import CustomButton from '../../common_components/button';
 import CustomHeader from '../../common_components/header';
-import { Stack } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import Logo from '../../common_components/logo';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CustomBigButton from '../../common_components/big-button';
@@ -91,6 +91,12 @@ export default class Home extends Component {
     <CustomBigButton theme='blue' side='right' text='Fetch & Analyse'/>
     </Link>
 </Grid>
+<Grid container
+      direction="row"
+      justifyContent="space-between">
+        <CustomButton size='small' text='?'/>
+        <Typography sx={{fontSize:'16px'}}>This project is distributed under CC-BY-NC-SA license</Typography>
+      </Grid>
     </Grid>
     </>:
     <Stack direction="column" spacing={4} mt={'82px'} alignItems="center">

@@ -33,11 +33,12 @@ export default class CustomHat extends Component {
     direction="row"
     justifyContent="space-between"
     alignItems="center">
+<Link to='/'>
 <CustomButton 
-    text='Log out' 
-    theme='black'
-    style={{display: 'inline-block', float: 'right',visibility: 'hidden'}}/>
-
+    text='Home' 
+    theme='white'
+    style={{display: 'inline-block', float: 'right',visibility: String(window.location.href).charAt(String(window.location.href).length - 1) != '/' ? 'visible' :'hidden'}}/>
+</Link>
 <Logo 
 size={{margin:'0 auto', 
       height: '100px',

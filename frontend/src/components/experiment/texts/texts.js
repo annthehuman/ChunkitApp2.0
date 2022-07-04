@@ -45,13 +45,11 @@ export default class TextTab extends Component {
             <a href={`${this.props.link}`}>
             <CustomButton size='small' theme="blue" text='Link back to Prolific'/>
             </a>:null}
-            {this.props.nextPage && this.props.header!='Informed consent'?
-            <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='Continue'/>: null}
              {this.props.nextPage && this.props.header=='Informed consent'?
              <>
             <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='I agree'/>{'   '}
-            <CustomButton size='small' onClick={this.goodbye} name='NextExperimentPage' theme="blue" text="I don't agree"/>
-            </>: null}
+            <CustomButton size='small' onClick={this.goodbye} name='NextExperimentPage' theme="blue" text="I disagree"/>
+            </>: <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='Continue'/>}
             <div className='clearfix'></div>
             </>}
         </>

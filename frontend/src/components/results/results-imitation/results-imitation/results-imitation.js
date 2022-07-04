@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { Table, Button, Spinner } from 'reactstrap';
 import { Link } from "react-router-dom";
 import Papa from 'papaparse'
+import CustomButton from '../../../../common_components/button';
 
 export default class ImitationResults extends Component {
   constructor(props) {
@@ -34,7 +35,7 @@ export default class ImitationResults extends Component {
       return result
     }).then(() => {
       store.set('sentence_results', 'loaded')
-      fetch(`/media/Experement/${this.props.name}/sentence.csv`)
+      fetch(`/static/media/Experement/${this.props.name}/sentence.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))
       .then(result => {
@@ -59,7 +60,7 @@ export default class ImitationResults extends Component {
       }).catch(error => {
     console.log(error)
     }) : 
-    fetch(`/media/Experement/${this.props.name}/sentence.csv`)
+    fetch(`/static/media/Experement/${this.props.name}/sentence.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))
       .then(result => {
@@ -98,10 +99,8 @@ export default class ImitationResults extends Component {
     let i = 0
     return(
     <>
-    <Link to={`/media/Experement/${this.props.name}/sentence.csv`} target="_blank" download>
-      <Button color="info" outline>Download Table</Button>
-      <br/>
-      <br/>
+    <Link to={`/static/media/Experement/${this.props.name}/sentence.csv`} target="_blank" download>
+      <CustomButton text='Download Table' theme='blue' size='small'/>
     </Link>
 
      {this.state.rows.length != 0 ? 

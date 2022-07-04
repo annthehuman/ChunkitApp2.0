@@ -27,21 +27,23 @@ class Experiment extends Component {
         this.state = {
           colsEx: '',
           rowsEx: '',
-          columns: [{ field: 'id', headerName: '#', width: 55 },
+          columns: [{field: 'id', hide: true},
           {field: 'audioName', headerName: 'Audio name', width: 171},
           {field: 'transcript', headerName: 'Transcript', width: 513}],
-          rows: [{id: 1, audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.'},
-          {id: 2, audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.'},
-          {id: 3, audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't."} ],
+          rows: [{id: '1',audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.'},
+          {id: '2',audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.'},
+          {id: '3',audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't."} ],
           editorState: EditorState.createEmpty(),
           anchorElAudio: null,
           anchorElInst: null,
           experimentTranscripts: "Upload transcripts table",
-          experimentAudio: "Upload audio zip"
+          experimentAudio: "Upload audio zip",
+          errorTable: false
         }
         this.onLoad = this.onLoad.bind(this)
         this.onLoadAudio = this.onLoadAudio.bind(this)
         this.onEditorStateChange = this.onEditorStateChange.bind(this)
+        this.arrayEquals = this.arrayEquals.bind(this)
     }
     componentDidMount() {
       let store = require('store');
@@ -58,25 +60,25 @@ class Experiment extends Component {
       }
     }
     store.get('UseQuestions') ?
-    this.setState({columns: [{ field: 'id', headerName: '#', width: 2 },
+    this.setState({columns: [{ field: 'id', hide: true},
     {field: 'audioName', headerName: 'Audio name', width: 80},
     {field: 'transcript', headerName: 'Transcript', width: 300},
     {field: 'question', headerName: 'Question', width: 145},
     {field: 'answer1', headerName: 'Answer1', width: 90},
     {field: 'answer2', headerName: 'Answer2', width: 90}],
-    rows: [{id: 1, audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.',
+    rows: [{id: '1',audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.',
   question: 'Is the fault in ourselves?', answer1: 'Yes', answer2: 'No'},
-    {id: 2, audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.',
+    {id: '2',audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.',
     question: 'Will my tongue tell the anger of my pancreas?', answer1: 'Yes', answer2: 'No'},
-    {id: 3, audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't.",
+    {id: '3',audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't.",
     question: 'Is there method in this madness?', answer1: 'Yes', answer2: 'No'} ]})
   :
-    this.setState({columns: [{ field: 'id', headerName: '#', width: 55 },
+    this.setState({columns: [{ field: 'id', hide: true},
     {field: 'audioName', headerName: 'Audio name', width: 150},
     {field: 'transcript', headerName: 'Transcript', width: 600}],
-    rows: [{id: 1, audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.'},
-    {id: 2, audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.'},
-    {id: 3, audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't."} ]})
+    rows: [{id: '1',audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.'},
+    {id: '2',audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.'},
+    {id: '3',audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't."} ]})
     }
     onEditorStateChange(editorState) {
       let store = require('store');
@@ -103,6 +105,12 @@ class Experiment extends Component {
       input.setAttribute('accept', '.zip')
       label.append(input)
     }
+    arrayEquals(a, b) {
+      return Array.isArray(a) &&
+          Array.isArray(b) &&
+          a.length === b.length &&
+          a.every((val, index) => val === b[index]);
+  }
     onLoad(e){
       let store = require('store');
       let fileFile = e.target.files[0]
@@ -119,8 +127,11 @@ class Experiment extends Component {
         else{
           this.setState({
             colsEx: resp.cols,
-            rowsEx: realRows
-          }, function () { console.log('states',this.state.colsEx, this.state.rowsEx), store.set('uploadExperimentTranscriptsData', this.state.rowsEx)});
+            rowsEx: realRows,
+            errorTable: store.get('UseQuestions') ?
+                        !this.arrayEquals(realRows[0], ['Audio name', 'Transcript', 'Question', 'Answer1', 'Answer2']) :
+                        !this.arrayEquals(realRows[0],['Audio name', 'Transcript'])
+          }, function () { console.log('states',this.state.colsEx, this.state.rowsEx, this.state.errorTable, realRows[0]!=['Audio name', 'Transcript', 'Question', 'Answer1', 'Answer2']), store.set('uploadExperimentTranscriptsData', this.state.rowsEx)});
         }
       });
       ExcelRenderer(fileFile)
@@ -146,57 +157,9 @@ class Experiment extends Component {
       const { classes } = this.props;
       return(
           <>
-          <CustomHeader text='Upload your practice extracts'/>
-            <div style={{paddingTop: '5px'}}>
-            <p>The chunking task is intuitive and might take participants a few tries before their behaviour becomes consistent. In order not to contaminate the results, the segmentation behaviour during the practice extracts is not recorded. In this section, choose the number of practice extracts, and upload the following elements to the website: 
-            </p>
-            <ul>
-              <li>Zip of audio extracts in any format.{'  '}            
-              <CustomButton onClick={(event) => this.setState({anchorElAudio: event.currentTarget})} 
-                            onMouseOver={(event) => this.setState({anchorElAudio: event.currentTarget})}
-                            text='i' 
-                            theme='gray' 
-                            size='icon' 
-                            style={{marginBottom:'5px'}}/>
-              <Popover
-                id='popover'
-                className={classes.root}
-                open={Boolean(this.state.anchorElAudio)}
-                anchorEl={this.state.anchorElAudio}
-                onClose={() => this.setState({anchorElAudio: null})}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left'
-                }}
-              ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}} theme='white'>
-                <Typography sx={{fontSize: '20px'}}>You should choose the sound format according to the purpose of your experiment. The MP3 format is compact but slightly degrades the signal. Thus, it will take no time to buffer and is well suited for experiments that do not require acoustical precision. For those that do, it is possible to upload the audio in WAV format which preserves the high sound quality but might take a while to load.</Typography>
-              </CustomBox>
-              </Popover></li>
-              
-              <li>The instructions for the task.{'  '}            
-              <CustomButton onClick={(event) => this.setState({anchorElInst: event.currentTarget})} 
-                            onMouseOver={(event) => this.setState({anchorElInst: event.currentTarget})}
-                            text='i' 
-                            theme='gray' 
-                            size='icon' 
-                            style={{marginBottom:'5px'}}/>
-              <Popover
-                id='popover'
-                className={classes.root}
-                open={Boolean(this.state.anchorElInst)}
-                anchorEl={this.state.anchorElInst}
-                onClose={() => this.setState({anchorElInst: null})}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left'
-                }}
-              ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px', width: '300px'}} theme='white'>
-                <Typography sx={{fontSize: '20px'}}>What would you like your participants to do?</Typography>
-              </CustomBox>
-              </Popover></li>
-              <li>Transcripts for the extracts in a table format according to the following below.</li>
-            </ul>
-            </div>
+      <CustomHeader text='Upload your extracts'/>
+        <div style={{paddingTop: '5px'}}>
+        <p>Fill in and format the instructions for your main experimental task.</p>
       <FormGroup>
       <CustomHeader text='Instruction for the task'/>
       <div style={{paddingTop: '5px', paddingBottom: '8px'}}>
@@ -209,8 +172,53 @@ class Experiment extends Component {
         editorStyle={{ margin: '0 1em 0 1em' }}
       />
       </div>
-      <CustomHeader text='Example of transcripts in a table format'/>
       </FormGroup>
+      <Grid container
+        direction='row'>
+      <p>Upload a .zip archive with you practice extracts.</p>        
+      <CustomButton onClick={(event) => this.setState({anchorElAudio: event.currentTarget})}
+                    onMouseOver={(event) => this.setState({anchorElAudio: event.currentTarget})}
+                    text='i' 
+                    theme='gray' 
+                    size='icon' 
+                    style={{marginBottom:'5px'}}/>
+      <Popover
+        id='popover'
+        className={classes.root}
+        open={Boolean(this.state.anchorElAudio)}
+        anchorEl={this.state.anchorElAudio}
+        onClose={() => this.setState({anchorElAudio: null})}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left'
+        }}
+      ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}}  theme='white'>
+        <Typography sx={{fontSize: '20px'}}>You should choose the sound format according to the purpose of your experiment.
+        The MP3 format is compact but slightly degrades the signal.
+        Thus, it will take no time to buffer and is well suited for experiments that do not require acoustical precision.
+        For those that do, it is possible to upload the audio in WAV format which preserves the high sound quality but might take a while to load.</Typography>
+      </CustomBox>
+      </Popover>
+      </Grid>
+      <CustomButton id='uploadExperimentAudio' size='small' text={this.state.experimentAudio} theme='green' component="label">
+      <input
+      name='uploadExperimentAudio' 
+      type="file"
+      onChange={this.onLoadAudio} 
+      hidden
+      accept=".zip" 
+      /></CustomButton>
+      <br/>
+      <br/>
+      </div>
+      <p>Upload a table with the transcripts for your audio files.
+        It should be one .xlsx or .csv file formatted as in the example:
+        extract name in the first column, transcript in the second column.
+        The headers should be identical to the ones in the example.</p>
+      <p>Main task extracts will be randomised if you checked the corresponding box in the Basics section.
+        If you do not need them to be randomised, you need to upload them in the order of intended presentation.</p>
+      <CustomHeader text='Example of transcripts in a table format'/>
+      
             <div style={{backgroundColor: '#FFFFFF',height: '300px', width: '740px',paddingTop: '5px'}}>
             <DataGrid
             components={{
@@ -247,10 +255,11 @@ class Experiment extends Component {
  
     </div>
     <br/>
-    <Grid container
-          direction='row'
-          gap='10px'>
-    <CustomButton id='uploadExperimentTranscripts' size='small' text={this.state.experimentTranscripts} theme='green' component="label"> 
+    <CustomButton id='uploadExperimentTranscripts'
+                  size='small' 
+                  text={this.state.experimentTranscripts} 
+                  theme='green' 
+                  component="label"> 
     <input
     type="file"
     hidden
@@ -258,18 +267,7 @@ class Experiment extends Component {
     name='uploadExperimentTranscripts'
     accept=".xlsx, .xls, .csv"
     /></CustomButton>
-
-    <CustomButton id='uploadExperimentAudio' size='small' text={this.state.experimentAudio} theme='green' component="label"> 
-    <input
-    name='uploadExperimentAudio' 
-    type="file"
-    onChange={this.onLoadAudio} 
-    hidden
-    accept=".zip" 
-    /></CustomButton>
-</Grid>
-
-  
+   {this.state.errorTable ? <Typography sx={{color: '#D21502'}}>Table headers should be identical to the ones in the example.</Typography> : null}
   </>
         )
         }
