@@ -106,13 +106,14 @@ def unpackArchive(experement_name):
             print('folder', dirs)
             for dir in dirs:
                 if dir != '__MACOSX':
-                    p = os.walk(directory_to_extract_to+dir)
-                    _, _, fi = next(test)
+                    p = os.walk(os.path.join(directory_to_extract_to, dir))
+                    _, _, fi = next(p)
                     for file in fi:
-                        shutil.copy(os.path.join(directory_to_extract_to,
-                                                 dir, file),
-                                    os.path.join(directory_to_extract_to,
-                                                 file))
+                        if file[0] != '.':
+                            shutil.copy(os.path.join(directory_to_extract_to,
+                                                     dir, file),
+                                        os.path.join(directory_to_extract_to,
+                                                     file))
 
         onlyfilesPractice = [os.path.join(experement_name, f) for f
                              in os.listdir(directory_to_extract_to) if
@@ -138,11 +139,12 @@ def unpackArchive(experement_name):
             print('folder', dirs)
             for dir in dirs:
                 if dir != '__MACOSX':
-                    p = os.walk(directory_to_extract_to+dir)
-                    pa, di, fi = next(test)
+                    p = os.walk(os.path.join(directory_to_extract_to, dir))
+                    _, _, fi = next(p)
                     for file in fi:
-                        print(file)
-                        shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
+                        if file[0] != '.':
+                            print(file[0], file)
+                            shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
 
         onlyfilesExperement = [os.path.join(experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
     
@@ -413,10 +415,10 @@ def load_draft_to_test(request, draft_experement_name):
 				for dir in dirs:
 					if dir != '__MACOSX':
 						p = os.walk(os.path.join(directory_to_extract_to,dir))
-						pa, di, fi = next(p)
+						_, _, fi = next(p)
 						for file in fi:
-							print(file)
-							shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
+							if file[0] != '.':
+								shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
 			onlyfilesPractice = [os.path.join(draft_experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
 
 		if draft_data_values['uploadExperementAudio']:
@@ -430,15 +432,14 @@ def load_draft_to_test(request, draft_experement_name):
 		# print(x)
 			test = os.walk(directory_to_extract_to)
 			path, dirs, files = next(test)
-			if dirs:    
-				print('folder', dirs)
+			if dirs:
 				for dir in dirs:
 					if dir != '__MACOSX':
 						p = os.walk(os.path.join(directory_to_extract_to,dir))
-						pa, di, fi = next(p)
+						_, _, fi = next(p)
 						for file in fi:
-							print(file)
-							shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
+							if file[0] != '.':
+								shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
 
 			onlyfilesExperement = [os.path.join(draft_experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
 		return HttpResponse(json.dumps({'audiosPractice': onlyfilesPractice, 'audiosExperement':onlyfilesExperement}))

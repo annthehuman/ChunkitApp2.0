@@ -91,10 +91,12 @@ export default class Home extends Component {
     <CustomBigButton theme='blue' side='right' text='Fetch & Analyse'/>
     </Link>
 </Grid>
+<br/>
 <Grid container
       direction="row"
-      justifyContent="space-between">
-        <CustomButton size='small' text='?'/>
+      justifyContent="space-between"
+      sx={{width: '56%'}}>
+        <CustomButton theme='white' size='icon' text='?'/>
         <Typography sx={{fontSize:'16px'}}>This project is distributed under CC-BY-NC-SA license</Typography>
       </Grid>
     </Grid>

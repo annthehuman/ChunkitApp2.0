@@ -476,7 +476,7 @@ export default class Constructor extends Component  {
                     <Link to='/'>
                     <CustomButton 
                         onClick={() => {document.cookie = 'access_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                        this.setState({autorized: false}); window.location.reload()}} 
+                        this.setState({autorized: false}); this.props.history.push("/"); window.location.reload()}} 
                         text='Log out' 
                         theme='black'
                         size='small'/>

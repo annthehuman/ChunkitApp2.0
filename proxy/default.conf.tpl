@@ -1,5 +1,6 @@
 server {
     listen ${LISTEN_PORT};
+    server_name chunkitapp.online www.chunkitapp.online;
 
     location /static {
         alias /vol/static;
