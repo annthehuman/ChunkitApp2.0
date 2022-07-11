@@ -33,10 +33,21 @@ services:
     volumes:
       - ./static/media/sentence/:/vol/static/media/sentence/
       - static-data:/vol/static
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     environment:
       - LISTEN_PORT=8000
       - APP_HOST=app
       - APP_PORT=9000
 
+  certbot:
+    image: certbot/certbot
+    depends_on:
+      - proxy
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+
 volumes:
   static-data:
+  etc-letsencrypt:
