@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import styled from 'styled-components';
 import CustomButton from '../../../common_components/button';
-import {  Input, FormGroup, Label, Button,  CustomInput } from 'reactstrap';
+import {  Input, FormGroup, Label,  CustomInput } from 'reactstrap';
 
 export default class ExperimentBackground extends Component {
     constructor(props) {
@@ -29,13 +28,8 @@ export default class ExperimentBackground extends Component {
                     obj.push({type, name, text})
                 }
                 s = s + 1
-                // console.log(this.props.data.backgroundAddQ[`BackgroundNew_bool_Qestion${i}`])
-                // obj.push
             }
             this.setState({addedQBack: obj})
-            // for (let key in Object.keys(JSON.parse(JSON.stringify(this.props.data.backgroundAddQ)))) {
-            //     console.log('BackgroundNew_bool_Qestion'+key)
-            // }  
         }
         getCookie(name) {
             let cookieValue = null;
@@ -65,11 +59,6 @@ export default class ExperimentBackground extends Component {
             formData.append('experiment_name', this.props.data.nameExperementForParticipants)
             fetch('/questionnaire/', {
                 method: "POST",
-                // headers: {
-                //     'X-CSRFToken': csrf,
-                //     "Content-Type": "application/json",
-                //     "X-Requested-With": "XMLHttpRequest"
-                // },
                 body: formData
                 }).then(data => {
                 let store = require('store')
@@ -89,7 +78,6 @@ export default class ExperimentBackground extends Component {
 
         render() {
             let store = require('store');
-            // console.log(this.props.data, this.props.data.backgroundAddQ)
             return(
             <>        
                 <h3>Background</h3>

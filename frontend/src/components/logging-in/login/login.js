@@ -124,9 +124,9 @@ class Login extends Component{
                 Forgot password?
                 </Link>
                 <Stack direction='row' spacing={2} mt={'82px'}>
-                <CustomButton text='Log In' theme='blue' type="submit" value="Submit" />
+                <CustomButton text='Log in' theme='blue' type="submit" value="Submit" />
                 <Link to='/signup/'>
-                <CustomButton theme='black' text='Sign Up' type="button" value="Submit" />
+                <CustomButton theme='black' text='Sign up' type="button" value="Submit" />
                 </Link>
                 </Stack>
             </Stack>

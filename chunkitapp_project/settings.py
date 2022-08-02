@@ -170,6 +170,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '/vol/web/db.sqlite3',
+        # 'NAME': './db.sqlite3',
     }
 }
 

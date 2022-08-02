@@ -2,13 +2,15 @@ import React, {Component} from 'react';
 
 import styled from 'styled-components';
 import { Link } from "react-router-dom";
-import { Button, Table, ListGroup, ListGroupItem } from 'reactstrap';
-import App from '../../app/app';
 import CustomHat from '../../../common_components/hat';
 import CustomButton from '../../../common_components/button';
 import { Grid } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Stack } from '@mui/material';
+import PlayArrow from '@mui/icons-material/PlayArrow';
+import Stop from '@mui/icons-material/Stop';
+import Clear from '@mui/icons-material/Clear';
+import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 
 const AppBlock = styled.div`
     margin: 0 auto;
@@ -29,42 +31,68 @@ export default class Draft extends Component {
       {field: 'prolific', headerName: 'Integrate with Prolific', width: 110},
       {field: 'link', headerName: 'Link to experiment', width: 200, renderCell: (params) => (
         <Link to={`/${params.value}`}>{params.value}</Link>)},
-        {field: 'load', headerName: '', width: 70, renderCell: (params) => (
-          console.log('load params', params),
+        {field: 'load', headerName: '', width: 30, renderCell: (params) => (
           <CustomButton 
-                      theme='blue' 
-                      size='small' 
+                      id={`edit_${params.value}`}
+                      theme='trans' 
+                      size='icon' 
                       type='button' 
                       onClick={this.getFormFromDB}
                       value={params.value}
-                      text='Edit'/>)},
-        {field: 'stop', headerName: '', width: 70, renderCell: (params) => (
-          console.log('stop params', params),
+                      text={<ModeEditOutlineIcon/>}
+                      title='Edit'/>)},
+        {field: 'start', headerName: '', width: 30, renderCell: (params) => (
           params.value ? 
           <CustomButton 
-                    theme='black' 
-                    size='small' 
+                    id={`start_${params.value}`}
+                    theme='trans' 
+                    size='icon' 
+                    type='button' 
+                    onClick={this.startExperiment}
+                    value={params.value}
+                    text={<PlayArrow/>}
+                    title='Start'/>:
+          <CustomButton 
+                    theme='trans' 
+                    size='icon' 
+                    type='button' 
+                    onClick={this.startExperiment}
+                    value={params.value}
+                    text={<PlayArrow/>}
+                    title='Start'
+                    disabled
+                    />)},
+        {field: 'stop', headerName: '', width: 30, renderCell: (params) => (
+          params.value ? 
+          <CustomButton 
+                    id={`stop_${params.value}`}
+                    theme='trans' 
+                    size='icon' 
                     type='button' 
                     onClick={this.stopExperiment}
                     value={params.value}
-                    text='Stop'
+                    text={<Stop/>}
+                    title='Stop'
                     />:
           <CustomButton 
-                    theme='black' 
-                    size='small' 
+                    theme='trans' 
+                    size='icon' 
                     type='button' 
                     onClick={this.stopExperiment}
                     value={params.value}
-                    text='Stop'
+                    text={<Stop/>}
+                    title='Stop'
                     disabled/>)},
-        {field: 'delete', headerName: '', width: 70, renderCell: (params) => (
+        {field: 'delete', headerName: '', width: 30, renderCell: (params) => (
           <CustomButton 
                     theme='danger' 
-                    size='small' 
+                    size='icon' 
                     type='button' 
+                    style={{border: '0px solid #D21919'}}
                     onClick={this.deleteDraft}
                     value={params.value}
-                    text='Delete'/>)}],
+                    text={<Clear/>}
+                    title='Delete'/>)}],
       rows: ''
     }
     this.getFormFromDB = this.getFormFromDB.bind(this);
@@ -73,13 +101,43 @@ export default class Draft extends Component {
     this.loadResults = this.loadResults.bind(this);
     this.getCookie = this.getCookie.bind(this);
     this.stopExperiment = this.stopExperiment.bind(this);
+    this.startExperiment = this.startExperiment.bind(this);
+  }
+
+  startExperiment(e) {
+    //TODO: delete by user token and name
+    let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
+    console.log('start_experiment', experiment_name)
+    fetch('/start_experiment/?'+ new URLSearchParams({
+      name: experiment_name}), {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    }).then(response => {
+      const result = response.json() 
+      const status_code = response.status;
+      console.log(status_code)
+      if(status_code != 200) {
+        console.log('Error in getting brand info!')
+        return false;
+    }
+      return result
+    }).then(store => {
+      console.log(store)
+      this.componentDidMount()
+    }).catch(error => {
+    console.log(error)
+    })
   }
 
   stopExperiment(e) {
     //TODO: delete by user token and name
-    console.log(e)
+    let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
+    console.log('stop_experiment', experiment_name)
     fetch('/stop_experiment/?'+ new URLSearchParams({
-      name: e.target.value}), {
+      name: experiment_name}), {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
@@ -104,9 +162,9 @@ export default class Draft extends Component {
 
   deleteLink(e) {
     //TODO: delete by user token and name
-    console.log(e)
+    let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
     fetch('/delete_experiment/?'+ new URLSearchParams({
-      name: e.target.value}), {
+      name: experiment_name}), {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
@@ -130,8 +188,9 @@ export default class Draft extends Component {
   }
   deleteDraft (e) {
     //TODO: delete by user token and name
+    let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
     fetch('/delete_draft/?'+ new URLSearchParams({
-      name: e.target.value}), {
+      name: experiment_name}), {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
@@ -154,9 +213,10 @@ export default class Draft extends Component {
     })
   }
   getFormFromDB(e){
-    console.log('target', e.target.value)
+    let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
+    console.log('target', experiment_name)
     fetch('/load_draft/?'+ new URLSearchParams({
-      name: e.target.value}), {
+      name: experiment_name}), {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
@@ -184,7 +244,7 @@ export default class Draft extends Component {
         return store
     })
     .then(store => {
-      if (store.get('nameExperementForParticipants') == e.target.value){
+      if (store.get('nameExperementForParticipants') == experiment_name){
         
         this.props.history.push('/constructor')
         console.log(this.props.history)
@@ -253,11 +313,11 @@ export default class Draft extends Component {
           let ImitationTask = pagesNeeded.indexOf('Imitation') != -1 ? 'Yes' : 'No'
           UseQuestions = UseQuestions ? 'Yes' : 'No'
           UseProlific = UseProlific ? 'Yes' : 'No'
-          let stop_value = experiment_link && experiment_link.length > 0 ? nameExperementForParticipants : undefined
+          let stop_start_value = experiment_link && experiment_link.length > 0 ? nameExperementForParticipants : undefined
           // console.log('link',experiment_link.length > 0, stop_value)
           rows.push({id: i, experimentName: String(nameExperementForParticipants).replace(/_/g, ' '), imitationTask: ImitationTask, 
             questions: UseQuestions, prolific: UseProlific, link: experiment_link,
-             load: nameExperementForParticipants, stop: stop_value, delete:nameExperementForParticipants})})
+             load: nameExperementForParticipants, start:stop_start_value, stop: stop_start_value, delete:nameExperementForParticipants})})
         this.setState({rows: rows})
       })
       .catch(error => {

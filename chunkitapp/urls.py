@@ -37,6 +37,7 @@ urlpatterns = [
     path('secret/', views.secret, name='secret'),
     path('delete_experiment/', views.delete_experiment, name='delete_experiment'),
     path('stop_experiment/', views.stop_experiment, name='stop_experiment'),
+    path('start_experiment/', views.start_experiment, name='start_experiment'),
     path('permutation/<name>', views.permutation, name='permutation')
 ]
 

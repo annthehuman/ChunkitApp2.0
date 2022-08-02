@@ -95,6 +95,7 @@ class Practice extends Component {
       store.set('practiceInstructions', draftToHtml(convertToRaw(editorState.getCurrentContent())))
     };
     onLoadAudio(e) {
+      console.log('onloadaudio')
       let file = e.target.value
       let store = require('store');
       file = file.replace(/\\/g, '/').split('/').pop();

@@ -19,8 +19,9 @@ import shutil
 import pandas as pd
 from rest_framework.views import APIView
 import requests
-
+import time
 from Levenshtein import distance
+import re
 
 
 class UserActivationView(APIView):
@@ -260,15 +261,12 @@ def save_draft(request):
 
 
 def drafts_list(request):
-    print('draft list')
     if request.method == 'GET':
-
-        print('GET',request.GET['access_token'])
         tokens = list(draft_data.objects.all().values_list('accessToken', flat = True))
         tokens_zip = list(zip(tokens, list(range(len(tokens)))))
         tokens_current = list(filter(lambda x: x[0] == request.GET['access_token'], tokens_zip))
-        print(tokens_current)
-        print('tokens', tokens)        
+        # print(tokens_current)
+        # print('tokens', tokens)        
         link_tokens = list(experiment_links.objects.all().values_list('accessToken', flat = True))
         link_tokens_zip = list(zip(link_tokens, list(range(len(link_tokens)))))
         link_tokens_current = list(filter(lambda x: x[0] == request.GET['access_token'], link_tokens_zip))
@@ -297,7 +295,6 @@ def drafts_list(request):
             draft_data_list.append(draft_data_values)
         draft_data_list.append({'links': current_experiment_link})
             # print(list(ex_data_model.objects.all().values_list()))
-        print(draft_data_list)
         # name_set = ','.join(name_set)
             # print(list(ex_data_model.objects.all().values_list()))
         return HttpResponse(json.dumps(draft_data_list))
@@ -343,25 +340,37 @@ def delete_experiment(request):
 def stop_experiment(request):
     if request.method == 'GET':
         print('GET',request.GET['name'])
-        links_set = list(experiment_links.objects.all().values_list('experiment_link', flat = True))
-        links_dict = dict(zip(links_set, list(range(len(links_set)))))
-        # print(names_dict)
-        model_columns = [f.name for f in experiment_links._meta.get_fields()]
-        row_number = links_dict[request.GET['name']]
-        links_data_values = {}
+        # links_set = list(experiment_links.objects.all().values_list('experiment_link', flat = True))
+        # links_dict = dict(zip(links_set, list(range(len(links_set)))))
+        # # print(names_dict)
+        # model_columns = [f.name for f in experiment_links._meta.get_fields()]
+        # row_number = links_dict[request.GET['name']]
+        # links_data_values = {}
         
-        for col_name in model_columns:
-            col_data = list(experiment_links.objects.all().values_list(col_name, flat = True))
-            # print(col_data[row_number])
-            links_data_values[col_name] = col_data[row_number]
-        name_set = experiment_links.objects.filter(experiment_link=request.GET['name']).delete()
-        experiment_links.objects.create(
-            experiment_link = links_data_values['experiment_link'],
-            accessToken = links_data_values['accessToken'],
-            experiment_stopped = True
-        )
-        print(name_set)
-        return HttpResponse(json.dumps(response))
+        # for col_name in model_columns:
+        #     col_data = list(experiment_links.objects.all().values_list(col_name, flat = True))
+        #     # print(col_data[row_number])
+        #     links_data_values[col_name] = col_data[row_number]
+        # name_set = experiment_links.objects.filter(experiment_link=request.GET['name']).delete()
+        # experiment_links.objects.create(
+        #     experiment_link = links_data_values['experiment_link'],
+        #     accessToken = links_data_values['accessToken'],
+        #     experiment_stopped = True
+        # )
+        # print(name_set)
+        experiment_links.objects.filter(experiment_link='experiment/'+request.GET['name']).update(experiment_stopped=True)
+        return HttpResponse('Ok!')
+
+def start_experiment(request):
+    if request.method == 'GET':
+        print('GET',request.GET['name'])
+        # links_dict = dict(zip(links_set, list(range(len(links_set)))))
+        date = datetime.datetime.now()
+        # time.sleep(3)
+        # print(datetime.datetime.now(), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'))
+        # print(datetime.datetime.now() - datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f').timestamp() > 0)
+        experiment_links.objects.filter(experiment_link='experiment/'+request.GET['name']).update(experiment_start_time=date)
+        return HttpResponse('Ok!')
 
 def delete_draft(request):
     if request.method == 'GET':
@@ -463,7 +472,7 @@ def load_experement(request, experement_name):
         link = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experement_name}.*').values_list())[-1]
         # print('link set', name_set, draft_data_values)
         # print()
-        # print(name_set_new)
+        # print('link',link[-1])
 
         draft_data_values['backgroundAddQ'] = ast.literal_eval(draft_data_values['backgroundAddQ'])
         draft_data_values['feedbackAddQ'] = ast.literal_eval(draft_data_values['feedbackAddQ'])
@@ -474,7 +483,7 @@ def load_experement(request, experement_name):
         draft_data_values['audiosPractice'] = ast.literal_eval(draft_data_values['audiosPractice'])
         draft_data_values['audiosExperement'] = ast.literal_eval(draft_data_values['audiosExperement'])
         draft_data_values['pagesNeeded'] = ast.literal_eval(draft_data_values['pagesNeeded'].replace('nan', '0'))
-        draft_data_values['experimentStopped'] = ast.literal_eval(link[-1])
+        draft_data_values['experimentStopped'] = ast.literal_eval(link[-2])
         print('draft_data_values',draft_data_values)
         ### TODO linux
         # path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadPracticeAudio']
@@ -586,7 +595,8 @@ def questionnaire(request):
                 Comments = request.POST.get('Comments', ''),
                 addedQ = backgroundDict,
                 experiment_name = request.POST.get('experiment_name', ''),
-                prolific_id = request.POST.get('prolific', '')
+                prolific_id = request.POST.get('prolific', ''),
+                date = datetime.datetime.now(),
             )
         print(background.objects.all().values_list())
             # newanswer = form.save(commit=False)
@@ -597,6 +607,7 @@ def questionnaire(request):
 
 @csrf_exempt
 def data(request):
+    print('prolific', request.POST.get('prolific', ''))
     if request.method == 'POST':
         if request.is_ajax():
             req = json.loads(request.body)
@@ -715,7 +726,8 @@ def feedbackQ(request):
             comments = request.POST.get('comments', ''),
             addedQ = feedbackDict,
             experiment_name = request.POST.get('experiment_name', ''),
-            prolific_id = request.POST.get('prolific', '')
+            prolific_id = request.POST.get('prolific', ''),
+            date = datetime.datetime.now(),
             )
             # newanswer = form.save(commit=False)
             # newanswer.addedQ = backgroundDict
@@ -733,32 +745,47 @@ def results(request, name):
     if request.method == 'GET':
         print('name', name, name.split('='))
         experiment_name = name.split('=')[1]
-        name_set = list(test.objects.all().values_list('experiment_name', flat = True))
+        # name_set = list(test.objects.all().values_list('experiment_name', flat = True))
 
-        names_dict = list(filter(lambda x: x[0]  == experiment_name,list(zip(name_set, list(range(len(name_set)))))))
+        # names_dict = list(filter(lambda x: x[0]  == experiment_name,list(zip(name_set, list(range(len(name_set)))))))
         
         model_columns = [f.name for f in test._meta.get_fields()]
-        
-        experiment_results = []
-        for name, index in names_dict:
-            experiment_one_result = {}
-            for col_name in model_columns:
-                if col_name == 'session_key':
-                    col_data = list(map(lambda x: x[:5],test.objects.all().values_list(col_name, flat = True)))
-                else:
-                    col_data = list(test.objects.all().values_list(col_name, flat = True))
-                experiment_one_result[col_name] = col_data[index]
-            experiment_results.append(experiment_one_result)
-        df_raw = pd.DataFrame(experiment_results)
-        print('experiment_results', df_raw) 
-        session_ids = []
-        session_time = []
+        experiment_results = list(test.objects.filter(experiment_name=experiment_name).values_list())
 
-        for i in experiment_results:
-            if i['index'] == 0:
-                session_ids.append(i['session_key'])
-                session_time.append(i['date'].split('.')[0])
-        # print('session_ids, session_time', session_ids, session_time)
+        # print(datetime.datetime.now(), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'))
+        # print(datetime.datetime.now() - datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f').timestamp() > 0)
+        experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').values_list())[0][4]
+
+        if experiment_time != 'nothing':
+            experiment_results = list(filter(
+                                            lambda x: datetime.datetime.strptime(x[6], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
+                                                    - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
+                                      ,experiment_results))
+
+        df_raw = pd.DataFrame(experiment_results, columns=model_columns)
+        df_raw['session_key'] = df_raw['session_key'].apply(lambda x: x[:5])
+        # print('filter', experiment_results)
+        # print('time', experiment_time)
+        # experiment_results = []
+        # for name, index in names_dict:
+        #     experiment_one_result = {}
+        #     for col_name in model_columns:
+        #         if col_name == 'session_key':
+        #             col_data = list(map(lambda x: x[:5],test.objects.all().values_list(col_name, flat = True)))
+        #         else:
+        #             col_data = list(test.objects.all().values_list(col_name, flat = True))
+        #         experiment_one_result[col_name] = col_data[index]
+        #     experiment_results.append(experiment_one_result)
+        # df_raw = pd.DataFrame(experiment_results)
+        # print('experiment_results', experiment_results) 
+        session_ids = df_raw['session_key']
+        session_time = df_raw['date']
+
+        # for i in experiment_results:
+        #     if i['index'] == 0:
+        #         session_ids.append(i['session_key'])
+        #         session_time.append(i['date'].split('.')[0])
+        print('session_ids, session_time', session_ids, session_time)
 
         
         experiments_names_numbers = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
@@ -769,7 +796,7 @@ def results(request, name):
 
 
         transcripts_data = ast.literal_eval(list(draft_data.objects.all().values_list('uploadExperimentTranscriptsData', flat = True))[row_number])
-        # print('transcripts_data', transcripts_data[0])
+        # print('transcripts_data', list(draft_data.objects.filter(nameExperementForParticipants=experiment_name).values_list()))
         row_names = []
         transcript_row_number = {}
         for i, transcript in enumerate(transcripts_data):
@@ -780,17 +807,16 @@ def results(request, name):
         results_dict = dict()
         for i in range(len(experiment_results)):
             resent_results = []
-            for n in range(len(transcripts_data[experiment_results[i]['index']][1].split())-1):
+            for n in range(len(transcripts_data[df_raw['index'][i]][1].split())-1):
                 # print('experiment_results', n, [str(n)] in ast.literal_eval(experiment_results[i]['checkbox']),  type(ast.literal_eval(experiment_results[i]['checkbox'])), ast.literal_eval(experiment_results[i]['checkbox']))
-                if [str(n)] in ast.literal_eval(experiment_results[i]['checkbox']):
+                if [str(n)] in ast.literal_eval(df_raw['checkbox'][i]):
                     resent_results.append(1)
                 else:
                     resent_results.append(0)
-            results = experiment_results[i]['session_key'], resent_results
-            results_dict.setdefault(experiment_results[i]['index'], []).append(results)
+            results = df_raw['session_key'][i], resent_results
+            results_dict.setdefault(df_raw['index'][i], []).append(results)
         # print('results_dict', results_dict)
         table = [[0 for i in range(len(session_ids))] for n in range(len(row_names))]
-
 
         # print(transcript_row_number)
         for i in range(len(session_ids)):
@@ -805,7 +831,8 @@ def results(request, name):
                             table[n][i] = v[1][z]
                             z += 1
         df = pd.DataFrame(table, index=row_names)
-        df.columns = [list(map(lambda x: x[:5], session_ids)), session_time]
+        df.columns = [session_ids, session_time]
+        # print('df', df)
         outdir = settings.MEDIA_ROOT +'/Experement/'+experiment_name
         if not os.path.exists(outdir):
             os.mkdir(outdir)
@@ -829,39 +856,33 @@ def backgroundRES(request, name):
     if request.method == 'GET':
         # print('name', name, name.split('='))
         current_experiment_name = name.split('=')[1]
-        name_set = list(background.objects.all().values_list('experiment_name', flat = True))
-        names_dict = list(filter(lambda x: x[0]  == current_experiment_name,list(zip(name_set, list(range(len(name_set)))))))
-        # print(names_dict) 
+
         model_columns = [f.name for f in background._meta.get_fields()]
+        experiment_results = list(background.objects.filter(experiment_name=current_experiment_name).values_list())
+        experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
 
-        experiments_names_numbers = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
-        experiments_names_numbers_dict = dict(zip(experiments_names_numbers, list(range(len(experiments_names_numbers)))))
-        # print('experiment_data_dict', experiment_data_dict, current_experiment_name)
-        row_number = experiments_names_numbers_dict[current_experiment_name]
+        if experiment_time != 'nothing':
+            experiment_results = list(filter(
+                                            lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
+                                                    - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
+                                      ,experiment_results))
 
-        get_background_questions = list(draft_data.objects.all().values_list('backgroundExample', flat = True))[row_number]
-        get_background_add_questions = list(draft_data.objects.all().values_list('backgroundAddQ', flat = True))[row_number]
-        model_columns = list(map(lambda x: x.split('Background')[1], list(ast.literal_eval(get_background_questions).keys())))
+        df = pd.DataFrame(experiment_results, columns=model_columns)
+
+        background_questions = list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
+                                                      .values_list('backgroundExample', flat = True))
+        # print(list(ast.literal_eval(background_questions[0]).keys()))
+        model_columns = list(map(lambda x: x.split('Background')[1], list(ast.literal_eval(background_questions[0]).keys())))
         model_columns = list(filter(lambda x: 'New' not in x, model_columns))
-        if get_background_add_questions:
+        background_questions_added = ast.literal_eval(list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
+                                                      .values_list('backgroundAddQ', flat = True))[0])
+        if background_questions_added:
             model_columns.append('addedQ')
-        
-        background_table = []
-        for name, index in names_dict:
-            background_one_result = {}
-            for col_name in model_columns:
-                if col_name == 'addedQ':
-                    col_data = list(background.objects.all().values_list(col_name, flat = True))[index]
-                    for question in ast.literal_eval(get_background_add_questions).keys():
-                        if col_data:
-                            if ast.literal_eval(col_data).get(question):
-                                background_one_result[ast.literal_eval(get_background_add_questions)[question][0]] = ast.literal_eval(col_data).get(question)[0]
-                else:
-                    col_data = list(background.objects.all().values_list(col_name, flat = True))
-                    background_one_result[col_name] = col_data[index]
-            background_table.append(background_one_result)
-        df = pd.DataFrame(background_table)
-        outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+        model_columns.append('session_key')
+        df = df[model_columns]
+        df['session_key'] = df['session_key'].apply(lambda x: x[:5])
+
+        outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
         if not os.path.exists(outdir):
             os.mkdir(outdir)
         df.to_csv(os.path.join(outdir, 'background.csv'), sep=',', encoding='utf-8')
@@ -869,43 +890,33 @@ def backgroundRES(request, name):
 
 def feedbackRES(request, name):
     current_experiment_name = name.split('=')[1]
-    name_set = list(feedback.objects.all().values_list('experiment_name', flat = True))
-    names_dict = list(filter(lambda x: x[0]  == current_experiment_name,list(zip(name_set, list(range(len(name_set)))))))
-    feedback_table = []
 
-    experiments_names_numbers = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
-    experiments_names_numbers_dict = dict(zip(experiments_names_numbers, list(range(len(experiments_names_numbers)))))
-    
-    # model_columns = [f.name for f in draft_data._meta.get_fields()]
-    row_number = experiments_names_numbers_dict[current_experiment_name]
-    get_feedback_questions = list(draft_data.objects.all().values_list('feedbackExample', flat = True))[row_number]
-    get_feedback_add_questions = list(draft_data.objects.all().values_list('feedbackAddQ', flat = True))[row_number]
-    # print('get_feedback_questions, get_feedback_add_questions', list(ast.literal_eval(get_feedback_questions).keys()) + list(ast.literal_eval(get_feedback_add_questions).keys()))
+    model_columns = [f.name for f in feedback._meta.get_fields()]
+    experiment_results = list(feedback.objects.filter(experiment_name=current_experiment_name).values_list())
+    experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
 
-    model_columns = list(map(lambda x: x.split('Feedback')[1], list(ast.literal_eval(get_feedback_questions).keys())))
+    if experiment_time != 'nothing':
+        experiment_results = list(filter(
+                                        lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
+                                                - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
+                                    ,experiment_results))
+
+    df = pd.DataFrame(experiment_results, columns=model_columns)
+
+    feedback_questions = list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
+                                                    .values_list('feedbackExample', flat = True))
+    # print(list(ast.literal_eval(background_questions[0]).keys()))
+    model_columns = list(map(lambda x: x.split('Feedback')[1], list(ast.literal_eval(feedback_questions[0]).keys())))
     model_columns = list(filter(lambda x: 'New' not in x, model_columns))
-    if get_feedback_add_questions:
+    feedback_questions_added = ast.literal_eval(list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
+                                                    .values_list('feedbackAddQ', flat = True))[0])
+    if feedback_questions_added:
         model_columns.append('addedQ')
-    
-    for name, index in names_dict:
-        feedback_one_result = {}
-        for col_name in model_columns:
-            if col_name == 'CommentsText':
-                continue
-            elif col_name == 'addedQ':
-                col_data = list(feedback.objects.all().values_list(col_name, flat = True))[index]
-                print('col data', col_data)
-                for question in ast.literal_eval(get_feedback_add_questions).keys():
-                    if col_data:
-                        if ast.literal_eval(col_data).get(question):
-                            feedback_one_result[ast.literal_eval(get_feedback_add_questions)[question][0]] = ast.literal_eval(col_data).get(question)[0]
-            else:
-                col_data = list(feedback.objects.all().values_list(col_name, flat = True))
-                feedback_one_result[col_name] = col_data[index]
-            # print('col_name', col_name, index)
-        feedback_table.append(feedback_one_result)
-    df = pd.DataFrame(feedback_table)
-    outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+    model_columns.append('session_key')
+    df = df[model_columns]
+    df['session_key'] = df['session_key'].apply(lambda x: x[:5])
+
+    outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
     if not os.path.exists(outdir):
         os.mkdir(outdir)
     df.to_csv(os.path.join(outdir,'feedback.csv'), sep=',', encoding='utf-8')

@@ -45,7 +45,7 @@ export default class TestExperimentComponent extends Component {
 
             console.log('tableParts', tableParts, audios)
             if (tableParts && audios){
-            if (tableParts[0][0] == 'Audio Name') {
+            if (tableParts[0][0] == 'Audio Name' || tableParts[0][0] == 'Audio name') {
                 tableParts.shift()}
             let tableaudios = []
             let zipaudios = []

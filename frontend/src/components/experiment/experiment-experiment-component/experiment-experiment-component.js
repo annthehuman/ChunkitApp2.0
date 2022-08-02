@@ -45,7 +45,7 @@ export default class ExperimentExperimentComponent extends Component {
 
             console.log('tableParts', tableParts, audios)
             if (tableParts && audios){
-            if (tableParts[0][0] == 'Audio Name') {
+            if (tableParts[0][0] == 'Audio Name' || tableParts[0][0] == 'Audio name') {
                 tableParts.shift()}
             let tableaudios = []
             let zipaudios = []
@@ -172,10 +172,12 @@ export default class ExperimentExperimentComponent extends Component {
             const form = document.getElementById(`Experiment_post-form_${this.state.partsOrder[this.state.partid]}`)
             const csrf = this.getCookie('csrftoken');
             const user = this.getCookie('user');
+            if (!user) {
+                this.props.nextPage()
+            }
             const formData = new FormData(form);
             const prolific = this.getCookie('prolific')
             prolific ? formData.append('prolific', prolific) : null
-            // console.log('nameExperement',this.props.data.nameExperement)
             this.props.data.UseQuestions ?
             (document.getElementById(`Experiment_popup_${this.state.partsOrder[this.state.partid]}`).style.display = "block",
             document.getElementById(`Experiment_${this.state.partsOrder[this.state.partid]}`).style.display = "none"):
@@ -253,8 +255,13 @@ export default class ExperimentExperimentComponent extends Component {
             const form = e.target;
             const formData = new FormData(form);
             const user = this.getCookie('user');
+            if (!user) {
+                this.props.user = false
+            }
             const csrf = this.getCookie('csrftoken');
-            
+            const prolific = this.getCookie('prolific')
+            prolific ? formData.append('prolific', prolific) : null
+            console.log('prolific',prolific)
             formData.append('question', this.state.answer);
             formData.append("csrfmiddlewaretoken", csrf);
             formData.append('index', this.state.partsOrder[this.state.partid])

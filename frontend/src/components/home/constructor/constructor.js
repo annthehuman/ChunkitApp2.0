@@ -12,7 +12,7 @@ import { Box } from '@mui/system';
 import TabContext from '@mui/lab/TabContext';
 import CustomHeader from '../../../common_components/header';
 import CustomButton from '../../../common_components/button';
-import { Grid, Stack } from '@mui/material';
+import { Grid, Stack, Popover, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { withStyles } from '@mui/styles';
 import EditorPage from './constructor-editor';
@@ -68,6 +68,7 @@ export default class Constructor extends Component  {
         this.getButton = this.getButton.bind(this)
         this.loadTest = this.loadTest.bind(this)
         this.allInputsAReHere = this.allInputsAReHere.bind(this)
+        this.handleClose = this.handleClose.bind(this)
     }
     allInputsAReHere() {
         let controlSumm = new Set(['nameExperement',
@@ -284,6 +285,11 @@ export default class Constructor extends Component  {
     getButton(e){
         console.log('get submit button',e,  e.target.name)
         this.setState({submitButton: e.target.name})
+        if (e.target.name == "SaveDraft") {
+            e.target.innerHTML = 'Saved!'
+            console.dir(e.target)
+            setTimeout(() => {e.target.innerHTML = 'Save Draft'}, 1000)
+        }
     }
 
     loadTest() {
@@ -323,19 +329,15 @@ export default class Constructor extends Component  {
             // },
             body: formData
             }).then(data => {
-            let store = require('store')
-            store.clearAll();
             if (!data.ok){
                 throw Error(data.status);
             } else {
-                this.props.history.push("/drafts");
+                this.setState({open: true})
             }
             //console.log('так')
             }).catch((data) => {
             console.log(`Try again! Error: ${Error(data.status)}`)
-            }).finally(() => {
-            form.reset();
-            });
+            })
             // if (formData) {
             //     this.componentDidMount()
             //     this.props.history.push("/drafts");
@@ -453,6 +455,12 @@ export default class Constructor extends Component  {
             })
         }
     }
+
+    handleClose(){
+        this.setState({open: false})
+    }
+    
+
     render () {
         return(
             <>
@@ -562,7 +570,7 @@ export default class Constructor extends Component  {
             container
             direction='row'
             style={{ gap: '5px', padding: '0 24px 24px 24px' }}>
-        <CustomButton size='small' type='submit' onClick={this.getButton} name='SaveDraft' theme='blue' text='Save Draft'/>
+        <CustomButton id='saved-popover' size='small' type='submit' onClick={this.getButton} name='SaveDraft' theme='blue' text='Save Draft'/>
         <CustomButton size='small' type='submit' onClick={this.getButton} name='TestRun' theme='blue' text='Test Run'/>
         <Tooltip 
             style={{whiteSpace: 'pre-line'}}

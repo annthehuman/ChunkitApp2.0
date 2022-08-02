@@ -55,8 +55,8 @@ class Experiment extends Component {
         }
         if (store.get('uploadExperimentTranscriptsData') && store.get('audiosExperement')){
       if (store.get('uploadExperimentTranscriptsData').length > 0 && store.get('audiosExperement').length > 0){
-        this.setState({experimentAudio: store.get('uploadExperementAudio'),
-                       experimentTranscripts: store.get('uploadExperementTranscripts')})
+        this.setState({experimentAudio: store.get('uploadExperimentAudio'),
+                       experimentTranscripts: store.get('uploadExperimentTranscripts')})
       }
     }
     store.get('UseQuestions') ?

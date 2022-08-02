@@ -9,7 +9,7 @@ export default class ExperimentExperiment extends Component {
         render() {
             return(
             <>  <h2>The experimental task</h2>
-                <TestExperimentComponent data={this.props.data} nextPage={this.props.nextPage} />
+                <TestExperimentComponent user={this.props.user} data={this.props.data} nextPage={this.props.nextPage} />
             </>
          )}
     }

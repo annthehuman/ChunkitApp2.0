@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Stack, Typography, TextField } from "@mui/material";
+import { Stack, Typography, TextField, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
 import Logo from "../../../common_components/logo";
 import CustomHeader from "../../../common_components/header";
@@ -76,11 +76,12 @@ class PasswordReset extends Component{
     render() {
         return (
             <div style={{'width': '70%', 'margin': 'auto'}}>
+            <form onSubmit={this.handleSubmit}>
             <Stack direction='column' spacing={2} mt={'35px'} alignItems="center">
+            {!this.state.passwordReseted ? 
+            <>
                 <Logo/>
                 <CustomHeader text='ChunkitApp 2.0'/>
-                {!this.state.passwordReseted ? 
-            <form onSubmit={this.handleSubmit}>
                 <Typography>Set new password</Typography>
                 <TextField 
                     name="newPassword" 
@@ -130,14 +131,16 @@ class PasswordReset extends Component{
                       }}
                     />
                 <CustomButton text='Submit' theme='blue' type="submit" value="Submit" />
-            </form> :
+                </>
+            :
             <>
-                <Typography>You'r password reseted successfully!</Typography>
-                <Link to='/signup/'>
-                <CustomButton theme='black' text='Sign Up' type="button" value="Submit" />
+                <Typography>Your password was successfully reset!</Typography>
+                <Link to='/login/'>
+                <CustomButton theme='black' text='Log in' type="button" />
                 </Link> 
             </>}
             </Stack>
+            </form> 
             
             </div>
         )

@@ -7,12 +7,7 @@ import styled from 'styled-components';
 // import Logo from '../../common_components/logo';
 import { Grid } from '@mui/material';
 import CustomHat from '../../../common_components/hat';
-
-
-const AppBlock = styled.div`
-    margin: 0 auto;
-    width: 100%;
-`
+import {Typography} from '@mui/material';
 
 
 export default class Guide extends Component {
@@ -22,7 +17,6 @@ export default class Guide extends Component {
 
   render() {return(
     <>
-    <AppBlock>
 <Grid container
     direction="column"
     alignItems="center">
@@ -35,7 +29,6 @@ export default class Guide extends Component {
           <Typography>Guide</Typography>
 </Grid>
     </Grid>
-    </AppBlock>
     </>
   )}
 }

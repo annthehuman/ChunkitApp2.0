@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
 import { Link } from "react-router-dom";
-import Draft from './test'
 import CustomButton from '../../common_components/button';
 import CustomHeader from '../../common_components/header';
 import { Stack, Typography } from '@mui/material';
 import Logo from '../../common_components/logo';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import CustomBigButton from '../../common_components/big-button';
 import { Grid } from '@mui/material';
 import CustomHat from '../../common_components/hat';
@@ -95,9 +94,14 @@ export default class Home extends Component {
 <Grid container
       direction="row"
       justifyContent="space-between"
-      sx={{width: '56%'}}>
-        <CustomButton theme='white' size='icon' text='?'/>
-        <Typography sx={{fontSize:'16px'}}>This project is distributed under CC-BY-NC-SA license</Typography>
+      sx={{width: '950px'}}>
+        <Link to='guide' style={{textDecoration: 'none'}}>
+         <Stack direction="row" spacing={1}  alignItems="center">
+        <CustomButton theme='blue' size='icon' text='?'/>
+        <Typography>Guide</Typography>
+        </Stack>
+        </Link>
+        <Typography sx={{fontSize:'12px'}}>This project is distributed under CC-BY-NC-SA license</Typography>
       </Grid>
     </Grid>
     </>:

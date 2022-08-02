@@ -20,9 +20,12 @@ export default class ExperimentRun extends Component {
         pageNumber: 0,
         prolificIsHere: true,
         currentPage: 'Hello',
-        experimentStopped: false
+        experimentStopped: false,
+        user: null
     }
     this.nextPage = this.nextPage.bind(this);
+    this.getCookie = this.getCookie.bind(this);
+    this.checkuser = this.checkuser.bind(this);
 }
 getCookie(name) {
     let cookieValue = null;
@@ -38,12 +41,19 @@ getCookie(name) {
     }
     return cookieValue;
 }
+checkuser(){
+    this.getCookie('user') ? null : this.setState({user: false})
+    console.log('user timout', this.state.user, this.getCookie('user'))
+}
 componentDidMount() {
-    document.cookie = `user=${uuidv4()}; max-age=5400`
     let store = require('store');
     store.get('pageNumber') ? this.setState({pageNumber: store.get('pageNumber')}) : null
-    
     const name = this.props.match.params.name
+    if (!this.getCookie('user') && !store.get('user')) {
+        document.cookie = `user=${uuidv4()}; max-age=5400`
+        this.setState({user: this.getCookie('user')})
+        store.set('user', 'set')
+   }
     fetch('/load_experement/'+ new URLSearchParams({
         'name': name}), {
         method: "GET",
@@ -94,8 +104,21 @@ componentDidMount() {
         console.log('nextpage', this.state.pageNumber, this.state.currentPage, this.state.experimentData.pagesNeeded)
     })
     }
+    getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = cookie.substring(name.length + 1);
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
   render() {
-    // console.log(this.state.experimentData.uploadPracticeTranscriptsData)
     return(
             <AppBlock>
             {this.state.experimentData ? 
@@ -105,6 +128,7 @@ componentDidMount() {
                 <p>See you in our future experiments!</p>
                 </>
                 :
+                 this.getCookie('user') ? 
                     this.state.experimentData.UseProlific && !(this.state.prolificIsHere) ? 
                         <>
                         <h3>Oops!</h3>
@@ -121,23 +145,28 @@ componentDidMount() {
                         <TextTab key='outline' nextPage={this.nextPage} header='Session outline' textToTab={this.state.experimentData.outlineEditor} />
                         :
                         this.state.currentPage == "Background" ? 
-                        <ExperimentBackground nextPage={this.nextPage} data={this.state.experimentData}/>
+                        <ExperimentBackground user={this.user} nextPage={this.nextPage} data={this.state.experimentData}/>
                         :
                         this.state.currentPage == "Practice" ? 
                         <ExperimentPractice nextPage={this.nextPage} data={this.state.experimentData} />
                         :
                         this.state.currentPage == "Experiment" ? 
-                        <ExperimentExperiment nextPage={this.nextPage} data={this.state.experimentData} />
+                        <ExperimentExperiment user={this.user} nextPage={this.nextPage} data={this.state.experimentData} />
                         :
                         this.state.currentPage == "Imitation" ? 
-                        <ExperimentImitation nextPage={this.nextPage} data={this.state.experimentData} />
+                        <ExperimentImitation user={this.user}  nextPage={this.nextPage} data={this.state.experimentData} />
                         :
                         this.state.currentPage == "Feedback" ? 
-                        <ExperimentFeedback nextPage={this.nextPage} data={this.state.experimentData} />
+                        <ExperimentFeedback user={this.user} nextPage={this.nextPage} data={this.state.experimentData} />
                         :
                         this.state.currentPage == "Goodbye" ? 
                         <TextTab header='Goodbye!' textToTab={this.state.experimentData.goodbyeEditor} link={this.state.experimentData.linkToProlific} />
                         : null 
+                      :
+                      <>
+                      <h3>Your session has expired!</h3>
+                      <p>See you in our future experiments!</p>
+                      </>
             :
             <Spinner
               color="primary"

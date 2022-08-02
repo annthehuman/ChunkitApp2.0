@@ -153,7 +153,7 @@ class Signup extends Component{
                 <Typography sx={{color: '#D21502'}}>{values}
                 </Typography>)
                 })}
-                <CustomButton theme='black' text='Sign Up' type="submit" value="Submit" />
+                <CustomButton theme='black' text='Sign up' type="submit" value="Submit" />
                 </Stack>
                 </form>
                 
@@ -163,7 +163,7 @@ class Signup extends Component{
             <Typography>Thank you for registration!<br/>
             Please сheck your email to confirm your account.</Typography>
             <Link to='/login/'>
-            <CustomButton theme='blue' text='Log In'/>
+            <CustomButton theme='blue' text='Log in'/>
             </Link>
             </>}
             </Stack>

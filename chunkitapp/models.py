@@ -8,6 +8,7 @@ class experiment_links(models.Model):
 	experiment_link = models.TextField()
 	accessToken = models.TextField()
 	experiment_stopped = models.TextField()
+	experiment_start_time = models.TextField(default='nothing')
 
 class draft_data(models.Model):
 	accessToken = models.TextField()
@@ -65,6 +66,7 @@ class background(models.Model):
 	addedQ = models.TextField()
 	experiment_name = models.TextField(default='nothing')
 	prolific_id = models.CharField(max_length=100)
+	date = models.TextField(default='nothing')
 
 class feedback(models.Model):
 	session_key = models.TextField()
@@ -84,6 +86,7 @@ class feedback(models.Model):
 	addedQ = models.TextField()
 	experiment_name = models.TextField(default='nothing')
 	prolific_id = models.CharField(max_length=100)
+	date = models.TextField(default='nothing')
 
 class sentence(models.Model):
 	text = models.TextField(default='nothing')
@@ -91,6 +94,7 @@ class sentence(models.Model):
 	session_key = models.CharField(max_length=40)
 	experiment_name = models.TextField(default='nothing')
 	prolific_id = models.CharField(max_length=100)
+	date = models.TextField(default='nothing')
 
 class test(models.Model):
 	session_key = models.CharField(max_length=40)

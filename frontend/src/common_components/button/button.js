@@ -9,7 +9,7 @@ const StyledButton = styled(Button)(({ theme, size }) => (
   height: size == 'small' ? '36px' : size == 'icon' ? '27px' :'50px',
   minWidth: '27px',
   backgroundColor: theme == 'blue' ? '#6083FF' : theme == 'danger' ? '#FFFFFF' : theme == 'white' ? '#F8F8F8' : theme == 'gray' ? '#C4C4C4' : theme=='green' ? '#00D6A2' : theme=='trans' ? 'transparent' : '#2D2D2D',
-  color: theme == 'danger' ? '#D21919' : theme == 'white' ? '#2D2D2D' : '#FFFFFF',
+  color: theme == 'danger' ? '#D21919' : theme == 'white' ? '#2D2D2D' : theme == 'trans' ? '#2D2D2D' : '#FFFFFF',
   fontWeight: '400',
   textTransform: 'none',
   fontSize: size == 'small' ? '14px' : size == 'icon' ? '17px' : '28px',
@@ -37,9 +37,11 @@ export default class CustomButton extends Component {
   constructor(props) {
     super(props);}
 
-  render() {return (
+  render() {
+    console.log('button children', this.props.children)
+    return (
     <>
-      <Tooltip title={this.props.title ? this.props.title : this.props.text}>
+      <Tooltip title={this.props.title ? this.props.title : this.props.text} >
       <StyledButton onClick={this.props.onClick} 
                     size = {this.props.size}
                     type={this.props.type ? this.props.type : 'button'} 
