@@ -248,6 +248,44 @@ class Inputs extends Component {
                   </CustomBox>
                   </Popover>
           </Grid>
+          <br/>
+          <Grid container
+              justifyContent="flex-start"
+              alignItems="center"
+              direction='row'>
+        <TextField 
+            name="sessionTime" 
+            id="sessionTime" 
+            sx={{ width:'300px', marginRight: '10px'}}
+            label="Duration of the experiment (in min.)" 
+            variant="outlined"
+            onChange={this.onChange}
+            type='text'
+            required
+            value={store.get('sessionTime') ? store.get('sessionTime') : ''}
+            inputProps={{style: {fontSize: '20px'}}}
+            />{'   '}
+            <CustomButton onClick={(event) => this.setState({anchorElName: event.currentTarget})} 
+                                onMouseOver={(event) => this.setState({anchorElName: event.currentTarget})}
+                                text='i' 
+                                theme='gray' 
+                                size='icon' 
+                                style={{marginBottom:'5px'}}/>
+                  <Popover
+                    className={classes.root}
+                    id='popover'
+                    open={Boolean(this.state.anchorElName)}
+                    anchorEl={this.state.anchorElName}
+                    onClose={() => this.setState({anchorElName: null})}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left'
+                    }}
+                  ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}} theme='white'>
+                    <Typography sx={{fontSize: '20px'}}>Collecting data online often means you can't control how the participants are going through the experiment and how distracted you are. This field allows you to set the maximum time a participant can take to finish the experiment. After this time, the experiment session will end automatically.</Typography>
+                  </CustomBox>
+                  </Popover>
+        </Grid>
         <FormGroup style={{marginTop: '15px'}}>
           <FormControlLabel control={<Checkbox 
                                         type='checkbox'
@@ -378,7 +416,6 @@ class Inputs extends Component {
               null
             }
         </FormGroup>
-
         <Accordion
           style={{width: '650px'}}
           expanded={this.state.accordionExpanded}

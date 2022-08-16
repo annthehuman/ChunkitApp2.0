@@ -12,6 +12,7 @@ class experiment_links(models.Model):
 
 class draft_data(models.Model):
 	accessToken = models.TextField()
+	sessionTime = models.IntegerField(default=90)
 	newField = models.TextField()
 	nameExperement = models.TextField()
 	shuffleExtracts = models.TextField()
@@ -31,8 +32,8 @@ class draft_data(models.Model):
 	goodbyeEditor = models.TextField()
 	uploadPracticeAudio = models.FileField()
 	uploadPracticeTranscripts = models.FileField()
-	uploadExperementAudio = models.FileField()
-	uploadExperementTranscripts = models.FileField()
+	uploadExperimentAudio = models.FileField()
+	uploadExperimentTranscripts = models.FileField()
 	experimentInstructions = models.TextField()
 	practiceInstructions = models.TextField()
 	audiosPractice = models.TextField()

@@ -52,6 +52,9 @@ export default class ExperimentBackground extends Component {
             console.log(...formData)
             const csrf = this.getCookie('csrftoken');
             const user = this.getCookie('user');
+            if (!user) {
+                this.props.nextPage()
+            }
             const prolific = this.getCookie('prolific')
             prolific ? formData.append('prolific', prolific) : null
             formData.append("csrfmiddlewaretoken", csrf);

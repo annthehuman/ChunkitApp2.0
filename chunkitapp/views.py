@@ -70,9 +70,9 @@ def unpackArchive(experement_name):
                 table_row.append(df.iat[row, col])
             transcripts_file_practice.append(table_row)
 
-    if draft_data_values.get('uploadExperementTranscripts'):
+    if draft_data_values.get('uploadExperimentTranscripts'):
         path_to_transcripts_file_experement = settings.MEDIA_ROOT + '/' + \
-                    draft_data_values.get('uploadExperementTranscripts')
+                    draft_data_values.get('uploadExperimentTranscripts')
         df = pd.read_excel(path_to_transcripts_file_experement, 
                            converters={'Audio name': str, 'Transcript': str,
                                        'Question': str, 'Answer1': str,
@@ -121,10 +121,10 @@ def unpackArchive(experement_name):
                              os.path.isfile(
                                  os.path.join(directory_to_extract_to, f))]
 
-    if draft_data_values.get('uploadExperementAudio'):
+    if draft_data_values.get('uploadExperimentAudio'):
         path_to_zip_file = os.path.join(settings.MEDIA_ROOT,
                                         draft_data_values.get(
-                                            'uploadExperementAudio'))
+                                            'uploadExperimentAudio'))
         directory_to_extract_to = os.path.join(settings.MEDIA_ROOT,
                                                'Experement', experement_name)
         if list(os.walk(directory_to_extract_to)):
@@ -150,10 +150,11 @@ def unpackArchive(experement_name):
         onlyfilesExperement = [os.path.join(experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
     
     draft_data.objects.filter(nameExperementForParticipants=experement_name).delete()
-    print('draft_data_values.get("uploadExperementTranscripts",0)', draft_data_values.get("uploadExperementTranscripts",0))
+    print('draft_data_values.get("uploadExperimentTranscripts",0)', draft_data_values.get("uploadExperimentTranscripts",0))
     draft_data.objects.create(
         accessToken = draft_data_values.get("accessToken",0),
         nameExperement = draft_data_values.get("nameExperement",0),
+        sessionTime = draft_data_values.get("sessionTime",0),
         shuffleExtracts =  draft_data_values.get("shuffleExtracts",0),
         shuffleExtractsPractice =  draft_data_values.get("shuffleExtractsPractice",0),
         nameExperementForParticipants  = draft_data_values.get("nameExperementForParticipants",0),
@@ -171,8 +172,8 @@ def unpackArchive(experement_name):
         goodbyeEditor  = draft_data_values.get("goodbyeEditor",0),
         uploadPracticeAudio  = draft_data_values.get("uploadPracticeAudio",0),
         uploadPracticeTranscripts  = draft_data_values.get("uploadPracticeTranscripts",0),
-        uploadExperementAudio  = draft_data_values.get("uploadExperementAudio",0),
-        uploadExperementTranscripts  = draft_data_values.get("uploadExperementTranscripts",0),
+        uploadExperimentAudio  = draft_data_values.get("uploadExperimentAudio",0),
+        uploadExperimentTranscripts  = draft_data_values.get("uploadExperimentTranscripts",0),
         experimentInstructions  = draft_data_values.get("experimentInstructions",0),
         practiceInstructions  = draft_data_values.get("practiceInstructions",0),
         pagesNeeded = draft_data_values.get("pagesNeeded",0),
@@ -201,7 +202,7 @@ def save_draft(request):
 
         name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
         names_dict = dict(zip(name_set, list(range(len(name_set)))))
-        model_columns = ['uploadPracticeAudio', 'uploadPracticeTranscripts', 'uploadExperementAudio', 'uploadExperementTranscripts']
+        model_columns = ['uploadPracticeAudio', 'uploadPracticeTranscripts', 'uploadExperimentAudio', 'uploadExperimentTranscripts']
         row_number = names_dict.get(experement_name, '')
         links = list(filter(lambda x: request.POST.get('link', '') in x ,experiment_links.objects.all().values_list('experiment_link', flat = True)))
         # print('links in bd', links, request.POST.get('link', ''))
@@ -215,7 +216,8 @@ def save_draft(request):
 
         # print('back',feedback, feedback_addQ)
         if form.is_valid():
-            # print('valid', form)
+            print('valid',form)
+            # print('valid',form.sessionTime)
             form = form.save(commit=False)
             form.nameExperementForParticipants = experement_name
             form.backgroundExample = background
@@ -237,15 +239,15 @@ def save_draft(request):
             if not request.FILES.get('uploadPracticeTranscripts') and row_number and row_number >= 0:
                 form.uploadPracticeTranscripts = list(draft_data.objects.all().values_list('uploadPracticeTranscripts', flat = True))[row_number]
             if not request.FILES.get('uploadExperimentAudio') and row_number and row_number >= 0:
-                form.uploadExperementAudio = list(draft_data.objects.all().values_list('uploadExperementAudio', flat = True))[row_number]
+                form.uploadExperimentAudio = list(draft_data.objects.all().values_list('uploadExperimentAudio', flat = True))[row_number]
             else:
-                form.uploadExperementAudio = request.FILES.get('uploadExperimentAudio')
+                form.uploadExperimentAudio = request.FILES.get('uploadExperimentAudio')
             if not request.FILES.get('uploadExperimentTranscripts') and row_number and row_number >= 0:
-                form.uploadExperementTranscripts = list(draft_data.objects.all().values_list('uploadExperementTranscripts', flat = True))[row_number]
+                form.uploadExperimentTranscripts = list(draft_data.objects.all().values_list('uploadExperimentTranscripts', flat = True))[row_number]
             else:
-                form.uploadExperementTranscripts = request.FILES.get('uploadExperimentTranscripts')
+                form.uploadExperimentTranscripts = request.FILES.get('uploadExperimentTranscripts')
             form.save()
-            print('form', form.uploadExperementTranscripts)
+            # print('form', form.uploadExperimentTranscripts)
             # text_from_user_list = list(draft_data.objects.all().values_list())
             # token = draft_data.objects.all().values_list('accessToken', flat = True)
             # ids = draft_data.objects.all().values_list('id', flat = True)
@@ -391,7 +393,7 @@ def load_draft_to_test(request, draft_experement_name):
 		name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
 		names_dict = dict(zip(name_set, list(range(len(name_set)))))
 		print(names_dict)
-		model_columns = ['uploadExperementTranscripts','uploadExperementAudio','uploadPracticeAudio', 'uploadPracticeTranscripts']
+		model_columns = ['uploadExperimentTranscripts','uploadExperimentAudio','uploadPracticeAudio', 'uploadPracticeTranscripts']
 		row_number = names_dict[draft_experement_name]
 		draft_data_values = {}
 		for col_name in model_columns:
@@ -430,8 +432,8 @@ def load_draft_to_test(request, draft_experement_name):
 								shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
 			onlyfilesPractice = [os.path.join(draft_experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
 
-		if draft_data_values['uploadExperementAudio']:
-			path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadExperementAudio']
+		if draft_data_values['uploadExperimentAudio']:
+			path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadExperimentAudio']
 			directory_to_extract_to = settings.MEDIA_ROOT + '/Experement/' + draft_experement_name
 			if list(os.walk(directory_to_extract_to)):
 				shutil.rmtree(directory_to_extract_to)
@@ -788,14 +790,20 @@ def results(request, name):
         print('session_ids, session_time', session_ids, session_time)
 
         
-        experiments_names_numbers = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
-        experiments_names_numbers_dict = dict(zip(experiments_names_numbers, list(range(len(experiments_names_numbers)))))
-        
+        # experiments_names_numbers = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
+        # experiments_names_numbers_dict = dict(zip(experiments_names_numbers, list(range(len(experiments_names_numbers)))))
+        draft_data_row = list(draft_data.objects.filter(nameExperementForParticipants=experiment_name).values_list())[0]
         # model_columns = [f.name for f in draft_data._meta.get_fields()]
-        row_number = experiments_names_numbers_dict[experiment_name]
+        # row_number = experiments_names_numbers_dict[experiment_name]
+        model_columns = [f.name for f in draft_data._meta.get_fields()]
+        transcripts_data_index = model_columns.index('uploadExperimentTranscriptsData')
+        print('transcripts_data_index', len(draft_data_row), transcripts_data_index)
+        transcripts_data = ast.literal_eval(draft_data_row[transcripts_data_index])
+        # print('transcripts_data data_index', ast.literal_eval(transcripts_data[0][data_index])[0][0])
 
 
-        transcripts_data = ast.literal_eval(list(draft_data.objects.all().values_list('uploadExperimentTranscriptsData', flat = True))[row_number])
+        # transcripts_data = ast.literal_eval(list(draft_data.objects.all().values_list('uploadExperimentTranscriptsData', flat = True))[row_number])
+        print('transcripts_data', transcripts_data)
         # print('transcripts_data', list(draft_data.objects.filter(nameExperementForParticipants=experiment_name).values_list()))
         row_names = []
         transcript_row_number = {}
@@ -832,19 +840,29 @@ def results(request, name):
                             z += 1
         df = pd.DataFrame(table, index=row_names)
         df.columns = [session_ids, session_time]
+
+        transcripts_name_index = model_columns.index('uploadExperimentTranscripts')
+        data_experiment = pd.read_excel(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
+        print('data_experiment', data_experiment["Right answer"])
+        # with open(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]), 'r') as f:
+        #     f.read()
+        # print()
+        question_index = df_raw.columns.tolist().index('question')
+        df_raw.insert(loc=question_index+1, column='right answer', value=data_experiment["Right answer"])
         # print('df', df)
-        outdir = settings.MEDIA_ROOT +'/Experement/'+experiment_name
+        outdir = os.path.join(settings.MEDIA_ROOT,'Experement',experiment_name)
         if not os.path.exists(outdir):
             os.mkdir(outdir)
         df.to_csv(os.path.join(outdir, 'results.csv'), sep=',', encoding='utf-8')
         
 
-        useQ = list(draft_data.objects.all().values_list('UseQuestions', flat = True))[row_number]
-        useP = list(draft_data.objects.all().values_list('UseProlific', flat = True))[row_number]
+        useQ = draft_data_row[model_columns.index('UseQuestions')]
+        useP = draft_data_row[model_columns.index('UseProlific')]
         print('use', useP, useQ)
         if experiment_results:
             if not useQ:
                 df_raw = df_raw.drop(labels=('question'), axis=1)
+                df_raw = df_raw.drop(labels=('right answer'), axis=1)
                 print('inplace', df_raw)
             if not useP:
                 df_raw = df_raw.drop(labels=('prolific_id'), axis=1)
@@ -1172,12 +1190,17 @@ def permutation(request, name):
     df['Benjamini'] = Benjamini
     print(df)
     ones_indexes = np.where(df['Benjamini'] == 1)
-    print('ones', type(ones_indexes), ones_indexes)
-    print(np.array(ones_indexes).tolist()[0])
+    # print('ones', type(ones_indexes), ones_indexes)
+    # print(np.array(ones_indexes).tolist()[0])
     final_numbers = []
     if ones_indexes:
         final_numbers = df['observed result'][np.array(ones_indexes).tolist()[0]]
-    print('ones', final_numbers)
+        final_numbers = set(final_numbers.values)
+        if final_numbers:
+            final_numbers = str(final_numbers)
+        else:
+            final_numbers = ''
+    # print('ones', set(final_numbers.values))
     df['Final Numbers'] = final_numbers
     outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
     if not os.path.exists(outdir):

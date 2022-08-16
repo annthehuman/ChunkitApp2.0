@@ -5,6 +5,7 @@ from .models import background, feedback, sentence, experement_data, draft_data
 class draftDataForm(forms.ModelForm):
 	accessToken = forms.CharField(required=False)
 	newField = forms.CharField(required=False)
+	sessionTime = forms.IntegerField(required=False)
 	nameExperement = forms.CharField(required=False)
 	nameExperementForParticipants = forms.CharField(required=False)
 	shuffleExtracts = forms.CharField(required=False)
@@ -40,7 +41,7 @@ class draftDataForm(forms.ModelForm):
 			  'feedbackExample', 'feedbackAddQ', 'goodbyeEditor', 'uploadPracticeAudio', 'uploadPracticeTranscripts',\
 				  'uploadExperementTranscripts', 'uploadExperementAudio', 'nameExperementForParticipants',\
 					  'practiceInstructions', 'experimentInstructions', 'audiosPractice', 'audiosExperement',\
-						  'uploadPracticeTranscriptsData', 'uploadExperimentTranscriptsData')
+						  'uploadPracticeTranscriptsData', 'uploadExperimentTranscriptsData', 'sessionTime')
 
 
 class experementDataForm(forms.ModelForm):

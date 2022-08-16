@@ -68,16 +68,17 @@ class Practice extends Component {
       store.get('UseQuestions') ?
         this.setState({columnsTable: [{ field: 'id', hide: true },
         {field: 'audioName', headerName: 'Audio name', width: 80},
-        {field: 'transcript', headerName: 'Transcript', width: 300},
+        {field: 'transcript', headerName: 'Transcript', width: 290},
         {field: 'question', headerName: 'Question', width: 145},
-        {field: 'answer1', headerName: 'Answer1', width: 90},
-        {field: 'answer2', headerName: 'Answer2', width: 90}],
+        {field: 'answer1', headerName: 'Answer1', width: 80},
+        {field: 'answer2', headerName: 'Answer2', width: 80},
+        {field: 'rightAnswer', headerName: 'Right answer', width: 80}],
         rowsTable: [{id: '1',audioName: 'stim_001', transcript: 'The fault, dear Brutus, is not in our stars, but in ourselves.',
-      question: 'Is the fault in ourselves?', answer1: 'Yes', answer2: 'No'},
+      question: 'Is the fault in ourselves?', answer1: 'Yes', answer2: 'No', rightAnswer: 'Yes'},
         {id: '2',audioName: 'stim_014', transcript: 'My tongue will tell the anger of my heart, or else my heart concealing it will break.',
-        question: 'Will my tongue tell the anger of my pancreas?', answer1: 'Yes', answer2: 'No'},
+        question: 'Will my tongue tell the anger of my pancreas?', answer1: 'Yes', answer2: 'No', rightAnswer: 'No'},
         {id: '3',audioName: 'stim_145', transcript: "Though this be madness, yet there is method in't.",
-        question: 'Is there method in this madness?', answer1: 'Yes', answer2: 'No'} ]})
+        question: 'Is there method in this madness?', answer1: 'Yes', answer2: 'No', rightAnswer: 'No'} ]})
       :
         this.setState({columnsTable: [{ field: 'id',  hide: true },
         {field: 'audioName', headerName: 'Audio name', width: 150},
@@ -135,10 +136,9 @@ class Practice extends Component {
             cols: resp.cols,
             rows: realRows,
             errorTable: store.get('UseQuestions') ?
-                        !this.arrayEquals(realRows[0], ['Audio name', 'Transcript', 'Question', 'Answer1', 'Answer2']) :
+                        !this.arrayEquals(realRows[0], ['Audio name', 'Transcript', 'Question', 'Answer1', 'Answer2', 'Right answer']) :
                         !this.arrayEquals(realRows[0],['Audio name', 'Transcript'])
-          }, function () { 
-            console.log('states cols',this.state.cols, this.state.errorTable)
+          }, function () {
             store.set('uploadPracticeTranscriptsData', this.state.rows)});
         }
       });

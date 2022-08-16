@@ -82,9 +82,9 @@ toggle (event, tab) {
                 variant="scrollable"
                 scrollButtons="auto"
                 >
-                <CustomTab label="Experiment raw results" />
-                <CustomTab label="Experiment clear results"  />
-                <CustomTab label="Experiment permutation" />
+                <CustomTab label="Raw chunking results" />
+                <CustomTab label="Aggregated chunking data"  />
+                <CustomTab label="Permutation results" />
             </TabList>
             </Box>
             <TabPanel value={this.state.activeTabExperimentResults} index={0}>

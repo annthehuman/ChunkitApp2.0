@@ -32,7 +32,7 @@ export default class ExperimentRawResults extends Component {
     }
       return result
     }).then(() => {
-      store.set('results', 'loaded')
+      // store.set('results', 'loaded')
       fetch(`/static/media/Experement/${this.props.name}/results_raw.csv`)
       .then(response => response.text())
       .then(data => Papa.parse(data))

@@ -166,7 +166,7 @@ toggle (tab) {
                     <MenuIcon />
                 </IconButton> */}
                 <CustomButton theme='trans' size='icon' onClick={this.toggleDrawer('menu', true)} title="Menu" aria-label="Menu" text={<MenuRoundedIcon style={{color: '#2D2D2D'}} />}/> {'    '}
-                <CustomHeader theme='small' text='Chunktapp 2.0'/>
+                <CustomHeader theme='small' text='ChunktApp 2.0'/>
                 </Grid>
                 </Grid>
                 <Grid 
@@ -178,7 +178,7 @@ toggle (tab) {
                     <Link to='/'>
                     <CustomButton 
                         onClick={() => {document.cookie = 'access_token' +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                        this.setState({autorized: false});window.location.reload()}} 
+                        this.setState({autorized: false});; this.props.history.push("/"); window.location.reload()}} 
                         text='Log out' 
                         theme='black'
                         size='small'/>

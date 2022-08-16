@@ -149,7 +149,7 @@ export default class Feedback extends Component {
     return(
       <>
         <CustomHeader text='Feedback questions'/>
-        <Typography sx={{fontSize: '20px', marginTop: '10px', marginBottom: '10px'}}>Please mark the questions that will be on the questionnaire or add your own.</Typography> 
+        <Typography sx={{fontSize: '20px', marginTop: '10px', marginBottom: '10px'}}>Please mark the questions that you want to use in your questionnaire or add your own.</Typography> 
       <div id='feedback'>
       <Grid container
         direction='row'
@@ -500,7 +500,7 @@ export default class Feedback extends Component {
                                         checked={store.get(`useFeedbackNew${item.question_type}_Qestion${index}`)}
                                         defaultChecked={item.isChecked} 
                                         />}
-                                      label={<Typography style={{fontSize: '20px'}}>{`Use new ${type} question:`}</Typography>}
+                                      label={<Typography style={{fontSize: '20px'}}>{`Use a new ${type} question:`}</Typography>}
                                       />
                 <TextField 
                 id={`FeedbackNew${item.question_type}_Qestion${index}`} 
@@ -526,7 +526,7 @@ export default class Feedback extends Component {
         spacing={'10px'}>
       <CustomButton  size='small' id='addButtonFeedback' onClick={() => this.addQuestion('bool')} text='Add a Yes/No question' theme='green'/> 
 
-      <CustomButton  size='small' id='addButtonFeedback' onClick={() => this.addQuestion('text')} text='Add text Question' theme='green'/>
+      <CustomButton  size='small' id='addButtonFeedback' onClick={() => this.addQuestion('text')} text='Add a text question' theme='green'/>
       </Stack>
         </div>
     

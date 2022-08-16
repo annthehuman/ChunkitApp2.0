@@ -256,7 +256,7 @@ export default class ExperimentExperimentComponent extends Component {
             const formData = new FormData(form);
             const user = this.getCookie('user');
             if (!user) {
-                this.props.user = false
+                this.props.nextPage()
             }
             const csrf = this.getCookie('csrftoken');
             const prolific = this.getCookie('prolific')

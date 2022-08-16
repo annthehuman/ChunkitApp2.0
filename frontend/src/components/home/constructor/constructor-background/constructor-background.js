@@ -401,7 +401,7 @@ export default class Background extends Component {
                                     checked={store.get(`useBackgroundNew_${item.question_type}_Qestion${index}`)}
                                     defaultChecked={item.isChecked} 
                                     />}
-                                  label={<Typography style={{fontSize: '20px'}}>{`Use new ${type} question:`}</Typography>}
+                                  label={<Typography style={{fontSize: '20px'}}>{`Use a new ${type} question:`}</Typography>}
                                   />
             <TextField 
             id={`BackgroundNew_${item.question_type}_Qestion${index}`} 
@@ -423,7 +423,7 @@ export default class Background extends Component {
         <CustomButton size='small' id='addButtonBackground' onClick={() => this.addQuestion('bool')} text='Add a Yes/No question' theme='green'/>
         <br/>
         <br/>
-        <CustomButton size='small' id='addButtonBackground' onClick={() => this.addQuestion('text')} text='Add text Question' theme='green'/>
+        <CustomButton size='small' id='addButtonBackground' onClick={() => this.addQuestion('text')} text='Add a text question' theme='green'/>
         </div>
       </div>
       </>

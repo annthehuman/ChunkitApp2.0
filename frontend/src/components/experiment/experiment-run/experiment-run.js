@@ -49,11 +49,6 @@ componentDidMount() {
     let store = require('store');
     store.get('pageNumber') ? this.setState({pageNumber: store.get('pageNumber')}) : null
     const name = this.props.match.params.name
-    if (!this.getCookie('user') && !store.get('user')) {
-        document.cookie = `user=${uuidv4()}; max-age=5400`
-        this.setState({user: this.getCookie('user')})
-        store.set('user', 'set')
-   }
     fetch('/load_experement/'+ new URLSearchParams({
         'name': name}), {
         method: "GET",
@@ -87,7 +82,11 @@ componentDidMount() {
                         this.setState({prolificIsHere: true}) : (document.cookie = `prolific=${params.get('PROLIFIC_PID')}; max-age=5400`, this.setState({prolificIsHere: true}))
                     :this.setState({prolificIsHere: false}) 
                 : console.log('no', this.state.experimentData.UseProlific)
-            
+            if (!this.getCookie('user') && !store.get('user')) {
+                document.cookie = `user=${uuidv4()}; max-age=${+this.state.experimentData.sessionTime*60}`
+                this.setState({user: this.getCookie('user')})
+                store.set('user', 'set')
+            }
 
             // console.log('params', !(this.state.experimentData.UseProlific && Boolean(this.state.prolific)),Boolean(this.state.prolific) )
         })

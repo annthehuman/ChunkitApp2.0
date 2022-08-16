@@ -52,7 +52,8 @@ export default class Constructor extends Component  {
             equal: false,
             disabled: true,
             difference: new Set(),
-            spelling: {'nameExperement': 'Name of Experiment','nameExperementForParticipants': 'Name of Experiment for Participants',
+            spelling: {'nameExperement': 'Name of Experiment',
+            'nameExperementForParticipants': 'Name of Experiment for Participants', 'sessionTime': 'Duration',
             'helloEditor': 'Hello Editor','outlineEditor': 'Outline Editor','consentEditor': 'Consent Editor',
             'backgroundExample': 'Background Questions','feedbackExample': 'Feedback Questions','goodbyeEditor': 'Goodbye Editor',
             'uploadPracticeAudio': 'Audios for Practice','uploadPracticeTranscripts': 'Transcripts for Practice',
@@ -72,7 +73,7 @@ export default class Constructor extends Component  {
     }
     allInputsAReHere() {
         let controlSumm = new Set(['nameExperement',
-        'nameExperementForParticipants'])
+        'nameExperementForParticipants', 'sessionTime'])
         let store = require('store');
         const pagesNeeded = store.get('pagesNeeded')
         console.log('pagesneeded', pagesNeeded)
@@ -235,6 +236,8 @@ export default class Constructor extends Component  {
         this.setState({ activeTab: store.get('tab') })
         // console.log('current tab', store.get('tab'), typeof(store.get('tab')))}
         // console.log('did mount control summ', this.state.controlSumm)
+        if(store.get('sessionTime')) 
+        {this.appendForm('sessionTime', store.get('sessionTime'))}
         if(store.get('nameExperement') && store.get('nameExperement').length > 0) 
         {this.appendForm('nameExperement', store.get('nameExperement'))}
         if(store.get('nameExperementForParticipants') && store.get('nameExperementForParticipants').length > 0) 
@@ -285,10 +288,10 @@ export default class Constructor extends Component  {
     getButton(e){
         console.log('get submit button',e,  e.target.name)
         this.setState({submitButton: e.target.name})
-        if (e.target.name == "SaveDraft") {
+        if (e.target.name == "SaveDraft" || e.target.name == "SaveFinalVersion") {
             e.target.innerHTML = 'Saved!'
             console.dir(e.target)
-            setTimeout(() => {e.target.innerHTML = 'Save Draft'}, 1000)
+            setTimeout(() => {e.target.innerHTML = e.target.name == "SaveDraft" ? 'Save Draft': 'Save Final Version'}, 1000)
         }
     }
 
@@ -433,20 +436,7 @@ export default class Constructor extends Component  {
             }).then(data => {
             if (!data.ok){
                 throw Error(data.status);
-            } else {    
-                    name.includes(" ") ? (name = name.replace(' ', "_"), console.log('name', name) ): null
-                    
-                    console.log('constructor props',prolific)
-                if (prolific){ 
-                    console.log('constructor prolific',prolific)
-                    this.props.history.push(`experiment/${name}?PROLIFIC_PID=test`)
-                    this.props.links.push(`experiment/${name}?PROLIFIC_PID=test`)
-                }
-                else{
-                    (this.props.history.push(`experiment/${name}`),
-                    this.props.links.push(`experiment/${name}`))}
-                    console.log('constructor props',this.props.links)
-                    }
+            }
                 }).catch(error => {
                   console.log(error)
             //console.log('так')
@@ -474,7 +464,7 @@ export default class Constructor extends Component  {
                   justifyContent="space-between"
                   >
                 
-                <CustomHeader theme='small' text='Chunktapp 2.0'/>
+                <CustomHeader theme='small' text='ChunktApp 2.0'/>
                 <Grid 
                     item
                     >
@@ -505,7 +495,7 @@ export default class Constructor extends Component  {
                 <CustomTab label="Outline" value="4" />
                 <CustomTab label="Background" value="5"  />
                 <CustomTab label="Practice" value="6" />
-                <CustomTab label="Experiment" value="7" />
+                <CustomTab label="Main task" value="7" />
                 <CustomTab label="Feedback" value="8"  />
                 <CustomTab label="Goodbye" value="9" />
             </TabList>
@@ -515,7 +505,7 @@ export default class Constructor extends Component  {
                 <Inputs appendForm={this.appendForm} allInputsAReHere={this.allInputsAReHere} toggle = {this.toggle} active={this.state.activeTab} />
             </TabPanel>
             <TabPanel value="2">
-                <EditorPage editorName='hello' header='Hello page' label='Text that will greet your participants.'
+                <EditorPage editorName='hello' header='Hello page' label='A text that will greet your participants.'
                         textSample='Please make sure that you have plugged in your headphones/earphones. It is vital that you complete the experiment while wearing them.'
                         appendForm={this.appendForm}  toggle={this.toggle} active={this.state.activeTab} />
             </TabPanel>
@@ -532,7 +522,7 @@ export default class Constructor extends Component  {
                         appendForm={this.appendForm}  toggle={this.toggle} active={this.state.activeTab} />
             </TabPanel>
             <TabPanel value="4">
-                    <EditorPage editorName='outline' header='Session outline page' label='Insert the text explaining the outline of your experiment to participants here.'
+                    <EditorPage editorName='outline' header='Session outline page' label='Insert the text explaining how your experiment is supposed to go.'
                         textSample='<div>This experiment session consists of several tasks listed below. It is essential that you complete each of them. Once you finish one task, you will be automatically guided to the next one. The approximate duration of each task is mentioned in parentheses. The main task takes the longest. We recommend that during this task you take a short break.</div>
                         <ul>
                           <li>Background questionnaire (~ <strong>[insert duration here]</strong> min.)</li>
@@ -555,7 +545,7 @@ export default class Constructor extends Component  {
                 <Feedback appendForm={this.appendForm} allInputsAReHere={this.allInputsAReHere} toggle = {this.toggle} active={this.state.activeTab} />
             </TabPanel>
             <TabPanel value="9">
-                <EditorPage editorName='goodbye' header='Goodbye' label='Text your goodbye message here.'
+                <EditorPage editorName='goodbye' header='Goodbye' label='Fill in and format your goodbye message here.'
                         textSample=''
                         appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTab} />
             </TabPanel>
@@ -569,21 +559,21 @@ export default class Constructor extends Component  {
         <Grid
             container
             direction='row'
-            style={{ gap: '5px', padding: '0 24px 24px 24px' }}>
+            style={{ gap: '3px', padding: '0 0 24px 24px' }}>
         <CustomButton id='saved-popover' size='small' type='submit' onClick={this.getButton} name='SaveDraft' theme='blue' text='Save Draft'/>
         <CustomButton size='small' type='submit' onClick={this.getButton} name='TestRun' theme='blue' text='Test Run'/>
         <Tooltip 
             style={{whiteSpace: 'pre-line'}}
             title={`You need to add: ${[...this.state.difference].map(item => this.state.spelling[item]).join(', ')}`}>
         <span>
-        <CustomButton size='small' type='submit' onClick={this.getButton} disabled={this.state.disabled} id='SaveFinalVersion' name='SaveFinalVersion' theme='blue' text='Run'/>
+        <CustomButton size='small' type='submit' onClick={this.getButton} disabled={this.state.disabled} id='SaveFinalVersion' name='SaveFinalVersion' theme='blue' text='Save Final Version'/>
         </span>
         </Tooltip>
         </Grid>
         <Grid
             container
             direction='row'
-            style={{gap: '5px', padding: '0 24px 24px 24px' }}
+            style={{gap: '3px', padding: '0 24px 24px 0' }}
             justifyContent="flex-end">
         {this.state.activeTab != '1' ? <CustomButton size='small' type='button' name='Back' onClick={this.toggleBack} theme='white' text='Back' startIcon={<ArrowBackIosIcon />} style={{border: '1px solid #6083FF'}}/> : null}
         {this.state.activeTab != '9' ?<CustomButton size='small' type='button' name='Next' onClick={this.toggleNext} theme='blue' text='Next' endIcon={<ArrowForwardIosIcon />}/> : null}
