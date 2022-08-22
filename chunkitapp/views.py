@@ -154,7 +154,7 @@ def unpackArchive(experement_name):
     draft_data.objects.create(
         accessToken = draft_data_values.get("accessToken",0),
         nameExperement = draft_data_values.get("nameExperement",0),
-        sessionTime = draft_data_values.get("sessionTime",0),
+        sessionTime = draft_data_values.get("sessionTime",90),
         shuffleExtracts =  draft_data_values.get("shuffleExtracts",0),
         shuffleExtractsPractice =  draft_data_values.get("shuffleExtractsPractice",0),
         nameExperementForParticipants  = draft_data_values.get("nameExperementForParticipants",0),
