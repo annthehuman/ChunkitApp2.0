@@ -843,12 +843,13 @@ def results(request, name):
 
         transcripts_name_index = model_columns.index('uploadExperimentTranscripts')
         data_experiment = pd.read_excel(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
-        print('data_experiment', data_experiment["Right answer"])
-        # with open(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]), 'r') as f:
-        #     f.read()
-        # print()
-        question_index = df_raw.columns.tolist().index('question')
-        df_raw.insert(loc=question_index+1, column='right answer', value=data_experiment["Right answer"])
+        if data_experiment.get("Right answer"):
+            print('data_experiment', data_experiment["Right answer"])
+            # with open(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]), 'r') as f:
+            #     f.read()
+            # print()
+            question_index = df_raw.columns.tolist().index('question')
+            df_raw.insert(loc=question_index+1, column='right answer', value=data_experiment["Right answer"])
         # print('df', df)
         outdir = os.path.join(settings.MEDIA_ROOT,'Experement',experiment_name)
         if not os.path.exists(outdir):
