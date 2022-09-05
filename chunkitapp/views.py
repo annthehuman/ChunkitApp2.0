@@ -194,6 +194,9 @@ def save_draft(request):
         pagesNeeded = ''
         if (request.POST.get('pagesNeeded')):
             pagesNeeded = request.POST.get('pagesNeeded').split(',')
+            print('pagesNeeded', pagesNeeded, type(pagesNeeded))
+            if 'goodbye' not in pagesNeeded:
+                pagesNeeded.append('Goodbye')
             # print('pagesNeeded', pagesNeeded)
         background = dict(filter(lambda x: 'useBackground' in x[0],dict(request.POST).items()))
         background_addQ = dict(filter(lambda x: 'BackgroundNew' in x[0] and not 'useBackground' in x[0],dict(request.POST).items()))
