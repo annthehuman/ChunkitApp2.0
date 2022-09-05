@@ -16,10 +16,6 @@ export default class ImitationLevi extends Component {
     this.onSubmit = this.onSubmit.bind(this);
 }
   componentDidMount() {
-    let store = require('store');
-    console.log('levi',store.get('levi'),this.props.name)
-    !store.get('levi') ? 
-
     fetch('/levi/'+ new URLSearchParams({
       name:this.props.name}), {
       method: "GET",
@@ -33,13 +29,22 @@ export default class ImitationLevi extends Component {
       console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
-        return false;
+        throw Error(status_code);
     }
       return result
     }).then(() => {
-      store.set('levi', 'loaded')
+      // store.set('levi', 'loaded')
       fetch(`/static/media/Experement/${this.props.name}/sentence_distance.csv`)
-      .then(response => response.text())
+      .then(response => {
+      const result = response.text() 
+      const status_code = response.status;
+      console.log(status_code)
+      if(status_code != 200) {
+        console.log('Error in getting brand info!')
+        throw Error(status_code);
+      }
+      return result
+    })
       .then(data => Papa.parse(data))
       .then(result => {
         console.log(result.data), this.setState({results:result.data})
@@ -60,33 +65,8 @@ export default class ImitationLevi extends Component {
            cells.push(<tr key={`tr_${index}`}>{ s }</tr>)}
         })
         this.setState({rows: cells, head: head})
-      }).catch(error => console.error(error))
-      }).catch(error => {
-    console.log(error)
-    }) : 
-    fetch(`/static/media/Experement/${this.props.name}/sentence_distance.csv`)
-      .then(response => response.text())
-      .then(data => Papa.parse(data))
-      .then(result => {
-        console.log(result.data), this.setState({results:result.data})
-        let cells = []
-        let head = []
-        result.data.forEach((i, index) => {
-          if ( index < 1) {
-           let s = []
-           i.forEach(k => {
-             s.push(<th>{ k }</th>)
-           })
-           head.push(<tr key={`tr_${index}`}>{ s }</tr>)}
-         else {
-           let s = []
-           i.forEach(k => {
-             s.push(<td>{ k }</td>)
-           })
-           cells.push(<tr key={`tr_${index}`}>{ s }</tr>)}
-        })
-        this.setState({rows: cells, head: head})
-      }).catch(error => console.error(error))
+      }).catch(error => this.setState({rows: [''], head: ['No results yet']}))
+      }).catch(error => {console.log('error',error);this.setState({rows: [''], head: ['No results yet']})}) 
   }
   onSubmit(e) {
     
@@ -106,7 +86,8 @@ export default class ImitationLevi extends Component {
     <Link to={`/static/media/Experement/${this.props.name}/sentence_distance.csv`} target="_blank" download>
       <CustomButton theme='blue' size='small' text="Download Table"/>
     </Link>
-
+    <br/>
+    <br/>
     {this.state.rows.length != 0 ? 
      (<Table striped>
      <thead>

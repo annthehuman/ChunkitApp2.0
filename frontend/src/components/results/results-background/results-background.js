@@ -13,10 +13,6 @@ export default class BackgroundResults extends Component {
     }
 }
   componentDidMount() {
-    let store = require('store');
-    // console.log(this.props.name)
-    !store.get('background_results') ? 
-
     fetch('/background_results/'+ new URLSearchParams({
       name:this.props.name}), {
       method: "GET",
@@ -30,16 +26,20 @@ export default class BackgroundResults extends Component {
       console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
-        return false;
+        throw Error(status_code);
     }
       return result
     }).then(() => {
-      store.set('background_results', 'loaded')
       fetch(`/static/media/Experement/${this.props.name}/background.csv`)
-      .then(response => response.text())
+      .then(response => {
+        const status_code = response.status;
+        if(status_code != 200) {
+          console.log('Error in getting brand info!')
+          throw Error(status_code);
+        }
+        return response.text()})
       .then(data => Papa.parse(data))
       .then(result => {
-        console.log(result.data), this.setState({results:result.data})
         let cells = []
         let head = []
         result.data.forEach((i, index) => {
@@ -57,41 +57,16 @@ export default class BackgroundResults extends Component {
            cells.push(<tr key={`tr_${index}`}>{ s }</tr>)}
         })
         this.setState({rows: cells, head: head})
-      }).catch(error => console.error(error))
-      }).catch(error => {
-    console.log(error)
-    }) : 
-    fetch(`/static/media/Experement/${this.props.name}/background.csv`)
-      .then(response => response.text())
-      .then(data => Papa.parse(data))
-      .then(result => {
-        console.log(result.data), this.setState({results:result.data})
-        let cells = []
-        let head = []
-        result.data.forEach((i, index) => {
-          if ( index < 1) {
-           let s = []
-           i.forEach(k => {
-             s.push(<th>{ k }</th>)
-           })
-           head.push(<tr key={`tr_${index}`}>{ s }</tr>)}
-         else {
-           let s = []
-           i.forEach(k => {
-             s.push(<td>{ k }</td>)
-           })
-           cells.push(<tr key={`tr_${index}`}>{ s }</tr>)}
-        })
-        this.setState({rows: cells, head: head})
-      }).catch(error => console.error(error))
-  
+      }).catch(error => {console.log('error', error);this.setState({rows: [''], head: ['No results yet']})})
+      }).catch(error => { console.log('error', error);
+        this.setState({rows: [''], head: ['No results yet']})
+    })
   }
   render() {
     let i = 0
     return(
     <>
     <Link to={`/static/media/Experement/${this.props.name}/background.csv`} target="_blank" download>
-      {/* <Button color="info" outline>Download Table</Button> */}
       <CustomButton text='Download Table' theme='blue' size='small'/>
       <br/>
       <br/>

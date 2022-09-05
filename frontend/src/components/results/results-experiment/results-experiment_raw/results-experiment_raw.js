@@ -13,7 +13,6 @@ export default class ExperimentRawResults extends Component {
 }
   componentDidMount() {
     let store = require('store');
-    !store.get('results') ? 
 
     fetch('/results_data/'+ new URLSearchParams({
       name:this.props.name}), {
@@ -28,13 +27,21 @@ export default class ExperimentRawResults extends Component {
       console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
-        return false;
-    }
+        throw Error(status_code);
+      }
       return result
     }).then(() => {
-      // store.set('results', 'loaded')
       fetch(`/static/media/Experement/${this.props.name}/results_raw.csv`)
-      .then(response => response.text())
+      .then(response => {
+      const result = response.text() 
+      const status_code = response.status;
+      console.log(status_code)
+      if(status_code != 200) {
+        console.log('Error in getting brand info!')
+        throw Error(status_code);
+      }
+      return result
+      })
       .then(data => Papa.parse(data))
       .then(result => {
         let cells = []
@@ -54,32 +61,12 @@ export default class ExperimentRawResults extends Component {
            cells.push(<tr key={`tr_${index}`}>{ s }</tr>)}
         })
         this.setState({rows: cells, head: head})
-      }).catch(error => console.error(error))
+      }).catch(error => this.setState({rows: [''], head: ['No results yet']}))
       }).catch(error => {
-    console.log(error)
-    }) : 
-    fetch(`/static/media/Experement/${this.props.name}/results_raw.csv`)
-      .then(response => response.text())
-      .then(data => Papa.parse(data))
-      .then(result => {
-        let cells = []
-        let head = []
-        result.data.forEach((i, index) => {
-          if ( index < 1) {
-           let s = []
-           i.forEach(k => {
-             s.push(<th>{ k }</th>)
-           })
-           head.push(<tr key={`tr_${index}`}>{ s }</tr>)}
-         else {
-           let s = []
-           i.forEach(k => {
-             s.push(<td>{ k }</td>)
-           })
-           cells.push(<tr key={`tr_${index}`}>{ s }</tr>)}
-        })
-        this.setState({rows: cells, head: head})
-      }).catch(error => console.error(error))
+                console.log(error)
+                this.setState({rows: [''], head: ['No results yet']})
+    })
+
 }
   render() {
     let i = 0

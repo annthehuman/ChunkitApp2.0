@@ -4,11 +4,13 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 from django.contrib.sessions.models import Session
 
+
 class experiment_links(models.Model):
 	experiment_link = models.TextField()
 	accessToken = models.TextField()
 	experiment_stopped = models.TextField()
 	experiment_start_time = models.TextField(default='nothing')
+
 
 class draft_data(models.Model):
 	accessToken = models.TextField()
@@ -44,6 +46,7 @@ class draft_data(models.Model):
 										'Background', 'Practice', 'Experiment', 
 										'Imitation', 'Feedback', 'Goodbye'])
 
+
 class experement_data(models.Model):
 	name = models.TextField(default='')
 	number = models.IntegerField()
@@ -69,6 +72,7 @@ class background(models.Model):
 	prolific_id = models.CharField(max_length=100)
 	date = models.TextField(default='nothing')
 
+
 class feedback(models.Model):
 	session_key = models.TextField()
 	instructions = models.TextField()
@@ -89,6 +93,7 @@ class feedback(models.Model):
 	prolific_id = models.CharField(max_length=100)
 	date = models.TextField(default='nothing')
 
+
 class sentence(models.Model):
 	text = models.TextField(default='nothing')
 	index = models.IntegerField()
@@ -97,14 +102,16 @@ class sentence(models.Model):
 	prolific_id = models.CharField(max_length=100)
 	date = models.TextField(default='nothing')
 
+
 class test(models.Model):
 	session_key = models.CharField(max_length=40)
-	checkbox = models.TextField(default='nothing')
+	prolific_id = models.CharField(max_length=100)
+	date = models.TextField(default='nothing')
 	index = models.IntegerField()
+	checkbox = models.TextField(default='nothing')
 	question = models.CharField(max_length=10)
 	experiment_name = models.TextField(default='nothing')
-	date = models.TextField(default='nothing')
-	prolific_id = models.CharField(max_length=100)
+
 
 class sessions(models.Model):
 	session_id = models.CharField(max_length=40)

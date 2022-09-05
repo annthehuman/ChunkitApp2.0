@@ -14,9 +14,6 @@ export default class ImitationResults extends Component {
     this.onSubmit = this.onSubmit.bind(this);
 }
   componentDidMount() {
-    let store = require('store');
-    console.log(this.props.name)
-    !store.get('sentence_results') ? 
     fetch('/sentence_results/'+ new URLSearchParams({
       name:this.props.name}), {
       method: "GET",
@@ -30,13 +27,19 @@ export default class ImitationResults extends Component {
       console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
-        return false;
+        throw Error(status_code);
     }
       return result
     }).then(() => {
-      store.set('sentence_results', 'loaded')
       fetch(`/static/media/Experement/${this.props.name}/sentence.csv`)
-      .then(response => response.text())
+      .then(response => {
+        const status_code = response.status;
+        console.log(status_code)
+        if(status_code != 200) {
+          console.log('Error in getting brand info!')
+          throw Error(status_code);
+        }
+        return response.text()})
       .then(data => Papa.parse(data))
       .then(result => {
         let cells = []
@@ -56,32 +59,11 @@ export default class ImitationResults extends Component {
            cells.push(<tr key={`tr_${index}`}>{ s }</tr>)}
         })
         this.setState({rows: cells, head: head})
-      }).catch(error => console.error(error))
+      }).catch(error => this.setState({rows: [''], head: ['No results yet']}))
       }).catch(error => {
     console.log(error)
-    }) : 
-    fetch(`/static/media/Experement/${this.props.name}/sentence.csv`)
-      .then(response => response.text())
-      .then(data => Papa.parse(data))
-      .then(result => {
-        let cells = []
-        let head = []
-        result.data.forEach((i, index) => {
-          if ( index < 1) {
-           let s = []
-           i.forEach(k => {
-             s.push(<th>{ k }</th>)
-           })
-           head.push(<tr key={`tr_${index}`}>{ s }</tr>)}
-         else {
-           let s = []
-           i.forEach(k => {
-             s.push(<td>{ k }</td>)
-           })
-           cells.push(<tr key={`tr_${index}`}>{ s }</tr>)}
-        })
-        this.setState({rows: cells, head: head})
-      }).catch(error => console.error(error))
+    this.setState({rows: [''], head: ['No results yet']})
+    })
   }
 
   onSubmit(e) {
@@ -102,7 +84,8 @@ export default class ImitationResults extends Component {
     <Link to={`/static/media/Experement/${this.props.name}/sentence.csv`} target="_blank" download>
       <CustomButton text='Download Table' theme='blue' size='small'/>
     </Link>
-
+    <br/>
+    <br/>
      {this.state.rows.length != 0 ? 
      (<Table striped>
      <thead>

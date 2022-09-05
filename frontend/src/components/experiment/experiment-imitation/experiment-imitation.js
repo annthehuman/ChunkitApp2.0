@@ -60,9 +60,7 @@ export default class ExperimentImitation extends Component {
             if (!this.state.changed.includes(e.target.id.split('_')[2])){
             let newChanged = this.state.changed
                 newChanged.push(e.target.id.split('_')[2])
-                console.log(newChanged)
                 this.setState({changed: newChanged})}
-            // this.setState({[event.target.name]: event.target.value});
         }
         enableInput(e) {
             const input = document.getElementById(`input_form_${e.target.id.split('_')[2]}`)
@@ -78,7 +76,6 @@ export default class ExperimentImitation extends Component {
             practice_instruction.style.display = 'block'
         }
         playAudio(e) {
-            console.log('name', e.target.name, Array(this.state.played), typeof(this.state.played))
             if (e.target.name == 'play_practice') {
                 const audio = document.getElementById('sentence_audio_01')
                 audio.play()
@@ -99,8 +96,6 @@ export default class ExperimentImitation extends Component {
         }
         handleSubmit(e) {
             e.preventDefault();
-            console.log(e.target.id, e.target.id.split('_')[1])
-
             const sentenceNumber = e.target.id.split('_')[1],
                   form = e.currentTarget
             const formData = new FormData(form);
@@ -110,7 +105,6 @@ export default class ExperimentImitation extends Component {
             formData.append('session_key', user)
             formData.append('index', sentenceNumber);
             formData.append('experiment_name', this.props.data.nameExperementForParticipants)
-            console.log(...formData)
             fetch('/text/', {
 					method: "POST",
 					// headers: {
@@ -120,7 +114,6 @@ export default class ExperimentImitation extends Component {
 				}).then(data => {
 				   if (!data.ok){
 					throw Error(data.status);
-					// console.log(1)
 				   }
 			    }).catch((error) => {
                     console.log(error)
@@ -130,7 +123,6 @@ export default class ExperimentImitation extends Component {
             // let nextSentenceNumberStr = null
             const nextSentenceNumber = +sentenceNumber + 1;
             const nextSentenceNumberStr = nextSentenceNumber < 10 ? '0' + nextSentenceNumber : nextSentenceNumber
-            console.log(nextSentenceNumberStr, nextSentenceNumber, sentenceNumber,this.sentences.length, nextSentenceNumber <= this.sentences.length)
             if ( nextSentenceNumber <= this.sentences.length){
                 document.getElementById("sentence_" + nextSentenceNumberStr).style.display = 'block';
                 document.getElementById("sentence_" + sentenceNumber).style.display = 'none';
@@ -140,7 +132,7 @@ export default class ExperimentImitation extends Component {
 
         }
         render() {
-            console.log('test feedback instructions')
+                        
             return(
             <>
                 <div id='sentence_instructions' style={{display: 'block'}}>
@@ -178,16 +170,17 @@ export default class ExperimentImitation extends Component {
                     />
                     <br/>
                     <br/>
-                    <CustomButton size='small' type="submit" disabled={!this.state.played.includes('01') && !this.state.changed.includes('01')} onClick={this.playAudio} text='Next' theme='blue'/>
+                    <CustomButton size='small' type="submit" disabled={!this.state.played.includes('01') && !this.state.changed.includes('01')} text='Next' theme='blue'/>
 
                     </form>
                 </div>
                 <>
                 {this.sentences.map((item, index) => {
-                        // console.log(index, item)
                         index = index + 2
                         if (index < 10) {
                             index = '0'+index
+                        } else {
+                            index = index.toString()
                         }
                         return(
                         <>
@@ -212,7 +205,7 @@ export default class ExperimentImitation extends Component {
                             />
                             <br/>
                             <br/>
-                            <CustomButton size='small' type="submit" disabled={!(this.state.played.includes(index) && this.state.changed.includes(index))} onClick={this.playAudio} text='Next' theme='blue'/>
+                            <CustomButton size='small' type="submit" disabled={!(this.state.played.includes(index) && this.state.changed.includes(index))} text='Next' theme='blue'/>
                             </form>
                         </div>
                         </>)

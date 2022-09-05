@@ -16,7 +16,14 @@ export default class ExperimentClearResults extends Component {
 }
   componentDidMount() {
     fetch(`/static/media/Experement/${this.props.name}/results.csv`)
-   .then(response => response.text())
+   .then(response => {
+    const status_code = response.status;
+    console.log(status_code)
+    if(status_code != 200) {
+      console.log('Error in getting brand info!')
+      throw Error(status_code);
+    }
+    return response.text()})
    .then(data => Papa.parse(data))
    .then(result => {
      console.log(result.data), this.setState({results:result.data})
@@ -38,7 +45,7 @@ export default class ExperimentClearResults extends Component {
      })
      this.setState({rows: cells, head: head})
     })
-   .catch(error => console.error(error))
+   .catch(error => this.setState({rows: [''], head: ['No results yet']}))
   }
   onSubmit(e) {
     e.preventDefault()

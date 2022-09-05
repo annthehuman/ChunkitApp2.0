@@ -27,6 +27,7 @@ export default class TextTab extends Component {
         this.setState({consentDontAgree: true})
     }
     render() {
+        console.log('this.props.nextPage ', this.props.nextPage && this.props.header=='Informed consent' )
         return(
         <>  
         {this.state.consentDontAgree ?
@@ -41,15 +42,21 @@ export default class TextTab extends Component {
             <h3>{this.props.header}</h3>
             <div id='htmlToText'>
             </div>
-            {this.props.header=='Goodbye!' && this.props.link ?
-            <a href={`${this.props.link}`}>
-            <CustomButton size='small' theme="blue" text='Link back to Prolific'/>
-            </a>:null}
-             {this.props.nextPage && this.props.header=='Informed consent'?
-             <>
+            {this.props.header=='Informed consent' ?
+            <>
             <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='I agree'/>{'   '}
             <CustomButton size='small' onClick={this.goodbye} name='NextExperimentPage' theme="blue" text="I disagree"/>
-            </>: <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='Continue'/>}
+            </>
+            :
+            this.props.header!='Goodbye!' ?
+            <CustomButton size='small' onClick={this.props.nextPage} name='NextExperimentPage' theme="blue" text='Continue'/> :
+            this.props.link ?
+            <a href={`${this.props.link}`}>
+            <CustomButton size='small' theme="blue" text='Link back to Prolific'/>
+            </a> 
+            :
+            null
+            }
             <div className='clearfix'></div>
             </>}
         </>

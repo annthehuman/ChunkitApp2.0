@@ -161,6 +161,8 @@ export default class TestImitation extends Component {
                         index = index + 2
                         if (index < 10) {
                             index = '0'+index
+                        } else {
+                            index = index.toString()
                         }
                         return(
                         <>

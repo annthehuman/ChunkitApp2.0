@@ -99,8 +99,8 @@ DJOSER = {
     'SERIALIZERS': {},
     'USER_CREATE_PASSWORD_RETYPE ': True,
     'ACCOUNT_USERNAME_REQUIRED': False,
-        'EMAIL': {
-            'activation': 'chunkitapp.email.ActivationEmail'
+    'EMAIL': {
+        'activation': 'chunkitapp.email.ActivationEmail'
     }
 }
 

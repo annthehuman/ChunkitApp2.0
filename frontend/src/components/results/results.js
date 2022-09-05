@@ -4,7 +4,6 @@ import FeedbackResults from './results-feedback';
 import ImitationResults from './results-imitation';
 import BackgroundResults from './results-background';
 import ExperimentResults from './results-experiment';
-import { Box } from '@mui/system';
 import CustomHeader from '../../common_components/header';
 import CustomButton from '../../common_components/button';
 import { Grid } from '@mui/material';
@@ -13,6 +12,18 @@ import { Tabs } from '@mui/material';
 import { Tab } from '@mui/material';
 import { Drawer } from '@mui/material';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import TabList from '@mui/lab/TabList';
+import TabContext from '@mui/lab/TabContext';
+import { withStyles } from '@mui/styles';
+import { Box } from '@mui/system';
+
+const CustomTab = withStyles({
+root: {
+    textTransform: "none",
+    fontSize: '24px'
+}
+})(Tab);
+
 const ConstructorBlock = styled.div`
     @media (max-width: 1200px) {
         max-width: 100%;
@@ -65,7 +76,7 @@ toggleNavbar () {
 };
 
 handleChange = (event, newValue) => {
-    this.setState({value : newValue, menu: false})
+    this.setState({value : +newValue})
     // this.toggleDrawer('menu', false)
 }
 
@@ -139,9 +150,10 @@ componentDidMount() {
             console.log(error)
         })
 }
-toggle (tab) {
+toggle (e, tab) {
+  console.log('toggle', tab)
   let store = require('store')
-  if(this.state.activeTabTest !== tab) this.setState({ activeTabTest: tab });
+  if(this.state.value !== tab) this.setState({ value: tab });
   store.set('tabTest', tab)
 }
   render() {
@@ -165,7 +177,6 @@ toggle (tab) {
                 {/* <IconButton onClick={this.toggleDrawer('menu', true)} aria-label="Menu">
                     <MenuIcon />
                 </IconButton> */}
-                <CustomButton theme='trans' size='icon' onClick={this.toggleDrawer('menu', true)} title="Menu" aria-label="Menu" text={<MenuRoundedIcon style={{color: '#2D2D2D'}} />}/> {'    '}
                 <CustomHeader theme='small' text='ChunktApp 2.0'/>
                 </Grid>
                 </Grid>
@@ -186,40 +197,37 @@ toggle (tab) {
                 </Grid>
             </Grid>
             </Box>
-    <div>
-          <Drawer
-            anchor='menu'
-            open={this.state.menu}
-            onClose={this.toggleDrawer('menu', false)}
-          >
-
-          {this.state.drafts_list.pagesNeeded && this.state.drafts_list.pagesNeeded.indexOf('Imitation') != -1 ?
-            <Tabs
-                orientation="vertical"
+          
+      <TabContext value={this.state.value}>
+          <div>
+          <Box mt={2} sx={{margin: '0px auto',
+                            width: '80%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            flexWrap: 'wrap'}}>
+            {this.state.drafts_list.pagesNeeded && this.state.drafts_list.pagesNeeded.indexOf('Imitation') != -1 ?
+            <TabList 
+                onChange={this.toggle}    
                 variant="scrollable"
-                value={this.state.value}
-                onChange={this.handleChange}
-                sx={{ borderRight: 1, borderColor: 'divider' }}
-            > 
-            <Tab label="Experiment results" />
-            <Tab label="Background results"  />
-            <Tab label="Imitation results" />
-            <Tab label="Feedback results" />
-            </Tabs>
-            :
-            <Tabs
-            orientation="vertical"
-            variant="scrollable"
-            value={this.state.value}
-            onChange={this.handleChange}
-            aria-label="Vertical tabs example"
-            sx={{ borderRight: 1, borderColor: 'divider' }}
-            > 
-            <Tab label="Experiment results" />
-            <Tab label="Background results"  />
-            <Tab label="Feedback results" />
-            </Tabs>}
-          </Drawer>
+                scrollButtons="auto"
+                >
+                <CustomTab label="Experiment results" />
+                <CustomTab label="Background results"  />
+                <CustomTab label="EIT results"  />
+                <CustomTab label="Feedback results" /> 
+                </TabList>
+                :
+            <TabList 
+                onChange={this.toggle}    
+                variant="scrollable"
+                scrollButtons="auto"
+                >
+                <CustomTab label="Experiment results" />
+                <CustomTab label="Background results"  />
+                <CustomTab label="Feedback results" /> 
+                </TabList>
+              }
+            </Box>
     </div>
             {this.state.drafts_list.pagesNeeded && this.state.drafts_list.pagesNeeded.indexOf('Imitation') != -1 ?
             <>
@@ -246,7 +254,9 @@ toggle (tab) {
       <TabPanel value={this.state.value} index={2}>
         <FeedbackResults name={this.props.match.params.name} toggle = {this.toggle} active={this.state.activeTabTest} />
       </TabPanel>
+      
         </>}
+        </TabContext>
     </>
   )}
 }

@@ -241,7 +241,7 @@ export default class ExperimentFeedback extends Component {
                     )}
                     }
                     }):null}
-                    <Button type='submit' name='ConfirmBackground' color="primary">Confirm</Button>
+                    <Button type='submit' name='ConfirmBackground' color="primary">Submit</Button>
                 </form>
             </>
          )}

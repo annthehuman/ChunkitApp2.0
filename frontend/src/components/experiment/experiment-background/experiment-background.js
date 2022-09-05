@@ -49,7 +49,6 @@ export default class ExperimentBackground extends Component {
             e.preventDefault();
             const form = e.target,
                   formData = new FormData(form)
-            console.log(...formData)
             const csrf = this.getCookie('csrftoken');
             const user = this.getCookie('user');
             if (!user) {
@@ -71,7 +70,6 @@ export default class ExperimentBackground extends Component {
                 } else {
                     this.props.nextPage()
                 }
-                //console.log('так')
                 }).catch((data) => {
                 console.log(`Try again! Error: ${Error(data.status)}`)
                 }).finally(() => {

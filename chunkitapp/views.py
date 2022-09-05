@@ -1,3 +1,4 @@
+from distutils.log import error
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, response
 from .models import background, feedback, test, sessions, experiment_links
@@ -152,7 +153,7 @@ def unpackArchive(experement_name):
     draft_data.objects.filter(nameExperementForParticipants=experement_name).delete()
     print('draft_data_values.get("uploadExperimentTranscripts",0)', draft_data_values.get("uploadExperimentTranscripts",0))
     draft_data.objects.create(
-        accessToken = draft_data_values.get("accessToken",0),
+        accessToken = draft_data_values.get("accessToken", 0),
         nameExperement = draft_data_values.get("nameExperement",0),
         sessionTime = draft_data_values.get("sessionTime",90),
         shuffleExtracts =  draft_data_values.get("shuffleExtracts",0),
@@ -360,18 +361,20 @@ def stop_experiment(request):
         #     experiment_stopped = True
         # )
         # print(name_set)
-        experiment_links.objects.filter(experiment_link='experiment/'+request.GET['name']).update(experiment_stopped=True)
+        experiment_name = request.GET['name']
+        experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').update(experiment_stopped=True)
         return HttpResponse('Ok!')
 
 def start_experiment(request):
     if request.method == 'GET':
         print('GET',request.GET['name'])
+        experiment_name = request.GET['name']
         # links_dict = dict(zip(links_set, list(range(len(links_set)))))
         date = datetime.datetime.now()
         # time.sleep(3)
         # print(datetime.datetime.now(), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'))
         # print(datetime.datetime.now() - datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f').timestamp() > 0)
-        experiment_links.objects.filter(experiment_link='experiment/'+request.GET['name']).update(experiment_start_time=date)
+        experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').update(experiment_start_time=date)
         return HttpResponse('Ok!')
 
 def delete_draft(request):
@@ -609,7 +612,6 @@ def questionnaire(request):
 
 @csrf_exempt
 def data(request):
-    print('prolific', request.POST.get('prolific', ''))
     if request.method == 'POST':
         if request.is_ajax():
             req = json.loads(request.body)
@@ -699,7 +701,8 @@ def text(request):
             text = text,
             index = index,
             experiment_name = experiment_name,
-            prolific_id = request.POST.get('prolific', '')
+            prolific_id = request.POST.get('prolific', ''),
+            date = datetime.datetime.now()
             )
         # print(request.POST)
         return HttpResponse('')
@@ -743,137 +746,99 @@ def end(request):
 from functools import reduce
 
 def results(request, name):
-    # print('results')
     if request.method == 'GET':
-        print('name', name, name.split('='))
         experiment_name = name.split('=')[1]
-        # name_set = list(test.objects.all().values_list('experiment_name', flat = True))
-
-        # names_dict = list(filter(lambda x: x[0]  == experiment_name,list(zip(name_set, list(range(len(name_set)))))))
         
         model_columns = [f.name for f in test._meta.get_fields()]
         experiment_results = list(test.objects.filter(experiment_name=experiment_name).values_list())
 
-        # print(datetime.datetime.now(), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'))
-        # print(datetime.datetime.now() - datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f').timestamp() > 0)
         experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').values_list())[0][4]
 
         if experiment_time != 'nothing':
             experiment_results = list(filter(
-                                            lambda x: datetime.datetime.strptime(x[6], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
-                                                    - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
+                                      lambda x: datetime.datetime.strptime(x[3], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
+                                             - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
                                       ,experiment_results))
+
+        if not experiment_results:
+            return(error)
 
         df_raw = pd.DataFrame(experiment_results, columns=model_columns)
         df_raw['session_key'] = df_raw['session_key'].apply(lambda x: x[:5])
-        # print('filter', experiment_results)
-        # print('time', experiment_time)
-        # experiment_results = []
-        # for name, index in names_dict:
-        #     experiment_one_result = {}
-        #     for col_name in model_columns:
-        #         if col_name == 'session_key':
-        #             col_data = list(map(lambda x: x[:5],test.objects.all().values_list(col_name, flat = True)))
-        #         else:
-        #             col_data = list(test.objects.all().values_list(col_name, flat = True))
-        #         experiment_one_result[col_name] = col_data[index]
-        #     experiment_results.append(experiment_one_result)
-        # df_raw = pd.DataFrame(experiment_results)
-        # print('experiment_results', experiment_results) 
+
         session_ids = df_raw['session_key']
         session_time = df_raw['date']
-
-        # for i in experiment_results:
-        #     if i['index'] == 0:
-        #         session_ids.append(i['session_key'])
-        #         session_time.append(i['date'].split('.')[0])
-        print('session_ids, session_time', session_ids, session_time)
-
         
-        # experiments_names_numbers = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
-        # experiments_names_numbers_dict = dict(zip(experiments_names_numbers, list(range(len(experiments_names_numbers)))))
         draft_data_row = list(draft_data.objects.filter(nameExperementForParticipants=experiment_name).values_list())[0]
-        # model_columns = [f.name for f in draft_data._meta.get_fields()]
-        # row_number = experiments_names_numbers_dict[experiment_name]
         model_columns = [f.name for f in draft_data._meta.get_fields()]
         transcripts_data_index = model_columns.index('uploadExperimentTranscriptsData')
-        print('transcripts_data_index', len(draft_data_row), transcripts_data_index)
         transcripts_data = ast.literal_eval(draft_data_row[transcripts_data_index])
-        # print('transcripts_data data_index', ast.literal_eval(transcripts_data[0][data_index])[0][0])
-
-
-        # transcripts_data = ast.literal_eval(list(draft_data.objects.all().values_list('uploadExperimentTranscriptsData', flat = True))[row_number])
-        print('transcripts_data', transcripts_data)
-        # print('transcripts_data', list(draft_data.objects.filter(nameExperementForParticipants=experiment_name).values_list()))
+        
         row_names = []
+        row_chunk = []
         transcript_row_number = {}
         for i, transcript in enumerate(transcripts_data):
-            # print('transcript',transcript[1].split())
             transcript_row_number[i] = len(row_names)
-            for space in range(len(transcript[1].split())-1):
-                row_names.append(str(transcript[0])+'_'+str(space))
+            for space, word in enumerate(transcript[1].split()[:-1]):
+                row_names.append(word)
+                row_chunk.append(str(transcript[0])+'_'+str(space))
         results_dict = dict()
         for i in range(len(experiment_results)):
             resent_results = []
             for n in range(len(transcripts_data[df_raw['index'][i]][1].split())-1):
-                # print('experiment_results', n, [str(n)] in ast.literal_eval(experiment_results[i]['checkbox']),  type(ast.literal_eval(experiment_results[i]['checkbox'])), ast.literal_eval(experiment_results[i]['checkbox']))
                 if [str(n)] in ast.literal_eval(df_raw['checkbox'][i]):
                     resent_results.append(1)
                 else:
                     resent_results.append(0)
             results = df_raw['session_key'][i], resent_results
             results_dict.setdefault(df_raw['index'][i], []).append(results)
-        # print('results_dict', results_dict)
+
         table = [[0 for i in range(len(session_ids))] for n in range(len(row_names))]
 
-        # print(transcript_row_number)
         for i in range(len(session_ids)):
             for key, value in results_dict.items():
                 for v in value:
-                    # print(v[0], session_ids[i])
                     if v[0] == session_ids[i]:
-                        # print(transcript_row_number.get(key), value)
                         z = 0
                         for n in range(transcript_row_number.get(key), transcript_row_number.get(key)+len(v[1])):
-                            # print('start and finish', transcript_row_number.get(key), transcript_row_number.get(key)+len(v[1]))
                             table[n][i] = v[1][z]
                             z += 1
-        df = pd.DataFrame(table, index=row_names)
+        df = pd.DataFrame(table, index=[row_chunk, row_names])
         df.columns = [session_ids, session_time]
 
         transcripts_name_index = model_columns.index('uploadExperimentTranscripts')
-        data_experiment = pd.read_excel(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
-        if data_experiment.get("Right answer"):
-            print('data_experiment', data_experiment["Right answer"])
-            # with open(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]), 'r') as f:
-            #     f.read()
-            # print()
-            question_index = df_raw.columns.tolist().index('question')
-            df_raw.insert(loc=question_index+1, column='right answer', value=data_experiment["Right answer"])
-        # print('df', df)
-        outdir = os.path.join(settings.MEDIA_ROOT,'Experement',experiment_name)
-        if not os.path.exists(outdir):
-            os.mkdir(outdir)
-        df.to_csv(os.path.join(outdir, 'results.csv'), sep=',', encoding='utf-8')
+
+        if draft_data_row[transcripts_name_index]:
+            if not os.path.exists(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index])):
+                os.makedirs(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
+            data_experiment = pd.read_excel(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
+            df_raw = df_raw[['session_key', 'prolific_id', 'date', 'index', 'checkbox', 'question']]
+            
+            if 'Right answer' in data_experiment.columns:
+                question_index = df_raw.columns.tolist().index('question')
+                df_raw.insert(loc=question_index, column='question text', value=data_experiment["Question"])
+                df_raw.insert(loc=question_index+1, column='right answer', value=data_experiment["Right answer"])
+            outdir = os.path.join(settings.MEDIA_ROOT,'Experement',experiment_name)
+            if not os.path.exists(outdir):
+                os.mkdir(outdir)
+            df.to_csv(os.path.join(outdir, 'results.csv'), sep=',', encoding='utf-8')
+            
+            useQ = draft_data_row[model_columns.index('UseQuestions')]
+            useP = draft_data_row[model_columns.index('UseProlific')]
+            if experiment_results:
+                if not useQ:
+                    df_raw = df_raw.drop(labels=('question'), axis=1)
+                    df_raw = df_raw.drop(labels=('right answer'), axis=1)
+                if not useP:
+                    df_raw = df_raw.drop(labels=('prolific_id'), axis=1)
+            df_raw.rename(columns={"question": "answer"})
+            df_raw.to_csv(os.path.join(outdir, 'results_raw.csv'), sep=',', encoding='utf-8')
+            return HttpResponse('Success!')
+        return HttpResponse(error)
         
 
-        useQ = draft_data_row[model_columns.index('UseQuestions')]
-        useP = draft_data_row[model_columns.index('UseProlific')]
-        print('use', useP, useQ)
-        if experiment_results:
-            if not useQ:
-                df_raw = df_raw.drop(labels=('question'), axis=1)
-                df_raw = df_raw.drop(labels=('right answer'), axis=1)
-                print('inplace', df_raw)
-            if not useP:
-                df_raw = df_raw.drop(labels=('prolific_id'), axis=1)
-        df_raw.to_csv(os.path.join(outdir, 'results_raw.csv'), sep=',', encoding='utf-8')
-        return HttpResponse('Success!')
-
 def backgroundRES(request, name):
-    # print('name', name, name.split('='))
     if request.method == 'GET':
-        # print('name', name, name.split('='))
         current_experiment_name = name.split('=')[1]
 
         model_columns = [f.name for f in background._meta.get_fields()]
@@ -884,20 +849,25 @@ def backgroundRES(request, name):
             experiment_results = list(filter(
                                             lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
                                                     - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
-                                      ,experiment_results))
+                                            ,experiment_results))
 
         df = pd.DataFrame(experiment_results, columns=model_columns)
 
         background_questions = list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
                                                       .values_list('backgroundExample', flat = True))
-        # print(list(ast.literal_eval(background_questions[0]).keys()))
+
         model_columns = list(map(lambda x: x.split('Background')[1], list(ast.literal_eval(background_questions[0]).keys())))
         model_columns = list(filter(lambda x: 'New' not in x, model_columns))
         background_questions_added = ast.literal_eval(list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
                                                       .values_list('backgroundAddQ', flat = True))[0])
+        prolific = list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
+                                                      .values_list('UseProlific', flat = True))[0]
         if background_questions_added:
             model_columns.append('addedQ')
+        if prolific:
+            model_columns.append('prolific_id')
         model_columns.append('session_key')
+        print('columns', model_columns)
         df = df[model_columns]
         df['session_key'] = df['session_key'].apply(lambda x: x[:5])
 
@@ -929,8 +899,12 @@ def feedbackRES(request, name):
     model_columns = list(filter(lambda x: 'New' not in x, model_columns))
     feedback_questions_added = ast.literal_eval(list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
                                                     .values_list('feedbackAddQ', flat = True))[0])
+    prolific = list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
+                                                      .values_list('UseProlific', flat = True))[0]
     if feedback_questions_added:
         model_columns.append('addedQ')
+    if prolific:
+        model_columns.append('prolific_id')
     model_columns.append('session_key')
     df = df[model_columns]
     df['session_key'] = df['session_key'].apply(lambda x: x[:5])
@@ -945,83 +919,100 @@ def feedbackRES(request, name):
 
 def sentenceRES(request, name):
     current_experiment_name = name.split('=')[1]
-    print('sentence', name)
-    name_set = list(s.objects.all().values_list('experiment_name', flat = True))
-    names_dict = list(filter(lambda x: x[0]  == current_experiment_name,list(zip(name_set, list(range(len(name_set)))))))
+    experiment_results = list(s.objects.filter(experiment_name=current_experiment_name).values_list())
+    experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
     sentence_table = {}
-    
 
-    experiments_names_numbers = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
-    experiments_names_numbers_dict = dict(zip(experiments_names_numbers, list(range(len(experiments_names_numbers)))))
-    
-    # model_columns = [f.name for f in draft_data._meta.get_fields()]
-    row_number = experiments_names_numbers_dict[current_experiment_name]
-    is_prolific_in_draft = list(draft_data.objects.all().values_list('UseProlific', flat = True))[row_number]
+    if experiment_time != 'nothing':
+        experiment_results = list(filter(
+                                        lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
+                                                - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
+                                    ,experiment_results))
 
-    if is_prolific_in_draft:
-        model_columns = ['session_key', 'index', 'text', 'prolific_id']
-    else:
-        model_columns = ['session_key', 'index', 'text']
+    model_columns = [f.name for f in s._meta.get_fields()]
+    text_column = model_columns.index('text')
+    index_column = model_columns.index('index')
+    session_key_column = model_columns.index('session_key')
+    
+    df = pd.DataFrame(list(s.objects.all().values()))
+
     text_len = 0
-    for name, index in names_dict:
-        text_index = list(s.objects.all().values_list('text', flat = True))[index]
-        sentence_table.setdefault(list(s.objects.all().values_list('session_key', flat = True))[index], []).append(text_index)
-        if len(sentence_table[list(s.objects.all().values_list('session_key', flat = True))[index]]) > text_len:
-            text_len = len(sentence_table[list(s.objects.all().values_list('session_key', flat = True))[index]])
+
+    sentence_number = {a: [] for a in range(1, 24)}
+    for row in experiment_results:
+        text_index = row[text_column]
+        setence_index = row[index_column]
+        session_key = row[session_key_column]
+        if session_key not in sentence_number[setence_index]:
+            sentence_table.setdefault(session_key, set()).add(text_index)
+            sentence_number.setdefault(setence_index, []).append(session_key)
+        if len(sentence_table[session_key]) > text_len:
+            text_len = len(sentence_table[session_key])
+
     with open('levi.txt', 'r') as f:
         sentencies_goal = list(map(lambda x: x.replace('\n', ''), f.readlines()))
     df = pd.DataFrame.from_dict(sentence_table, orient='index', columns=sentencies_goal[:text_len])
-    # df.columns = sentencies_goal
-    # for name, index in names_dict:
-    #     sentence_one_result = {}
-    #     for col_name in model_columns:
-    #         col_data = list(s.objects.all().values_list(col_name, flat = True))[index]
-    #         if col_name == 'session_key':
-    #             col_data = col_data[:5]
-    #         sentence_one_result[col_name] = col_data
-    #     sentence_table.append(sentence_one_result)
+    df.rename(index=lambda s: s[:5], inplace=True)
 
-    # df = pd.DataFrame(sentence_table)
-    outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+    outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
     if not os.path.exists(outdir):
-        os.mkdir(outdir)
-    print('sentence', outdir, sentence_table)
+        os.makedirs(outdir)
     df.to_csv(os.path.join(outdir,'sentence.csv'), sep=',', encoding='utf-8')
     return HttpResponse("Ok!")
 
 
 def levi(request, name):
     current_experiment_name = name.split('=')[1]
-    print(name)
-    name_set = list(s.objects.all().values_list('experiment_name', flat = True))
-    names_dict = list(filter(lambda x: x[0]  == current_experiment_name,list(zip(name_set, list(range(len(name_set)))))))
+    experiment_results = list(s.objects.filter(experiment_name=current_experiment_name).values_list())
+    experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
     sentence_table = {}
-    for name, index in names_dict:
-        text_index = list(s.objects.all().values_list('text', flat = True))[index]
-        sentence_table.setdefault(list(s.objects.all().values_list('session_key', flat = True))[index], []).append(text_index)
-    # print('sentence', sentence_table, current_experiment_name)
-    with open('levi.txt', 'r') as f:
-        sentencies_goal = list(map(lambda x: x.replace('\n', ''), f.readlines()))
-        # print('goal', sentencies_goal)
-    sentence_distance = {}
-    for key, value in sentence_table.items():
-        for index, i in enumerate(value):
-            # print('dist', i, index, sentencies_goal[index])
-            sentence_distance.setdefault(key[:5], []).append(distance(i, sentencies_goal[index]))
-    print('sentence_distance', sentence_distance)
-    df = pd.DataFrame.from_dict(sentence_distance, orient='index')
-    outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
-    if not os.path.exists(outdir):
-        os.mkdir(outdir)
-    df.to_csv(os.path.join(outdir,'sentence_distance.csv'), sep=',', encoding='utf-8')
-    # json.dumps(parsed, indent=4)  
-    return HttpResponse("Ok!")
+
+    print('experiment_time', experiment_time)
+    if experiment_time != 'nothing':
+        experiment_results = list(filter(
+                                        lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
+                                                - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
+                                    ,experiment_results))
+
+    if experiment_results:
+        model_columns = [f.name for f in s._meta.get_fields()]
+        text_column = model_columns.index('text')
+        session_key_column = model_columns.index('session_key')
+
+        sentence_table = {}
+        for row in experiment_results:
+            text_index = row[text_column]
+            sentence_table.setdefault(row[session_key_column], []).append(text_index)
+        # print('sentence', sentence_table, current_experiment_name)
+        with open('levi.txt', 'r') as f:
+            sentencies_goal = list(map(lambda x: x.replace('\n', ''), f.readlines()))
+            # print('goal', sentencies_goal)
+        sentence_distance = {}
+        for key, value in sentence_table.items():
+            for index, i in enumerate(value):
+                # print('dist', i, index, sentencies_goal[index])
+                print(index, i, sentencies_goal[index])
+                sentence_distance.setdefault(key[:5], []).append(distance(i, sentencies_goal[index]))
+
+        df = pd.DataFrame.from_dict(sentence_distance, orient='index', columns=sentencies_goal[:index+1])
+        outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
+        if not os.path.exists(outdir):
+            os.mkdir(outdir)
+        df.to_csv(os.path.join(outdir,'sentence_distance.csv'), sep=',', encoding='utf-8')
+        # json.dumps(parsed, indent=4)  
+        return HttpResponse("Ok!")
+    else:
+        df = pd.DataFrame.from_dict({})
+        outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
+        if not os.path.exists(outdir):
+            os.mkdir(outdir)
+        df.to_csv(os.path.join(outdir,'sentence_distance.csv'), sep=',', encoding='utf-8')
+    return HttpResponse(error)
 
 
 @csrf_exempt
 def permutation(request, name):
     current_experiment_name = name.split('=')[1]
-    print(name)
     #monte carlo program. shuffles real results into random results (permutation test).
     #new version (divide and conquer!)
     #Nina Mikušová, 9.3.2020
@@ -1055,32 +1046,20 @@ def permutation(request, name):
             if i == 0:
                 print(line.split(',')[0])
             row_names.append(line.split(',')[0])
-        print('len', len(row_names))
-        
-        
-    
 
     table = np.loadtxt(p, dtype='int', delimiter=',', skiprows=2, usecols=np.arange(1,ncols))
-    print('table', table)
     observed_result = []
     for row in table:
         observed_result.append(sum(row))
-    # column_names = table[0]
-    # row_names = table[ : , 0]
-    print('cr', table)
     table = np.transpose(table)
 
 
     #I could count the maximum, but right now for the counting I actually need the zeroes up until the real maximum. so give as an input the number of participants.
     #CHANGE NUMBER OF PARTICIPANTS HERE
     maximum = ncols - 1
-    print(maximum)
-
 
     #create array of results, empty; will have shape of no. of participants times no. of positions
     tableshape = table.shape
-    print('shape', tableshape)
-
 
     ###added for checking the positions (?)
     a=[]
@@ -1101,8 +1080,7 @@ def permutation(request, name):
     if len(request.POST.get('amount'))>0:
         runs = int(request.POST.get('amount'))
     else:
-        runs = 1000
-    print('runs',runs,request.POST.get('amount'))
+        runs = 1000000
     cycle_length = 10
     cycles = runs // cycle_length
 
@@ -1141,7 +1119,6 @@ def permutation(request, name):
 
         #lets me know how long an outer loop execution takes
         timepoint = datetime.datetime.now()
-        print(timepoint-timestart)
 
         ###this is not the best practice, but it shouldn't hurt. calling garbage collector to clean up memory.
         gc.collect()
@@ -1189,7 +1166,6 @@ def permutation(request, name):
         return significant
     Benjamini = lsu(double_lower_p, q=0.05)
     df['Benjamini'] = Benjamini
-    print(df)
     ones_indexes = np.where(df['Benjamini'] == 1)
     # print('ones', type(ones_indexes), ones_indexes)
     # print(np.array(ones_indexes).tolist()[0])

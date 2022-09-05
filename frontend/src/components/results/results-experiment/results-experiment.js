@@ -39,12 +39,12 @@ function TabPanel(props) {
     );
   }
 
-  const CustomTab = withStyles({
-    root: {
-      textTransform: "none",
-      fontSize: '24px'
-    }
-  })(Tab);
+const CustomTab = withStyles({
+  root: {
+    textTransform: "none",
+    fontSize: '24px'
+  }
+})(Tab);
 
 export default class ExperimentResults extends Component {
   constructor(props) {
@@ -96,7 +96,7 @@ toggle (event, tab) {
             <TabPanel value={this.state.activeTabExperimentResults} index={2}>
             { this.state.activeTabExperimentResults == 2 ?  <ExperimentResultsPermutation name={this.props.name} toggle = {this.toggle} active={this.state.activeTabExperimentResults} />:null}
             </TabPanel>
-            </TabContext>
+        </TabContext>
     </>
   )}
 }
