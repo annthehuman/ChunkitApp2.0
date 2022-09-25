@@ -8,7 +8,6 @@ urlpatterns = [
     path('authorized', views.index, name='authorized'),
     path('password/reset/<uid>/<token>', views.index)
 ]
-print(urlpatterns)
 
 react_routes = getattr(settings, 'REACT_ROUTES', [])
 
@@ -16,4 +15,3 @@ for route in react_routes:
     urlpatterns += [
         path('{}'.format(route), TemplateView.as_view(template_name='frontend/index.html'))
     ]
-print(urlpatterns)

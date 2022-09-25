@@ -539,26 +539,11 @@ def consent(request):
     if request.method == 'POST':
         if request.POST['consent'] == "I agree":
             ip = get_ip(request)
-            # if sessions.objects.filter(ip=str(ip)):
-            #     for i in sessions.objects.filter(ip=str(ip)):
-            #         #print(i.ip)
-            #     #print('IP found')
 
             if sessions.objects.filter(ip=str(ip)) or sessions.objects.filter(session_id=list(request.session.keys())[1]):
-                # print('session', request.session.session_key)
-                # print('ip', sessions.objects.filter(ip=str(ip)))
-                # print('prolific', sessions.objects.filter(session_id=list(request.session.keys())[1]))
                 return redirect('passed')
 
             else:
-
-                # global x
-                # x = str(uuid.uuid4())
-                # request.session.set_expiry(5400)
-                # request.session[x]=x
-                # # #print('sessions', request.session[x], request.session.session_key)
-                # request.session.save()
-                # # #print('sessions', request.session[x], request.session.session_key)
                 session = request.session.session_key
                 prolific = list(request.session.keys())[1]
                 publish_date = datetime.datetime.now()
@@ -586,9 +571,6 @@ def questionnaire(request):
     form = backgroundForm(request.POST)
     if request.method == 'POST':
         backgroundDict = dict(filter(lambda x: 'BackgroundNew' in x[0],dict(request.POST).items()))
-        print(backgroundDict)
-        # print(form.is_valid(), form)
-        # print(request.POST.get('LevelEducation'))
         background.objects.create(
                 session_key = request.POST.get('session_key', ''),
                 Age = request.POST.get('Age', ''),
@@ -606,11 +588,6 @@ def questionnaire(request):
                 prolific_id = request.POST.get('prolific', ''),
                 date = datetime.datetime.now(),
             )
-        print(background.objects.all().values_list())
-            # newanswer = form.save(commit=False)
-            # newanswer.addedQ = backgroundDict
-            # newanswer.session_key = 0
-            # newanswer.save()
     return HttpResponse('')
 
 @csrf_exempt
@@ -619,15 +596,11 @@ def data(request):
         if request.is_ajax():
             req = json.loads(request.body)
             checkboxes = req['check']
-            #print(checkboxes)
             index = req['index']
             session = request.session.session_key
             question = req['question']
         else:
-            checkboxes = dict(filter(lambda x: 'checkbox' in x[0],dict(request.POST).items()))
-            print(dict(request.POST).values(), list(checkboxes.keys()))
-            checkboxes = list(checkboxes.values())
-            #print(checkboxes)
+            checkboxes = list(dict(filter(lambda x: 'checkbox' in x[0],dict(request.POST).items())).values())
             index = request.POST['index']
             session = request.POST.get('session_key', '')
             question = request.POST.get('question', '')
@@ -640,7 +613,6 @@ def data(request):
             date = datetime.datetime.now(),
             prolific_id = request.POST.get('prolific', '')
             )
-        #print('1', checkboxes, question, session, index)
         return HttpResponse('')
 
 
@@ -714,9 +686,9 @@ def feedbackQ(request):
     form = feedbackForm(request.POST)
     if request.method == 'POST':
         feedbackDict = dict(filter(lambda x: 'FeedbackNew' in x[0],dict(request.POST).items()))
-        print(feedbackDict)
-        print(form.is_valid(), form)
-        print(request.POST.get('education'))
+        # print(feedbackDict)
+        # print(form.is_valid(), form)
+        # print(request.POST.get('education'))
         feedback.objects.create(
             session_key = request.POST.get('session_key', ''),
             instructions = request.POST.get('instructions', ''),
@@ -756,7 +728,6 @@ def results(request, name):
         experiment_results = list(test.objects.filter(experiment_name=experiment_name).values_list())
 
         experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').values_list())[0][4]
-
         if experiment_time != 'nothing':
             experiment_results = list(filter(
                                       lambda x: datetime.datetime.strptime(x[3], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
@@ -765,12 +736,20 @@ def results(request, name):
 
         if not experiment_results:
             return(error)
-
         df_raw = pd.DataFrame(experiment_results, columns=model_columns)
         df_raw['session_key'] = df_raw['session_key'].apply(lambda x: x[:5])
 
         session_ids = df_raw['session_key']
         session_time = df_raw['date']
+
+        session_dict = {}
+
+        for index, id in enumerate(session_ids):
+            if not session_dict.get(id):
+                session_dict[id] = session_time[index]
+
+        session_ids = list(session_dict.keys())
+        session_time = list(session_dict.values())
         
         draft_data_row = list(draft_data.objects.filter(nameExperementForParticipants=experiment_name).values_list())[0]
         model_columns = [f.name for f in draft_data._meta.get_fields()]
@@ -789,6 +768,7 @@ def results(request, name):
         for i in range(len(experiment_results)):
             resent_results = []
             for n in range(len(transcripts_data[df_raw['index'][i]][1].split())-1):
+                # print(df_raw['checkbox'][i])
                 if [str(n)] in ast.literal_eval(df_raw['checkbox'][i]):
                     resent_results.append(1)
                 else:
@@ -807,6 +787,7 @@ def results(request, name):
                             table[n][i] = v[1][z]
                             z += 1
         df = pd.DataFrame(table, index=[row_chunk, row_names])
+        # print(df, session_ids, session_time)
         df.columns = [session_ids, session_time]
 
         transcripts_name_index = model_columns.index('uploadExperimentTranscripts')
@@ -815,12 +796,19 @@ def results(request, name):
             if not os.path.exists(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index])):
                 os.makedirs(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
             data_experiment = pd.read_excel(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
+            question_dict = dict(zip(data_experiment.index, data_experiment["Question"]))
+            answer_dict = dict(zip(data_experiment.index, data_experiment["Right answer"]))
+            question_column = []
+            answer_column = []
+            for i in df_raw['index']:
+                question_column.append(question_dict[i])
+                answer_column.append(answer_dict[i])
             df_raw = df_raw[['session_key', 'prolific_id', 'date', 'index', 'checkbox', 'question']]
             
             if 'Right answer' in data_experiment.columns:
                 question_index = df_raw.columns.tolist().index('question')
-                df_raw.insert(loc=question_index, column='question text', value=data_experiment["Question"])
-                df_raw.insert(loc=question_index+1, column='right answer', value=data_experiment["Right answer"])
+                df_raw.insert(loc=question_index, column='question text', value=question_column)
+                df_raw.insert(loc=question_index+1, column='correct answer', value=answer_column)
             outdir = os.path.join(settings.MEDIA_ROOT,'Experement',experiment_name)
             if not os.path.exists(outdir):
                 os.mkdir(outdir)
@@ -834,7 +822,7 @@ def results(request, name):
                     df_raw = df_raw.drop(labels=('right answer'), axis=1)
                 if not useP:
                     df_raw = df_raw.drop(labels=('prolific_id'), axis=1)
-            df_raw.rename(columns={"question": "answer"})
+            df_raw.rename(columns={"question": "reply", 'question text': 'question'}, inplace=True)
             df_raw.to_csv(os.path.join(outdir, 'results_raw.csv'), sep=',', encoding='utf-8')
             return HttpResponse('Success!')
         return HttpResponse(error)
@@ -846,6 +834,8 @@ def backgroundRES(request, name):
 
         model_columns = [f.name for f in background._meta.get_fields()]
         experiment_results = list(background.objects.filter(experiment_name=current_experiment_name).values_list())
+        if not experiment_results:
+            return(error)
         experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
 
         if experiment_time != 'nothing':
@@ -868,9 +858,9 @@ def backgroundRES(request, name):
         if background_questions_added:
             model_columns.append('addedQ')
         if prolific:
-            model_columns.append('prolific_id')
-        model_columns.append('session_key')
-        print('columns', model_columns)
+            model_columns = ['prolific_id'] + model_columns
+        model_columns = ['session_key'] + model_columns
+
         df = df[model_columns]
         df['session_key'] = df['session_key'].apply(lambda x: x[:5])
 
@@ -886,7 +876,8 @@ def feedbackRES(request, name):
     model_columns = [f.name for f in feedback._meta.get_fields()]
     experiment_results = list(feedback.objects.filter(experiment_name=current_experiment_name).values_list())
     experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
-
+    if not experiment_results:
+        return(error)
     if experiment_time != 'nothing':
         experiment_results = list(filter(
                                         lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
@@ -907,8 +898,8 @@ def feedbackRES(request, name):
     if feedback_questions_added:
         model_columns.append('addedQ')
     if prolific:
-        model_columns.append('prolific_id')
-    model_columns.append('session_key')
+        model_columns = ['prolific_id'] + model_columns
+    model_columns = ['session_key'] + model_columns
     df = df[model_columns]
     df['session_key'] = df['session_key'].apply(lambda x: x[:5])
 
@@ -924,43 +915,32 @@ def sentenceRES(request, name):
     current_experiment_name = name.split('=')[1]
     experiment_results = list(s.objects.filter(experiment_name=current_experiment_name).values_list())
     experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
-    sentence_table = {}
+    model_columns = [f.name for f in s._meta.get_fields()]
+    df = pd.DataFrame(list(s.objects.filter(experiment_name=current_experiment_name).values_list()), columns=model_columns)
 
     if experiment_time != 'nothing':
         experiment_results = list(filter(
                                         lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
                                                 - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
                                     ,experiment_results))
+        
+        df = df[df.apply(lambda x: datetime.datetime.strptime(x['date'], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
+                              - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0, axis=1)]
+    sentence_dict = {}
 
-    model_columns = [f.name for f in s._meta.get_fields()]
-    text_column = model_columns.index('text')
-    index_column = model_columns.index('index')
-    session_key_column = model_columns.index('session_key')
-    
-    df = pd.DataFrame(list(s.objects.all().values()))
+    for index, row in df.iterrows():
+        sentence_dict.setdefault(row['index'], {}).setdefault(row['session_key'][:5], row['text'])
 
-    text_len = 0
-
-    sentence_number = {a: [] for a in range(1, 24)}
-    for row in experiment_results:
-        text_index = row[text_column]
-        setence_index = row[index_column]
-        session_key = row[session_key_column]
-        if session_key not in sentence_number[setence_index]:
-            sentence_table.setdefault(session_key, set()).add(text_index)
-            sentence_number.setdefault(setence_index, []).append(session_key)
-        if len(sentence_table[session_key]) > text_len:
-            text_len = len(sentence_table[session_key])
 
     with open('levi.txt', 'r') as f:
         sentencies_goal = list(map(lambda x: x.replace('\n', ''), f.readlines()))
-    df = pd.DataFrame.from_dict(sentence_table, orient='index', columns=sentencies_goal[:text_len])
-    df.rename(index=lambda s: s[:5], inplace=True)
+    df1 = pd.DataFrame.from_dict(sentence_dict)
+    df1.columns = sentencies_goal[:df1.shape[1]]
 
     outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
     if not os.path.exists(outdir):
         os.makedirs(outdir)
-    df.to_csv(os.path.join(outdir,'sentence.csv'), sep=',', encoding='utf-8')
+    df1.to_csv(os.path.join(outdir,'sentence.csv'), sep=',', encoding='utf-8')
     return HttpResponse("Ok!")
 
 
@@ -968,49 +948,33 @@ def levi(request, name):
     current_experiment_name = name.split('=')[1]
     experiment_results = list(s.objects.filter(experiment_name=current_experiment_name).values_list())
     experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
-    sentence_table = {}
+    model_columns = [f.name for f in s._meta.get_fields()]
+    df = pd.DataFrame(list(s.objects.filter(experiment_name=current_experiment_name).values_list()), columns=model_columns)
 
-    print('experiment_time', experiment_time)
     if experiment_time != 'nothing':
         experiment_results = list(filter(
                                         lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
                                                 - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0
                                     ,experiment_results))
+        
+        df = df[df.apply(lambda x: datetime.datetime.strptime(x['date'], '%Y-%m-%d %H:%M:%S.%f').timestamp() 
+                              - datetime.datetime.strptime(experiment_time, '%Y-%m-%d %H:%M:%S.%f').timestamp() >= 0, axis=1)]
+    
+    with open('levi.txt', 'r') as f:
+        sentencies_goal = list(map(lambda x: x.replace('\n', ''), f.readlines()))
+    sentence_dict = {}
+    for index, row in df.iterrows():
+        sentence_dict.setdefault(row['index'], {}).setdefault(row['session_key'][:5], distance(row['text'], sentencies_goal[row['index']-1]) )
+    df1 = pd.DataFrame.from_dict(sentence_dict)
+    df1.columns = sentencies_goal[:df1.shape[1]]
 
-    if experiment_results:
-        model_columns = [f.name for f in s._meta.get_fields()]
-        text_column = model_columns.index('text')
-        session_key_column = model_columns.index('session_key')
+    outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
-        sentence_table = {}
-        for row in experiment_results:
-            text_index = row[text_column]
-            sentence_table.setdefault(row[session_key_column], []).append(text_index)
-        # print('sentence', sentence_table, current_experiment_name)
-        with open('levi.txt', 'r') as f:
-            sentencies_goal = list(map(lambda x: x.replace('\n', ''), f.readlines()))
-            # print('goal', sentencies_goal)
-        sentence_distance = {}
-        for key, value in sentence_table.items():
-            for index, i in enumerate(value):
-                # print('dist', i, index, sentencies_goal[index])
-                print(index, i, sentencies_goal[index])
-                sentence_distance.setdefault(key[:5], []).append(distance(i, sentencies_goal[index]))
+    df1.to_csv(os.path.join(outdir,'sentence_distance.csv'), sep=',', encoding='utf-8')
+    return HttpResponse("Ok!")
 
-        df = pd.DataFrame.from_dict(sentence_distance, orient='index', columns=sentencies_goal[:index+1])
-        outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
-        if not os.path.exists(outdir):
-            os.mkdir(outdir)
-        df.to_csv(os.path.join(outdir,'sentence_distance.csv'), sep=',', encoding='utf-8')
-        # json.dumps(parsed, indent=4)  
-        return HttpResponse("Ok!")
-    else:
-        df = pd.DataFrame.from_dict({})
-        outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
-        if not os.path.exists(outdir):
-            os.mkdir(outdir)
-        df.to_csv(os.path.join(outdir,'sentence_distance.csv'), sep=',', encoding='utf-8')
-    return HttpResponse(error)
 
 
 @csrf_exempt
@@ -1046,11 +1010,9 @@ def permutation(request, name):
         row_names = []
         for i, line in enumerate(f.readlines()):
             # print('i', i, line)
-            if i == 0:
-                print(line.split(',')[0])
             row_names.append(line.split(',')[0])
 
-    table = np.loadtxt(p, dtype='int', delimiter=',', skiprows=2, usecols=np.arange(1,ncols))
+    table = np.loadtxt(p, dtype='int', delimiter=',', skiprows=2, usecols=np.arange(2,ncols))
     observed_result = []
     for row in table:
         observed_result.append(sum(row))
@@ -1182,12 +1144,41 @@ def permutation(request, name):
             final_numbers = ''
     # print('ones', set(final_numbers.values))
     df['Final Numbers'] = final_numbers
-    outdir = settings.MEDIA_ROOT +'/Experement/'+current_experiment_name
+    outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
     if not os.path.exists(outdir):
         os.mkdir(outdir)
     df.to_csv(os.path.join(outdir,'results_permutation.csv'), sep=',', encoding='utf-8')
     timeend = datetime.datetime.now()
-    print("finished after ", timeend-timestart)
 
+    if request.POST.get('user'):
+        username = get_user(request.POST.get('user'))
+        send_email(os.path.join(outdir, 'results_permutation.csv'), username)
 
     return HttpResponse("Ok!")
+
+def send_email(filename, username):
+    from django.core.mail import EmailMessage
+    subject = "ChunkitApp results of permutation test"
+    message = "Hi, \nPlease find the attached csv containing results of permutation test."
+    email = username
+    try:
+        with open(filename, "rb") as csvfile:
+            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, [email])
+            mail.attach(filename, csvfile.read(), 'text/csv')
+            # print("\nSending email..")
+            mail.send()
+            # print("Email sent successfully!")
+        csvfile.close()
+    except Exception as e:
+        print("Sorry mail was not sent.")
+        print(e)
+
+def get_user(user_key):
+    from rest_framework.authtoken.models import Token
+    from django.contrib.auth.models import User
+
+    # print(user_key)
+
+    user_id = Token.objects.get(key=user_key).user_id
+    user = User.objects.get(id=user_id)
+    return user

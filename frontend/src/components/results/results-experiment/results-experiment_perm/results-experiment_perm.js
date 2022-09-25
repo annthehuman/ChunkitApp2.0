@@ -16,11 +16,27 @@ export default class ExperimentResultsPermutation extends Component {
       head: []
     }
     this.onSubmit = this.onSubmit.bind(this)
+    this.getCookie = this.getCookie.bind(this)
+  }
+  getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          let cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              let cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = cookie.substring(name.length + 1);
+                  break;
+              }
+          }
+      }
+      return cookieValue;
   }
   componentDidMount() {
     let store = require('store')
     // if (store.get('sended'))
     // {this.setState({ sended: store.get('sended') });}
+
     store.get('perm') ? 
     fetch(`/static/media/Experement/${this.props.name}/results_permutation.csv`)
     .then(response => response.text())
@@ -53,7 +69,8 @@ export default class ExperimentResultsPermutation extends Component {
     e.preventDefault();
     const form = e.target
     const formData = new FormData(form);
-    console.log(...formData)
+    const user = this.getCookie('access_token');
+    formData.append('user', user)
     fetch('/permutation/'+ new URLSearchParams({
       name:this.props.name}), {
     method: "POST",

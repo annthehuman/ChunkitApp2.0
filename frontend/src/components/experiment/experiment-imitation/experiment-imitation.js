@@ -92,8 +92,7 @@ export default class ExperimentImitation extends Component {
             }
             }
         }
-        componentDidMount(){
-        }
+
         handleSubmit(e) {
             e.preventDefault();
             const sentenceNumber = e.target.id.split('_')[1],

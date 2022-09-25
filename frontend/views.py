@@ -5,5 +5,4 @@ from rest_framework import generics, permissions
 # Create your views here.
 @ensure_csrf_cookie
 def index(request, **kwargs):
-    
     return render(request, 'frontend/index.html')
