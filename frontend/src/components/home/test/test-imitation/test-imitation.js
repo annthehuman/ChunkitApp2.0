@@ -45,9 +45,7 @@ export default class TestImitation extends Component {
             if (!this.state.changed.includes(e.target.name.split('_')[2])){
             let newChanged = this.state.changed
                 newChanged.push(e.target.name.split('_')[2])
-                console.log(newChanged)
                 this.setState({changed: newChanged})}
-            // this.setState({[event.target.name]: event.target.value});
         }
         enableInput(e) {
             const input = document.getElementById(`input_form_${e.target.id.split('_')[2]}`)
@@ -63,7 +61,6 @@ export default class TestImitation extends Component {
             practice_instruction.style.display = 'block'
         }
         playAudio(e) {
-            console.log('name', e.target.name, Array(this.state.played), typeof(this.state.played))
             if (e.target.name == 'play_practice') {
                 const audio = document.getElementById('sentence_audio_01')
                 audio.play()
@@ -84,17 +81,14 @@ export default class TestImitation extends Component {
         }
         handleSubmit(e) {
             e.preventDefault();
-            console.log(e.target.id, e.target.id.split('_')[1])
 
             const sentenceNumber = e.target.id.split('_')[1],
                   form = e.currentTarget
             let nextSentenceNumber = null
             const k = +sentenceNumber + 1;
-            console.log(k)
             if (k < 10) {
                 
                 nextSentenceNumber = '0' + k;
-                console.log(nextSentenceNumber)
                 if (nextSentenceNumber <= 24){
 					document.getElementById("sentence_" + nextSentenceNumber).style.display = 'block';
 					document.getElementById("sentence_" + sentenceNumber).style.display = 'none';
@@ -110,12 +104,10 @@ export default class TestImitation extends Component {
                     this.props.toggle(String(+this.props.active + 1))
 				}
             }
-			    console.log(nextSentenceNumber)
 
         }
         render() {
             let store = require('store');
-            console.log('test feedback instructions')
             return(
             <>
                 <div id='sentence_instructions' style={{display: 'block'}}>
@@ -157,7 +149,6 @@ export default class TestImitation extends Component {
                 </div>
                 <>
                 {this.sentences.map((item, index) => {
-                        // console.log(index, item)
                         index = index + 2
                         if (index < 10) {
                             index = '0'+index

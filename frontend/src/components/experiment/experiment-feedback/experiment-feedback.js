@@ -12,13 +12,10 @@ export default class ExperimentFeedback extends Component {
         this.getCookie = this.getCookie.bind(this)
         }
         componentDidMount() {
-            // console.log(this.props.data.backgroundAddQ[`BackgroundNew_bool_Qestion${0}`])
             let obj = []
             let s = 0
             for (let i in this.props.data.feedbackAddQ) {
-                console.log(i.split('_')[1])
                 if (i.split('_')[1] == 'bool') {
-                    console.log(i.slice(-1), this.props.data.feedbackAddQ, this.props.data.feedbackAddQ[`FeedbackNew_bool_Qestion${s}`],`FeedbackNew_bool_Qestion${s}`, s)
                     let type = 'bool',
                         name = `FeedbackNew_bool_Qestion${i.slice(-1)}`,
                         text = this.props.data.feedbackAddQ[`FeedbackNew_bool_Qestion${i.slice(-1)}`][0];
@@ -30,14 +27,8 @@ export default class ExperimentFeedback extends Component {
                     obj.push({type, name, text})
                 }
                 s = s + 1
-            console.log(obj)
-                // console.log(this.props.data.backgroundAddQ[`BackgroundNew_bool_Qestion${i}`])
-                // obj.push
             }
             this.setState({addedQFeed: obj})
-            // for (let key in Object.keys(JSON.parse(JSON.stringify(this.props.data.backgroundAddQ)))) {
-            //     console.log('BackgroundNew_bool_Qestion'+key)
-            // }  
         }
         getCookie(name) {
             let cookieValue = null;
@@ -57,7 +48,6 @@ export default class ExperimentFeedback extends Component {
             e.preventDefault();
             const form = e.target,
                   formData = new FormData(form)
-            console.log(...formData)
             const csrf = this.getCookie('csrftoken');
             const user = this.getCookie('user');
             if (!user) {
@@ -70,11 +60,6 @@ export default class ExperimentFeedback extends Component {
             formData.append('experiment_name', this.props.data.nameExperementForParticipants)
             fetch('/feedback/', {
                 method: "POST",
-                // headers: {
-                //     'X-CSRFToken': csrf,
-                //     "Content-Type": "application/json",
-                //     "X-Requested-With": "XMLHttpRequest"
-                // },
                 body: formData
                 }).then(data => {
                 let store = require('store')
@@ -84,7 +69,6 @@ export default class ExperimentFeedback extends Component {
                 } else {
                     this.props.nextPage()
                 }
-                //console.log('так')
                 }).catch((data) => {
                 console.log(`Try again! Error: ${Error(data.status)}`)
                 }).finally(() => {
@@ -221,7 +205,6 @@ export default class ExperimentFeedback extends Component {
                     :null}
                 {this.state.addedQFeed?
                 this.state.addedQFeed.map((item, index) => {
-                    console.log('this.state.addedQFeed',this.state.addedQFeed, this.props.data.feedbackExample[`use${item.name}`])
                     if (this.props.data.feedbackExample[`use${item.name}`])
                     {if(item.type == 'bool'){
                         return (

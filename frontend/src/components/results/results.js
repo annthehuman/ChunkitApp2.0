@@ -95,24 +95,18 @@ getCookie(name) {
     return cookieValue;
 }
 toggleDrawer = (anchor, open) => (event) => {
-    console.log('menu closed')
 
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
-    console.log('menu closed', open)
 
     this.setState({[anchor]: open });
   };
 
 componentDidMount() {
     let store = require('store')
-    console.log('tabTest',store.get('tabTest'))
     if (store.get('tabTest'))
     {this.setState({ activeTabTest: store.get('tabTest') });}
-    console.log(this.state.activeTabTest)
-
-    console.log('props',this.props.links)
     const usertoken = this.getCookie('access_token');
     fetch ('/drafts_list/?'+ new URLSearchParams({
         access_token: usertoken}), {
@@ -123,11 +117,8 @@ componentDidMount() {
       }
       })
       .then(response => {
-          // console.log(response.text())
           const result = response.json()
-          console.log('result', result);
           const status_code = response.status;
-          console.log(status_code)
           if(status_code != 200) {
               console.log('Error in getting brand info!')
               return false;
@@ -135,29 +126,23 @@ componentDidMount() {
           
           return result
         }).then(result => {
-          console.log('result result', result);
           result.pop()
           result.forEach(item => {
-              console.log('name', item.nameExperementForParticipants, this.props.match.params.name)
               if(item.nameExperementForParticipants == this.props.match.params.name) {
                 this.setState({drafts_list: item})
               }
           })
-          
-          // Do something with the result
         })
         .catch(error => {
             console.log(error)
         })
 }
 toggle (e, tab) {
-  console.log('toggle', tab)
   let store = require('store')
   if(this.state.value !== tab) this.setState({ value: tab });
   store.set('tabTest', tab)
 }
   render() {
-    console.log('drafts_list', typeof(this.state.drafts_list.pagesNeeded))
     return(
             <>
             <Box mt={2} sx={{margin: '30px auto 15px auto',
@@ -174,9 +159,6 @@ toggle (e, tab) {
                   direction='row'
                   justifyContent="space-between"
                   >
-                {/* <IconButton onClick={this.toggleDrawer('menu', true)} aria-label="Menu">
-                    <MenuIcon />
-                </IconButton> */}
                 <CustomHeader theme='small' text='ChunktApp 2.0'/>
                 </Grid>
                 </Grid>

@@ -57,12 +57,10 @@ class Practice extends Component {
       
       if (store.get('uploadPracticeTranscriptsData')){
       if (store.get('uploadPracticeTranscriptsData').length > 0){
-        console.log("(store.get('uploadPracticeTranscriptsData')",(store.get('uploadPracticeTranscriptsData')))
         this.setState({practiceTranscripts: store.get('uploadPracticeTranscripts')})
       }
       if (store.get('audiosPractice')){
         if (store.get('audiosPractice').length > 0){
-          console.log("store.get('audiosPractice'))",store.get('audiosPractice'))
           this.setState({practiceAudio: store.get('uploadPracticeAudio')})
         }}
       store.get('UseQuestions') ?
@@ -96,7 +94,6 @@ class Practice extends Component {
       store.set('practiceInstructions', draftToHtml(convertToRaw(editorState.getCurrentContent())))
     };
     onLoadAudio(e) {
-      console.log('onloadaudio')
       let file = e.target.value
       let store = require('store');
       file = file.replace(/\\/g, '/').split('/').pop();
@@ -158,7 +155,6 @@ class Practice extends Component {
       input.setAttribute('hidden', true);
       input.setAttribute('accept', '.xlsx, .xls, .csv')
       label.append(input)
-      // console.log('label',label.children,React.cloneElement(<input/>))
       
     }  
 

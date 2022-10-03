@@ -8,6 +8,7 @@ urlpatterns = [
     path('noprolificid', views.noprolificid, name='noprolificid'),
     path('consent', views.consent, name='consent'),
     path('outline', views.outline, name='outline'),
+    path('get_all_prolific/<name>', views.get_all_prolific, name='get_all_prolific'),
     path('questionnaire/', views.questionnaire, name='questionnaire'),
     path('training1', views.training1, name='training1'),
     path('training2', views.training2, name='training2'),

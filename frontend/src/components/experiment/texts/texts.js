@@ -15,19 +15,17 @@ export default class TextTab extends Component {
         const input = this.props.textToTab
         const e = document.createElement('div');
         e.innerHTML = input;
-        // console.log(e)
         const div = document.getElementById('htmlToText');
-        // console.log(input)
         div.append(e)
-        // console.log('active', this.props.link)
-        // console.log(e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue)
-        // return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+        if (this.props.header=='Goodbye!'){
+            let store = require('store');
+            store.clearAll()
+        }
         }
     goodbye() {
         this.setState({consentDontAgree: true})
     }
     render() {
-        console.log('this.props.nextPage ', this.props.nextPage && this.props.header=='Informed consent' )
         return(
         <>  
         {this.state.consentDontAgree ?

@@ -24,7 +24,7 @@ export default class ExperimentRawResults extends Component {
     }).then(response => {
       const result = response.text() 
       const status_code = response.status;
-      console.log(status_code)
+
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         throw Error(status_code);
@@ -35,7 +35,6 @@ export default class ExperimentRawResults extends Component {
       .then(response => {
       const result = response.text() 
       const status_code = response.status;
-      console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         throw Error(status_code);

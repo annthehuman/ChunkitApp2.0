@@ -61,7 +61,6 @@ class EditorPage extends Component {
       let store = require('store')
       const blocksFromHTML = convertFromHTML(this.props.textSample),
             content = ContentState.createFromBlockArray(blocksFromHTML.contentBlocks, blocksFromHTML.entityMap);
-      // console.log('click',click)
       this.setState({isClicked: click}, function() {
       store.set(`${this.props.editorName}Clicked`, this.state.isClicked)
       this.state.isClicked ?

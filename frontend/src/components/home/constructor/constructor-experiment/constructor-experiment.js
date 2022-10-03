@@ -115,7 +115,6 @@ class Experiment extends Component {
     onLoad(e){
       let store = require('store');
       let fileFile = e.target.files[0]
-      console.log('load file',e.target)
       ExcelRenderer(fileFile, (err, resp) => {
         let realRows = []
         resp.rows.forEach(row =>{

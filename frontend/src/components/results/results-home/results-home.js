@@ -25,7 +25,6 @@ export default class ResultsHome extends Component {
           {field: 'link', headerName: 'Link to experiment', width: 400, renderCell: (params) => (
             <Link to={`/${params.value}`}>{params.value}</Link>)},
             {field: 'results', headerName: '', width: 100, renderCell: (params) => (
-                console.log('params.value', params.value),
                 <Link to={`/results/${params.value}`}>
               <CustomButton 
                         theme='blue' 
@@ -52,7 +51,6 @@ export default class ResultsHome extends Component {
         return cookieValue;
     }
       componentDidMount() {
-        console.log('props',this.props.links)
         const usertoken = this.getCookie('access_token');
         fetch ('/drafts_list/?'+ new URLSearchParams({
           access_token: usertoken}), {
@@ -63,11 +61,8 @@ export default class ResultsHome extends Component {
         }
         })
         .then(response => {
-            // console.log(response.text())
             const result = response.json()
-            console.log('result', result);
             const status_code = response.status;
-            console.log(status_code)
             if(status_code != 200) {
                 console.log('Error in getting brand info!')
                 return false;
@@ -75,20 +70,16 @@ export default class ResultsHome extends Component {
             
             return result
           }).then(result => {
-            console.log('result', result);
             const links = result.pop()
-            console.log('links', links.links)
             let links_set = new Set(links.links)
-            this.setState({drafts_list: result, links: links_set},console.log('result', this.state.drafts_list))
-            // Do something with the result
+            this.setState({drafts_list: result, links: links_set})
+
             let rows = []
             let i = 0
             result.map(({nameExperementForParticipants}) => {
-              console.log('links_set', links_set)
               let experiment_link = Array.from(links_set).filter(link => link.split('/')[link.split('/').length-1].indexOf(nameExperementForParticipants) != -1)
               experiment_link = experiment_link[experiment_link.length - 1]
               i += 1
-              // let stop_value = experiment_link.length > 0 ? nameExperementForParticipants : undefined
               rows.push({id: i, experimentName: nameExperementForParticipants,link: experiment_link,
                 results:nameExperementForParticipants})})
             this.setState({rows: rows})
@@ -98,8 +89,6 @@ export default class ResultsHome extends Component {
           })
       }   
       render () {
-        let i = 0
-        console.log(this.state.drafts_list.length)
         return(
           <AppBlock>
             

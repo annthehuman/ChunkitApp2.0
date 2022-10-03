@@ -68,7 +68,6 @@ export default class Background extends Component {
     Object.keys(backgroundExample).forEach((key) => {
       if (backgroundExample[key][0] == 'true') {
         if (key.indexOf('New') != -1){
-          console.log('New', key)
           const question_type = key.split('_')[1],
                   id = +key.split('_').at(-1).at(-1),
                   isChecked = true;
@@ -76,15 +75,12 @@ export default class Background extends Component {
         }
         store.set(key, true)
       }
-      // console.log('backgroundExample key','addedQuestionsBackground', item, backgroundExample[key]);
     });
     store.set('addedQuestionsBackground', item)
     }
-    // console.log('backgroundAddQ', backgroundAddQ)
     if (backgroundAddQ) {
       Object.keys(backgroundAddQ).forEach((key) => {
         store.set(key, backgroundAddQ[key][0])
-        // console.log('background added q', key,backgroundAddQ[key] ,backgroundAddQ[key][0])
       })
     }
     checks.forEach(check => {
@@ -96,30 +92,11 @@ export default class Background extends Component {
       this.setState({additional_quesion_list: store.get('addedQuestionsBackground'),
       additional_quesion_id: +store.get('addedQuestionsBackground')[store.get('addedQuestionsBackground').length-1].id})
     }
-    // if (store.get('backgroundAddQ')) {
-    //   this.setState({additional_quesion_list: store.get('backgroundAddQ'),
-    //   additional_quesion_id: +store.get('backgroundAddQ')[store.get('backgroundAddQ').length-1].id}, 
-    //   () => {
-    //     console.log('added from store', store.get('backgroundAddQ'), this.state.additional_quesion_id, this.state.additional_quesion_list)
-    //   })
-    // }
   }
   onCheck(e){
     let store = require('store');
     store.set(e.target.name, e.target.checked)
-    console.log(e.target.name, e.target.checked)
-    // const papa = document.getElementById('background'),
-    //       checks = papa.querySelectorAll('input[type="checkbox"]'),
-    //       feedback_info = {};
-    // console.log('checks', checks)
-    // checks.forEach(check => {
-    //   feedback_info[check.name] = check.checked
-    //   if (check.checked) {
-    //     store.set(check.name, check.checked)
-    //   }
-    //   })
     this.props.appendForm(e.target.name, e.target.checked)
-    // this.props.appendForm('backgroundExample', JSON.stringify(feedback_info))
   }
   onChange(e) {
     let store = require('store');
@@ -133,20 +110,16 @@ export default class Background extends Component {
   addQuestion(type){
     let store = require('store'),
         id = this.state.additional_quesion_id+1;
-    // console.log(this.state.additional_quesion_id)
     const item = this.state.additional_quesion_list,
           question_type = type,
           isChecked = true;
     item.push({ question_type, id, isChecked})
-    // store.set('addedQuestionsBackground', item)
     store.set(`useBackgroundNew_${question_type}_Qestion${id}`, true)
     this.props.appendForm(`useBackgroundNew_${question_type}_Qestion${id}`, true)
-    // this.props.appendForm('addedQuestionsBackground', item)
     this.setState({additional_quesion_list: item,
                     additional_quesion_id: id}, function(){
                       store.set('addedQuestionsBackground', item)
                     })
-    // console.log(this.state.additional_quesion_list)
   }
   render () {
     let store = require('store');
@@ -388,7 +361,6 @@ export default class Background extends Component {
         </Grid>
         <div id='addedQBack'>
         {this.state.additional_quesion_list.map((item, index) => {
-              console.log(`BackgroundNew_${item.question_type}_Qestion${item.id}`, store.get(`BackgroundNew_${item.question_type}_Qestion${item.id}`))
           let type = item.question_type == 'bool' ? 'Yes/No' : 'text'
           return (
         <Grid container

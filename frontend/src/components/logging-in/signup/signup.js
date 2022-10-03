@@ -50,8 +50,6 @@ class Signup extends Component{
     };
     
     handleSubmit(event) {
-        console.log('A username and password was submitted: ' + this.state.username + " " + 
-                this.state.password + " " + this.state.email + " " + this.state.confirmPassword);
         event.preventDefault();
         fetch('/auth/users/', {
             method: "POST",
@@ -68,7 +66,6 @@ class Signup extends Component{
                  if (!data.ok){
                     data.json()
                     .then(data =>{
-                        console.log(data)
                      this.setState({errorSingup: data});})
                      throw Error(data.status);
                  }

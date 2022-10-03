@@ -5,15 +5,9 @@ import {  Input, FormGroup, Label, Button, CustomInput } from 'reactstrap';
 export default class TestFeedback extends Component {
     constructor(props) {
         super(props);
-        // this.htmlDecode = this.htmlDecode.bind(this)
         }
-        componentDidMount(){
-            // console.log(e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue)
-            // return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-            }
         render() {
             let store = require('store');
-            console.log('test feedback instructions')
             return(
             <>
             <h3>Feedback</h3>

@@ -22,21 +22,18 @@ export default class Draft extends Component {
     }).then(response => {
       const result = response.json() 
       const status_code = response.status;
-      console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         return false;
     }
       return result
     }).then(store => {
-      console.log(store)
       this.componentDidMount()
     }).catch(error => {
     console.log(error)
     })
   }
   getFormFromDB(e){
-    console.log('target', e.target.value)
     fetch('/load_draft/?'+ new URLSearchParams({
       name: e.target.value}), {
       method: "GET",
@@ -48,7 +45,6 @@ export default class Draft extends Component {
     .then(response => {
         const result = response.json() 
         const status_code = response.status;
-        console.log(status_code)
         if(status_code != 200) {
           console.log('Error in getting brand info!')
           return false;
@@ -56,9 +52,7 @@ export default class Draft extends Component {
         return result
     })
     .then(result => {
-        const n = new Object(result)
         let store = require('store')
-        // console.log(n.entries())
         Object.entries(result).forEach(([key, value]) => {
           console.log(key, value)
           store.set(key, value);
@@ -67,9 +61,7 @@ export default class Draft extends Component {
     })
     .then(store => {
       if (store.get('nameExperement') == e.target.value){
-        
         this.props.history.push('/constructor')
-        console.log(this.props.history)
       }
     })
     .catch(error => {
@@ -87,21 +79,15 @@ export default class Draft extends Component {
     }
     })
     .then(response => {
-        // console.log(response.text())
         const result = response.json()
-        console.log('result', result);
         const status_code = response.status;
-        console.log(status_code)
         if(status_code != 200) {
             console.log('Error in getting brand info!')
             return false;
         }
-        
         return result
       }).then(result => {
-        console.log('result', result);
-        this.setState({drafts_list: result},console.log(this.state.drafts_list))
-        // Do something with the result
+        this.setState({drafts_list: result})
       })
       .catch(error => {
           console.log(error)
@@ -110,7 +96,6 @@ export default class Draft extends Component {
   }   
   render () {
     let i = 0
-    console.log(this.state.drafts_list.length)
     if (this.state.drafts_list.length != 0){
     return(
       <>

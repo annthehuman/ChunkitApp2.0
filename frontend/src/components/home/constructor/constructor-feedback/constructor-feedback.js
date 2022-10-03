@@ -67,14 +67,12 @@ export default class Feedback extends Component {
     Object.keys(feedbackExpample).forEach(function (key){
       if (feedbackExpample[key][0] == 'true') {
         if (key.indexOf('New') != -1){
-          console.log('New', key)
           const question_type = key.split('_')[1],
                   id = +key.split('_').at(-1).at(-1),
                   isChecked = true;
           item.push({ question_type, id, isChecked})
         }
         store.set(key, true)
-        console.log('store.get(key)',key,store.get(key))
       }
     });
     store.set('addQFeedback', item)}
@@ -91,25 +89,11 @@ export default class Feedback extends Component {
     if (store.get('addQFeedback') && store.get('addQFeedback').length > 0){
     this.setState({additional_quesion_list: store.get('addQFeedback'),
     additional_quesion_id: +store.get('addQFeedback').pop().id})}
-    // console.log('additional_quesion_id', store.get('addQFeedback') && store.get('addQFeedback').length > 0)
   }
   onCheck(e){
     let store = require('store');
     store.set(e.target.name, e.target.checked)
     this.props.appendForm(e.target.name, e.target.checked)
-    // const papa = document.getElementById('feedback'),
-    //       checks = papa.querySelectorAll('input[type="checkbox"]'),
-    //       feedback_info = {};
-    // console.log(checks)
-    // checks.forEach(check => {
-    //   feedback_info[check.name] = check.checked
-    //   console.log(check.checked)
-    //   if (check.checked) {
-    //     store.set(check.name, check.checked)
-    //   }
-    //   })
-    // this.props.allInputsAReHere()
-    // this.props.appendForm('feedbackExample', JSON.stringify(feedback_info))
   }
 
   onChange(e) {
@@ -118,7 +102,6 @@ export default class Feedback extends Component {
     store.set(qName, e.target.value)
     this.props.appendForm(qName, e.target.value)
     let addedQ = store.get('feedbackAddQ') ? store.get('feedbackAddQ') : new Object()
-    console.log('feedbackAddQ addedQ', addedQ)
     addedQ[qName] = [e.target.value]
     store.set('feedbackAddQ', addedQ)
   }
@@ -128,24 +111,17 @@ export default class Feedback extends Component {
           id = this.state.additional_quesion_id+1,
           question_type = type,
           isChecked = true;
-    // console.log('id additional_quesion_id', id)
     item.push({ question_type, id, isChecked})
-    // store.set('addedQuestionsBackground', item)
     store.set(`useFeedbackNew_${question_type}_Qestion${id}`, true)
     this.props.appendForm(`useFeedbackNew_${question_type}_Qestion${id}`, true)
     this.setState({additional_quesion_list: item,
                     additional_quesion_id: id}, function(){
                       store.set('addQFeedback', this.state.additional_quesion_list)
                     })
-    
-    // console.log('addQFeedback', this.state.additional_quesion_list)
   }
-//   componentDidUpdate() {
-//     this.onCheck()
-//  }
+
   render () {
     let store = require('store');
-    console.log('additional_quesion_id', this.state.additional_quesion_id)
     return(
       <>
         <CustomHeader text='Feedback questions'/>

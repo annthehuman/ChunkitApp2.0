@@ -58,13 +58,10 @@ export default class ImitationResultsMenu extends Component {
 }
 componentDidMount() {
     let store = require('store')
-    console.log('activeTabExperimentResults',store.get('activeTabExperimentResults'))
     if (store.get('activeTabExperimentResults'))
     {this.setState({ activeTabExperimentResults: store.get('activeTabExperimentResults') });}
-    console.log(this.state.activeTabExperimentResults)
 }
 toggle (event, tab) {
-    console.log('tab', tab)
   let store = require('store')
   if(this.state.activeTabExperimentResults !== tab) this.setState({ activeTabExperimentResults: +tab });
   store.set('activeTabExperimentResults', +tab)

@@ -76,7 +76,6 @@ export default class Constructor extends Component  {
         'nameExperementForParticipants', 'sessionTime'])
         let store = require('store');
         const pagesNeeded = store.get('pagesNeeded')
-        console.log('pagesneeded', pagesNeeded)
         if (pagesNeeded) {
         if (pagesNeeded.indexOf('Hello') != -1) {
             controlSumm.add('helloEditor')
@@ -124,12 +123,10 @@ export default class Constructor extends Component  {
     
     const formData = new FormData(form)
     this.setState({controlSumm, controlSumm})
-    console.log('controlSumm',controlSumm,form, ...formData)
     let formSum = new Set()
     
 
     formData.forEach((item, name) => {
-        // console.log(item, name)
         if (item) {
         if (name.includes('Background')) {
             formSum.add('backgroundExample')
@@ -139,7 +136,6 @@ export default class Constructor extends Component  {
             if (item.name) {
                 formSum.add(name)
             }
-            console.log('file.name', item.name)
         } else {
             formSum.add(name)
         }}
@@ -158,13 +154,11 @@ export default class Constructor extends Component  {
     let difference = new Set(
         [...controlSumm].filter(x => !formSum.has(x)));
     this.setState({difference: difference})
-    console.log('difference', difference)
     if (difference.size == 0) { 
         this.setState({equal: true, disabled: false})
     } else {
         this.setState({equal: false})
     }
-    console.log('what',formSum, formData)
     }
     toggle (event, tab) {
         let store = require('store')
@@ -185,18 +179,14 @@ export default class Constructor extends Component  {
         store.set('tab', String(+this.state.activeTab + 1))
       }
     appendForm(...values){
-        // console.log('load append form', values)
         const f = document.getElementById('constructorForm')
         let child_name_array = []
         f.childNodes.forEach(child => {
             child_name_array.push(child.name)
             })
-        // console.log('child_name_array', child_name_array)
         const we_have_name = child_name_array.some(item => item == values[0]);
         // TODO: добавить обработку файлов
         if (values[2] != 'file') {
-
-                // console.log(we_have_name)
             if (we_have_name){
                 const the_name = child_name_array.filter(item => item == values[0]),
                         the_element = f.querySelector(`input[name="${the_name}"]`);
@@ -216,26 +206,19 @@ export default class Constructor extends Component  {
                 f.removeChild(the_element)
                 f.append(values[1]);
                 let formData = new FormData(f);
-                // console.log('append formdata', ...formData)
             } else {
-                // console.log('append file', values)
                 f.append(values[1]);
                 let formData = new FormData(f);
-                // console.log('append formdata', ...formData)
-                // formData.append(values[0], values[1], values[0])
                 }
         }
         this.allInputsAReHere()
 
     }
     componentDidMount() {
-        // console.log('constructor props',this.props)
         this.allInputsAReHere()
         let store = require('store')
         if (store.get('tab'))
         this.setState({ activeTab: store.get('tab') })
-        // console.log('current tab', store.get('tab'), typeof(store.get('tab')))}
-        // console.log('did mount control summ', this.state.controlSumm)
         if(store.get('sessionTime')) 
         {this.appendForm('sessionTime', store.get('sessionTime'))}
         if(store.get('nameExperement') && store.get('nameExperement').length > 0) 
@@ -248,7 +231,6 @@ export default class Constructor extends Component  {
             document.getElementById(`pageNeeded_${item}`).checked = true
             store.set(`pageNeeded_${item}`, true)
         })
-        // this.props.appendForm('pagesNeeded', store.get('pagesNeeded'))
         }
           if (store.get('UseQuestions')){
             document.getElementById('UseQuestions').checked = store.get('UseQuestions')}
@@ -260,12 +242,10 @@ export default class Constructor extends Component  {
                 || key.indexOf('background') != -1 || key.indexOf('feedback') != -1
                 || key.indexOf('Questions') != -1){
             if (Boolean(value)){
-                console.log('key', key)
                 if (key.indexOf('backgroundEx') != -1 || key.indexOf('feedbackEx') != -1) {
                     Object.keys(value).map((item) => {this.appendForm(item, true), store.set(item, true)})}
                 else if (key.indexOf('backgroundAdd') != -1 || key.indexOf('feedbackAdd') != -1) {
-                    if (key.indexOf('backgroundAdd') != -1) {console.log('backgroundAdd', value)}
-                    Object.keys(value).map((item) => {console.log('backgroundAdd item', item, value[item]),this.appendForm(item, value[item]), store.set(item, value[item])})}
+                    Object.keys(value).map((item) => {this.appendForm(item, value[item]), store.set(item, value[item])})}
                 else {this.appendForm(key, value)}
 }}
         })
@@ -286,7 +266,6 @@ export default class Constructor extends Component  {
         return cookieValue;
     }
     getButton(e){
-        console.log('get submit button',e,  e.target.name)
         this.setState({submitButton: e.target.name})
         if (e.target.name == "SaveDraft" || e.target.name == "SaveFinalVersion") {
             e.target.innerHTML = 'Saved!'
@@ -297,39 +276,27 @@ export default class Constructor extends Component  {
 
     loadTest() {
         const name = document.getElementById('nameExperement').value
-        console.log(`/test/${name}`)
-        this.setState({experementName: name}, function() {
-             console.log(`/test/${this.state.experementName}`)})
+        this.setState({experementName: name})
     }
 
     onSubmit(e) {
         e.preventDefault();
-        console.log('submit', this.state.submitButton)
         if (this.state.submitButton == 'SaveDraft'){
             const form = e.target
             const formData = new FormData(form);
-            // object = ...formData
-            //TODO по кнопке загружать файл            
+         
             const csrf = this.getCookie('csrftoken');
             const files = form.querySelectorAll(`input[type='file']`);
             const usertoken = this.getCookie('access_token');
-            
-            console.log('files',files)
             files.forEach(item => {
-                console.log(item.name)
                 formData.append("file", item.files[0]);
             })
             formData.append("csrfmiddlewaretoken", csrf);
-            // formData.append("file", files[0].files[0]);
+
             formData.append("accessToken", usertoken);
-            console.log(...formData)
             fetch('/save_draft/', {
             method: "POST",
-            // headers: {
-            //     'X-CSRFToken': csrf,
-            //     "Content-Type": "application/json",
-            //     "X-Requested-With": "XMLHttpRequest"
-            // },
+
             body: formData
             }).then(data => {
             if (!data.ok){
@@ -337,32 +304,20 @@ export default class Constructor extends Component  {
             } else {
                 this.setState({open: true})
             }
-            //console.log('так')
             }).catch((data) => {
             console.log(`Try again! Error: ${Error(data.status)}`)
             })
-            // if (formData) {
-            //     this.componentDidMount()
-            //     this.props.history.push("/drafts");
-            // }
         } else if (this.state.submitButton == 'TestRun') {
-            console.log(this.state.submitButton)
             const form = e.target
             const formData = new FormData(form);
-            // object = ...formData
-            //TODO по кнопке загружать файлы
+
             const csrf = this.getCookie('csrftoken');
             formData.append("csrfmiddlewaretoken", csrf);
             const usertoken = this.getCookie('access_token');
             formData.append("accessToken", usertoken);
-            console.log(...formData)
+
             fetch('/save_draft/', {
             method: "POST",
-            // headers: {
-            //     'X-CSRFToken': csrf,
-            //     "Content-Type": "application/json",
-            //     "X-Requested-With": "XMLHttpRequest"
-            // },
             body: formData
             }).then(data => {
             if (!data.ok){
@@ -379,18 +334,14 @@ export default class Constructor extends Component  {
                   }).then(response => {
                     const result = response.json() 
                     const status_code = response.status;
-                    console.log(status_code)
                     if(status_code != 200) {
                       console.log('Error in getting brand info!')
                       return false;
                   }
-                    console.log('audios',result)
-    
                     return result
                 }).then(result => {
                     let store = require('store')
                     Object.entries(result).forEach(([key, value]) => {
-                        console.log('res', key, value)
                         store.set(key, value);
                       })
                       if (formData) {
@@ -400,7 +351,6 @@ export default class Constructor extends Component  {
                   })
                 
             }
-            //console.log('так')
             }).catch((data) => {
             console.log(`Try again! Error: ${Error(data.status)}`)
             }).finally(() => {
@@ -409,29 +359,19 @@ export default class Constructor extends Component  {
         } else if (this.state.submitButton == 'SaveFinalVersion'){
             const form = e.target
             const formData = new FormData(form);
-            console.log(...formData, formData.get('nameExperementForParticipants'))
-            // object = ...formData
-            //TODO по кнопке загружать файлы
             const csrf = this.getCookie('csrftoken');
             let name = formData.get('nameExperementForParticipants')
             const prolific = Boolean(formData.get('UseProlific'))
             const usertoken = this.getCookie('access_token');
             formData.append("accessToken", usertoken);
             formData.append("csrfmiddlewaretoken", csrf);
-            console.log('prolific', prolific,  formData.get('UseProlific'))
-            name.includes(" ") ? (name = name.replace(' ', "_"), console.log('name', name) ): null
+            name.includes(" ") ? name = name.replace(' ', "_"): null
             if (prolific){ 
             formData.append('link', `experiment/${name}?PROLIFIC_PID=test`)}
             else {
             formData.append('link', `experiment/${name}`)}
-            console.log(...formData)
             fetch('/save_draft/', {
             method: "POST",
-            // headers: {
-            //     'X-CSRFToken': csrf,
-            //     "Content-Type": "application/json",
-            //     "X-Requested-With": "XMLHttpRequest"
-            // },
             body: formData
             }).then(data => {
             if (!data.ok){
@@ -439,7 +379,6 @@ export default class Constructor extends Component  {
             }
                 }).catch(error => {
                   console.log(error)
-            //console.log('так')
             }).catch((data) => {
             console.log(`Try again! Error: ${Error(data.status)}`)
             })

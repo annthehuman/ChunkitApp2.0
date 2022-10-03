@@ -27,7 +27,7 @@ import re
 
 class UserActivationView(APIView):
     def get(self, request, uid, token):
-        print('get')
+        # print('get')
         protocol = 'https://' if request.is_secure() else 'http://'
         web_url = protocol + request.get_host()
         post_url = web_url + "/auth/users/activation/"
@@ -138,20 +138,20 @@ def unpackArchive(experement_name):
         test = os.walk(directory_to_extract_to)
         _, dirs, _ = next(test)
         if dirs:    
-            print('folder', dirs)
+            # print('folder', dirs)
             for dir in dirs:
                 if dir != '__MACOSX':
                     p = os.walk(os.path.join(directory_to_extract_to, dir))
                     _, _, fi = next(p)
                     for file in fi:
                         if file[0] != '.':
-                            print(file[0], file)
+                            # print(file[0], file)
                             shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
 
         onlyfilesExperement = [os.path.join(experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
     
     draft_data.objects.filter(nameExperementForParticipants=experement_name).delete()
-    print('draft_data_values.get("uploadExperimentTranscripts",0)', draft_data_values.get("uploadExperimentTranscripts",0))
+    # print('draft_data_values.get("uploadExperimentTranscripts",0)', draft_data_values.get("uploadExperimentTranscripts",0))
     draft_data.objects.create(
         accessToken = draft_data_values.get("accessToken", 0),
         nameExperement = draft_data_values.get("nameExperement",0),
@@ -185,7 +185,7 @@ def unpackArchive(experement_name):
         )
 
 def save_draft(request):
-    print('request.FILES',request.FILES)
+    # print('request.FILES',request.FILES)
     form = draftDataForm(request.POST, request.FILES)
     if request.method == 'POST':
         
@@ -194,7 +194,7 @@ def save_draft(request):
         pagesNeeded = ''
         if (request.POST.get('pagesNeeded')):
             pagesNeeded = request.POST.get('pagesNeeded').split(',')
-            print('pagesNeeded', pagesNeeded, type(pagesNeeded))
+            # print('pagesNeeded', pagesNeeded, type(pagesNeeded))
             if 'goodbye' not in pagesNeeded:
                 pagesNeeded.append('Goodbye')
             # print('pagesNeeded', pagesNeeded)
@@ -220,7 +220,7 @@ def save_draft(request):
 
         # print('back',feedback, feedback_addQ)
         if form.is_valid():
-            print('valid',form)
+            # print('valid',form)
             # print('valid',form.sessionTime)
             form = form.save(commit=False)
             form.nameExperementForParticipants = experement_name
@@ -333,19 +333,19 @@ def load_draft(request):
 
 def delete_experiment(request):
     if request.method == 'GET':
-        print('GET',request.GET['name'])
+        # print('GET',request.GET['name'])
         name_set = experiment_links.objects.filter(experiment_link=request.GET['name']).delete()
         response = dict()
         if not (experiment_links.objects.filter(experiment_link=request.GET['name'])):
             response['answer'] = 'Sucsess!'
         else:
             response['answer'] = 'Error'
-        print(name_set)
+        # print(name_set)
         return HttpResponse(json.dumps(response))
 
 def stop_experiment(request):
     if request.method == 'GET':
-        print('GET',request.GET['name'])
+        # print('GET',request.GET['name'])
         # links_set = list(experiment_links.objects.all().values_list('experiment_link', flat = True))
         # links_dict = dict(zip(links_set, list(range(len(links_set)))))
         # # print(names_dict)
@@ -370,7 +370,7 @@ def stop_experiment(request):
 
 def start_experiment(request):
     if request.method == 'GET':
-        print('GET',request.GET['name'])
+        # print('GET',request.GET['name'])
         experiment_name = request.GET['name']
         # links_dict = dict(zip(links_set, list(range(len(links_set)))))
         date = datetime.datetime.now()
@@ -382,14 +382,14 @@ def start_experiment(request):
 
 def delete_draft(request):
     if request.method == 'GET':
-        print('GET',request.GET['name'])
+        # print('GET',request.GET['name'])
         name_set = draft_data.objects.filter(nameExperementForParticipants=request.GET['name']).delete()
         response = dict()
         if not (draft_data.objects.filter(nameExperementForParticipants=request.GET['name'])):
             response['answer'] = 'Sucsess!'
         else:
             response['answer'] = 'Error'
-        print(name_set)
+        # print(name_set)
         return HttpResponse(json.dumps(response))
 
 
@@ -398,7 +398,7 @@ def load_draft_to_test(request, draft_experement_name):
 	if request.method == 'GET':
 		name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
 		names_dict = dict(zip(name_set, list(range(len(name_set)))))
-		print(names_dict)
+		# print(names_dict)
 		model_columns = ['uploadExperimentTranscripts','uploadExperimentAudio','uploadPracticeAudio', 'uploadPracticeTranscripts']
 		row_number = names_dict[draft_experement_name]
 		draft_data_values = {}
@@ -428,7 +428,7 @@ def load_draft_to_test(request, draft_experement_name):
 			test = os.walk(directory_to_extract_to)
 			path, dirs, files = next(test)
 			if dirs:    
-				print('folder', dirs)
+				# print('folder', dirs)
 				for dir in dirs:
 					if dir != '__MACOSX':
 						p = os.walk(os.path.join(directory_to_extract_to,dir))
@@ -463,7 +463,7 @@ def load_draft_to_test(request, draft_experement_name):
 
 def load_experement(request, experement_name):
     experement_name = experement_name.split('=')[1].replace(' ', '_').replace('+', '_')
-    print('experement_name', experement_name)
+    # print('experement_name', experement_name)
     if request.method == 'GET':
         name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
         name_set_new = list(draft_data.objects.filter(nameExperementForParticipants=experement_name).values_list())
@@ -492,7 +492,7 @@ def load_experement(request, experement_name):
         draft_data_values['audiosExperement'] = ast.literal_eval(draft_data_values['audiosExperement'])
         draft_data_values['pagesNeeded'] = ast.literal_eval(draft_data_values['pagesNeeded'].replace('nan', '0'))
         draft_data_values['experimentStopped'] = ast.literal_eval(link[-2])
-        print('draft_data_values',draft_data_values)
+        # print('draft_data_values',draft_data_values)
         ### TODO linux
         # path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadPracticeAudio']
         # directory_to_extract_to = settings.MEDIA_ROOT + '/' + draft_experement_name
@@ -860,9 +860,18 @@ def backgroundRES(request, name):
         if prolific:
             model_columns = ['prolific_id'] + model_columns
         model_columns = ['session_key'] + model_columns
-
+        rename_dict = {"LevelEducation": "Level of education", 
+                        "AcadmicField": "Academic field",
+                        "NativeLanguage": "Native language",
+                        "OtherLanguage": "Other languages", 
+                        "Dyslexsia": "Have you been diagnosed with dyslexia",
+                        "HearingDiff": "Do you have any hearing difficulties",
+                        "Whisper": "Do you have dificulty hearing someone speaks in a wisper", 
+                        "Comments": "Comments"}
         df = df[model_columns]
         df['session_key'] = df['session_key'].apply(lambda x: x[:5])
+        rename_dict = dict(map(lambda x: (x, rename_dict.get(x)), filter(lambda x: x in rename_dict.keys(), model_columns)))
+        df.rename(columns=rename_dict, errors="raise", inplace=True)
 
         outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
         if not os.path.exists(outdir):
@@ -900,8 +909,25 @@ def feedbackRES(request, name):
     if prolific:
         model_columns = ['prolific_id'] + model_columns
     model_columns = ['session_key'] + model_columns
+
+    rename_dict = {"instructions": "The task instructions were clear.", 
+                    "doing": "I knew what I was doing.",
+                    "simple": "The task was relatively simple.",
+                    "demanding": "The task was very demanding. I feel tired now.", 
+                    "pessure": "The task put a lot of pressure on me. I was in a hurry all the time and even panicked several times.",
+                    "fun": "It was fun.",
+                    "reflects": "I think the task in some way reflects what I naturally do when I listen to speech.", 
+                    "performance": "How would you evaluate your performance in the task?",
+                    "understood":"I understood what the speaker was saying...",
+                    "measured":"Can you guess what the chunking task measured?",
+                    "strategy":"Did you consciously adopt some strategy in marking boundaries between chunks, if any?",
+                    "impression":"Did you have an impression that the task gradually became easier?",
+                    "comments":"Do you have other comments?",}
     df = df[model_columns]
     df['session_key'] = df['session_key'].apply(lambda x: x[:5])
+    rename_dict = dict(map(lambda x: (x, rename_dict.get(x)), filter(lambda x: x in rename_dict.keys(), model_columns)))
+    df.rename(columns=rename_dict, errors="raise", inplace=True)
+
 
     outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
     if not os.path.exists(outdir):
@@ -1159,7 +1185,7 @@ def permutation(request, name):
 def send_email(filename, username):
     from django.core.mail import EmailMessage
     subject = "ChunkitApp results of permutation test"
-    message = "Hi, \nPlease find the attached csv containing results of permutation test."
+    message = "Hi, \nPlease find the attached .csv containing the results of the permutation test."
     email = username
     try:
         with open(filename, "rb") as csvfile:
@@ -1182,3 +1208,11 @@ def get_user(user_key):
     user_id = Token.objects.get(key=user_key).user_id
     user = User.objects.get(id=user_id)
     return user
+
+def get_all_prolific(request, name):
+    experiment_name = name.split('=')[1]
+    experiment_results = pd.DataFrame(list(test.objects.filter(experiment_name=experiment_name).values_list()))
+    index_prolific = [f.name for f in test._meta.get_fields()].index('prolific_id')
+    prolific_id_set = set(experiment_results[index_prolific])
+
+    return HttpResponse(json.dumps({'prolific_id_set': list(prolific_id_set)}))

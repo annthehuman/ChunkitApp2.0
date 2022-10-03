@@ -40,28 +40,21 @@ export default class TestPractice extends Component {
             let store = require('store');
             const tableParts = store.get('uploadPracticeTranscriptsData'),
                   audios = store.get('audiosPractice');
-            console.log('tableParts && audios', tableParts, audios)
             if (tableParts && audios){
             if (tableParts[0][0] == 'Audio Name') {
             tableParts.shift()}
             let tableaudios = []
             let zipaudios = []
                 const tablelen = Object.keys(tableParts).length
-                /////////TODO: if checked 1 три оставить, а остальные перемешать, то с trio, если без trio, перемешать все
-                // const trio = [...Array(2).keys()];
-                // // const order = this.shuffle([...Array(tablelen-3).keys()]) ;
-                // // console.log('trio, order',trio, order)
-                // let finalOrder = trio
+
                 let finalOrder = []
                     for (var i = 0; i < tablelen; i++) {
                         finalOrder.push(i);
                     }
-                console.log('order',finalOrder)
                 this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder})
                 tableParts.forEach((row, id) => {
                         tableaudios.push(row[0])
                 })
-                console.log('tableParts', tableParts)
                 tableaudios = new Set(tableaudios)
                 audios.forEach(audio => {
                     let splitter = '\\'
@@ -74,7 +67,6 @@ export default class TestPractice extends Component {
                           b = p.slice(0, p.length-1);
                     zipaudios.push(b.join())})
                 const zipaudiosSet = new Set(zipaudios)
-                console.log('tableaudios, zipaudiosSet',tableaudios, zipaudiosSet)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
                 if (areSetsEqual(tableaudios, zipaudiosSet)) { 
                     this.setState({audioTableEqual: true})
@@ -85,7 +77,6 @@ export default class TestPractice extends Component {
                                 }
                             })
                     })
-                    console.log('tableParts',tableParts)
                     this.setState({tableParts: tableParts})
                         
                     // store.set('uploadPracticeTranscriptsData', this.state.tableParts))
@@ -96,18 +87,11 @@ export default class TestPractice extends Component {
         createInstructions() {
             const instructions = store.get('practiceInstructions');
             if (instructions){
-                // const e = document.createElement('div');
-                // e.innerHTML = instructions;
-                // const div = document.getElementById('instructionsPracticeText');
-                // console.log('instructions',div)
-                // div.append(e)
                 return {__html: instructions};
             }
         }
         pause() {
-            console.log('kkkk')
             let audio = this.state.currentAudio;
-            console.log(audio)
             if (this.state.isPlaying) {
                 audio.pause();
                 this.setState({isPlaying: false})
@@ -119,10 +103,8 @@ export default class TestPractice extends Component {
             }
         }
         audioplay() {
-            console.log(this)
             const currentAudioPath = `/static/media/Practice/${this.state.tableParts[this.state.partsOrder[this.state.partid]][0]}`,
                   div = document.getElementById(`practice_${this.state.partsOrder[this.state.partid]}`);
-            console.log(currentAudioPath, div)
             let request = new XMLHttpRequest();
             request.open("GET", currentAudioPath, true);
             request.responseType = "blob"; 
@@ -130,9 +112,7 @@ export default class TestPractice extends Component {
             this.setState({currentAudio: currentAudio})
             currentAudio.addEventListener('ended', this.audioend);
             request.onload = function() {
-                console.log(this)
                 if (this.status == 200) {
-                // url = URL.createObjectURL(this.response);
                 
                 let sourceElement = document.createElement('source');
                 currentAudio.setAttribute('hidden', true);
@@ -143,10 +123,6 @@ export default class TestPractice extends Component {
                 currentAudio.load();
                 currentAudio.play();
                 
-                // console.log(audio)
-                // loadWatingHref.style.display = 'none';
-                // load.style.display = 'block';
-                
                 document.getElementById('instructions').style.display = 'none';
                 div.style.display = 'block';
             }
@@ -155,31 +131,21 @@ export default class TestPractice extends Component {
             this.setState({isPlaying: true})
         }
         audioend(){
-            console.log('ended', this)
             setTimeout(() => this.gofurther(), 1000);
         }
         gofurther() {
             const form = document.getElementById(`post-form_${this.state.partsOrder[this.state.partid]}`)
             const csrf = this.getCookie('csrftoken');
             const formData = new FormData(form);
-            console.log(form)
             let store = require('store');
             store.get('UseQuestions') ? (
             document.getElementById(`popup_${this.state.partsOrder[this.state.partid]}`).style.display = "block",
             document.getElementById(`practice_${this.state.partsOrder[this.state.partid]}`).style.display = "none") :
             (this.instruction(),
-            console.log('dddd'),
             formData.append("csrfmiddlewaretoken", csrf),
-            formData.append('index', this.state.partid),
-            console.log(...formData))
-            // loadWatingHref.style.display = 'block';
-            // load.style.display = 'none';
-        }
-        start() {
-            
+            formData.append('index', this.state.partid))
         }
         instruction(){
-            console.log(this.state.partid, this.state.partsOrder[this.state.partid])
             const instruction = document.getElementById('instructions'),
                   div = document.getElementById(`practice_${this.state.partsOrder[this.state.partid]}`)
             this.state.partid+1 != this.state.totalParts ? (
@@ -190,11 +156,9 @@ export default class TestPractice extends Component {
             // this.nextpart()
         }
         nextpart() {
-            console.log(this.state.partid + 1)
-            this.setState({partid: this.state.partid + 1}, console.log(this.state.partid))
+            this.setState({partid: this.state.partid + 1})
         }
         getanswer(e){
-            console.log(e.target.value)
             this.setState({answer: e.target.value})
         }
         getCookie(name) {
@@ -213,25 +177,21 @@ export default class TestPractice extends Component {
         }
         onload(e) {
             e.preventDefault();
-            console.log(e)
             const form = e.target;
             const formData = new FormData(form);
             
             document.getElementById(`popup_${this.state.partsOrder[this.state.partid]}`).style.display = 'none'
             this.nextpart()
             this.instruction()
-            console.log('t',e.target.id.split('_')[1])
             formData.append('question', this.state.answer);
             formData.append('index', e.target.id.split('_')[1]);
             const csrf = this.getCookie('csrftoken');
             formData.append("csrfmiddlewaretoken", csrf);
-            console.log(...formData);
         }
 
         render() {
             const arr = this.state.tableParts;
             let store = require('store')
-            console.log('arr',arr)
             return(
             <> 
             <h3>Practice</h3>

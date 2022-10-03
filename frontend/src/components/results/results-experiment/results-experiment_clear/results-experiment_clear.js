@@ -18,15 +18,13 @@ export default class ExperimentClearResults extends Component {
     fetch(`/static/media/Experement/${this.props.name}/results.csv`)
    .then(response => {
     const status_code = response.status;
-    console.log(status_code)
     if(status_code != 200) {
       console.log('Error in getting brand info!')
       throw Error(status_code);
     }
     return response.text()})
    .then(data => Papa.parse(data))
-   .then(result => {
-     console.log(result.data), this.setState({results:result.data})
+   .then(result => {this.setState({results:result.data})
      let cells = []
      let head = []
      result.data.forEach((i, index) => {
@@ -49,9 +47,7 @@ export default class ExperimentClearResults extends Component {
   }
   onSubmit(e) {
     e.preventDefault()
-    console.log(e.target)
     const input = document.getElementById('secretWord')
-    console.log(input.value)
     if (input.value == this.state.secret) {
       document.getElementById('secretWordForm').style.display = 'none'
       document.getElementById('panel').style.display = 'block'

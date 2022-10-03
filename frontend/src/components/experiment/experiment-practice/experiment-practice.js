@@ -33,7 +33,6 @@ export default class ExperimentPractice extends Component {
         };
         this.instruction = this.instruction.bind(this);
         this.pause = this.pause.bind(this);
-        this.start = this.start.bind(this);
         this.audioend = this.audioend.bind(this);
         this.nextpart = this.nextpart.bind(this);
         this.shuffle = this.shuffle.bind(this);
@@ -50,37 +49,28 @@ export default class ExperimentPractice extends Component {
         }
 
         componentWillMount() {
-            // console.log(this.props.data)
-            // console.log(this.props.data.uploadPracticeTranscriptsData)
-            // console.log(this.props.data.audiosPractice)
 
             const tableParts = this.props.data.uploadPracticeTranscriptsData,
                   audios = this.props.data.audiosPractice;
                   
-            console.log('tableParts && audios', tableParts, audios)
             if (tableParts && audios){
             if (tableParts[0][0] == 'Audio Name') {
                 tableParts.shift()}
             let tableaudios = []
             let zipaudios = []
             const tablelen = Object.keys(tableParts).length
-            /////////TODO: if checked 1 три оставить, а остальные перемешать, то с trio, если без trio, перемешать все
-            // const trio = [...Array(3).keys()];
-            // let finalOrder = trio
-            // if (tablelen > 2)
+
             let finalOrder = []
             for (var i = 0; i < tablelen; i++) {
                 finalOrder.push(i);
             }
-            // console.log('order',finalOrder)
             this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder})
-            // console.log('tableParts', tableParts)
+
             tableParts.forEach((row, id) => {
                     tableaudios.push(row[0])
             })
             tableaudios = new Set(tableaudios)
-            // console.log('tableParts', tableaudios)
-            // console.log('audios', audios)
+
             audios.forEach(audio => {
                 let splitter = '\\'
                 if (audio.indexOf('/') > -1)
@@ -91,9 +81,7 @@ export default class ExperimentPractice extends Component {
                         p = s[s.length - 1].split("."),
                         b = p.slice(0, p.length-1);
                 zipaudios.push(b.join())})
-            console.log('zipaudios', zipaudios)
             const zipaudiosSet = new Set(zipaudios)
-            console.log('tableaudios, zipaudiosSet',tableaudios, zipaudiosSet)
             let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
             if (areSetsEqual(tableaudios, zipaudiosSet)) { 
                 this.setState({audioTableEqual: true})
@@ -104,10 +92,7 @@ export default class ExperimentPractice extends Component {
                             }
                         })
                 })
-                console.log('tableParts',tableParts)
                 this.setState({tableParts: tableParts})
-                    
-                // store.set('uploadPracticeTranscriptsData', this.state.tableParts))
                 }
 
             }
@@ -130,10 +115,9 @@ export default class ExperimentPractice extends Component {
             div.style.display = 'block';
         }
         audioplay() {
-            // console.log(this)
             const currentAudioPath = `/static/media/Practice/${this.state.tableParts[this.state.partsOrder[this.state.partid]][0]}`,
                   div = document.getElementById(`practice_${this.state.partsOrder[this.state.partid]}`);
-            // console.log(currentAudioPath, div)
+
             let request = new XMLHttpRequest();
             request.open("GET", currentAudioPath, true);
             request.responseType = "blob"; 
@@ -142,9 +126,8 @@ export default class ExperimentPractice extends Component {
             currentAudio.addEventListener('ended', this.audioend);
             currentAudio.addEventListener('canplaythrough', this.displayText);
             request.onload = function() {
-                // console.log(this)
+
                 if (this.status == 200) {
-                // url = URL.createObjectURL(this.response);
                 
                 let sourceElement = document.createElement('source');
                 currentAudio.setAttribute('hidden', true);
@@ -155,47 +138,21 @@ export default class ExperimentPractice extends Component {
                 currentAudio.load();
                 currentAudio.play();
                 
-                // console.log(audio)
-                // loadWatingHref.style.display = 'none';
-                // load.style.display = 'block';
-                
-                // currentAudio.canplaythrough = () => {console.log('jjj')}
-                // document.getElementById('instructions').style.display = 'none';
-                // div.style.display = 'block';
             }
             };
             request.send();
             this.setState({isPlaying: true})
         }
         audioend(){
-            // console.log('ended', this)
             setTimeout(() => this.gofurther(), 1000);
         }
         gofurther() {
-            // const form = document.getElementById(`post-form_${this.state.partsOrder[this.state.partid]}`)
-            // const csrf = this.getCookie('csrftoken');
-            // const formData = new FormData(form);
-            // console.log(form)
-            // console.log(document.getElementById(`Experiment_popup_${this.state.partsOrder[this.state.partid]}`))
-            
-            console.log('go further', document.getElementById(`popup_${this.state.partsOrder[this.state.partid]}`),
-            document.getElementById(`practice_${this.state.partsOrder[this.state.partid]}`))
             this.props.data.UseQuestions ? (
             document.getElementById(`popup_${this.state.partsOrder[this.state.partid]}`).style.display = "block",
             document.getElementById(`practice_${this.state.partsOrder[this.state.partid]}`).style.display = "none") :
             this.instruction()
-            // console.log('dddd')
-            // formData.append("csrfmiddlewaretoken", csrf),
-            // formData.append('index', this.state.partid),
-            // console.log(...formData))
-            // loadWatingHref.style.display = 'block';
-            // load.style.display = 'none';
-        }
-        start() {
-            
         }
         instruction(){
-            console.log(this.state.partid, this.state.partsOrder[this.state.partid])
             const instruction = document.getElementById('instructions'),
                   div = document.getElementById(`practice_${this.state.partsOrder[this.state.partid]}`),
                   question = document.getElementById(`popup_${this.state.partsOrder[this.state.partid]}`)
@@ -206,14 +163,11 @@ export default class ExperimentPractice extends Component {
                 this.nextpart()) 
                 :
                 this.props.nextPage()
-            // this.nextpart()
         }
         nextpart() {
-            console.log(this.state.partid + 1)
-            this.setState({partid: this.state.partid + 1}, console.log(this.state.partid))
+            this.setState({partid: this.state.partid + 1})
         }
         getanswer(e){
-            console.log(e.target.value)
             this.setState({answer: e.target.value})
         }
         getCookie(name) {
@@ -232,18 +186,15 @@ export default class ExperimentPractice extends Component {
         }
         onload(e) {
             e.preventDefault();
-            console.log(e)
             const form = e.target;
             const formData = new FormData(form);
             
             document.getElementById(`popup_${this.state.partsOrder[this.state.partid]}`).style.display = 'none'
             this.instruction()
-            console.log('t',e.target.id.split('_')[1])
             formData.append('question', this.state.answer);
             formData.append('index', e.target.id.split('_')[1]);
             const csrf = this.getCookie('csrftoken');
             formData.append("csrfmiddlewaretoken", csrf);
-            console.log(...formData);
         }
 
         render() {
@@ -274,7 +225,7 @@ export default class ExperimentPractice extends Component {
                     
                         <form  key={`post-form${i}`} id={`post-form_${i}`}>
                         <div key={`practice_${i}`} id={`practice_${i}`} style={{display: 'none'}}>
-                        <CustomButton theme='blue' size='small' onClick={() => {console.log('pause please'),this.pause()}} text={(this.state.isPlaying)? 'Pause': 'Continue'}/>
+                        <CustomButton theme='blue' size='small' onClick={() => {this.pause()}} text={(this.state.isPlaying)? 'Pause': 'Continue'}/>
                         <br/>
                         <span className='text' id={`text_${i}`} >
                                 <p key={`textPractice${i}`} id={`textPractice${i}`}>

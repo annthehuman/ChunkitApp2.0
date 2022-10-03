@@ -48,8 +48,6 @@ class PasswordReset extends Component{
     handleSubmit(event) {
         // alert('A username and password was submitted: ' + this.state.username + " " + this.state.password);
         event.preventDefault();
-        console.log('uid', this.props.match.params.uid)
-        console.log('token', this.props.match.params.token)
         fetch('/auth/users/reset_password_confirm/', {
             method: "POST",
             headers: {

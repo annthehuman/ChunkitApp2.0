@@ -102,7 +102,7 @@ export default class ExperimentResultsPermutation extends Component {
       this.setState({rows: cells, head: head})
       store.set('perm', true)
     }).catch(error => console.error(error))
-    //console.log('так')
+
     }).catch((data) => {
     console.log(`Try again! Error: ${Error(data.status)}`)
     }).finally(() => {

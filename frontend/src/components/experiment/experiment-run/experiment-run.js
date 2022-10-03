@@ -21,7 +21,8 @@ export default class ExperimentRun extends Component {
         prolificIsHere: true,
         currentPage: 'Hello',
         experimentStopped: false,
-        user: null
+        user: null,
+        prolificIsDouble: false
     }
     this.nextPage = this.nextPage.bind(this);
     this.getCookie = this.getCookie.bind(this);
@@ -43,7 +44,6 @@ getCookie(name) {
 }
 checkuser(){
     this.getCookie('user') ? null : this.setState({user: false})
-    console.log('user timout', this.state.user, this.getCookie('user'))
 }
 componentDidMount() {
     let store = require('store');
@@ -59,18 +59,16 @@ componentDidMount() {
     }).then(response => {
         const result = response.json() 
         const status_code = response.status;
-        // console.log(status_code)
         if(status_code != 200) {
-        console.log('Error in getting brand info!')
+            throw Error(status_code);
         }
         return result
     }).then(result => {
-        console.log(result)
         this.setState({experimentData: result}, () => {
             let search = window.location.search;
             let params = new URLSearchParams(search);
             const prolificCookie = this.getCookie('prolific')
-            // console.log('this.state.experimentData.pagesNeeded', this.state.experimentData.pagesNeeded[0])
+            store.get("prolificCheck") == 'double' ? this.setState({prolificIsDouble: true}) : null
             this.state.experimentData.pagesNeeded ? 
                     store.get('pageNumber') ? 
                     this.setState({currentPage: this.state.experimentData.pagesNeeded[+store.get('pageNumber')]}):
@@ -78,20 +76,36 @@ componentDidMount() {
                 null
             this.state.experimentData.UseProlific ? 
                 params.get('PROLIFIC_PID') ? 
-                    Boolean(prolificCookie) ? 
-                        this.setState({prolificIsHere: true}) : (document.cookie = `prolific=${params.get('PROLIFIC_PID')}; max-age=5400`, this.setState({prolificIsHere: true}))
-                    :this.setState({prolificIsHere: false}) 
-                : console.log('no', this.state.experimentData.UseProlific)
+                    Boolean(prolificCookie) ? (
+                        !Boolean(store.get("prolificCheck")) && store.get("prolificCheck") != 'double'? 
+                    fetch('/get_all_prolific/' + new URLSearchParams({
+                        'name': name}), {
+                        method: "GET",
+                        headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                    }).then(response => {return response.json()})
+                        .then(prolific_ids => {
+                        if (prolificCookie != 'test' && prolific_ids.prolific_id_set.includes(prolificCookie)) {
+                            this.setState({prolificIsDouble: true})
+                            store.set("prolificCheck", 'double')
+                        } else {this.setState({prolificIsHere: true})
+                                store.set("prolificCheck", true)}
+                        
+                    }) : null)
+                    
+                        : (document.cookie = `prolific=${params.get('PROLIFIC_PID')}; max-age=5400`, this.setState({prolificIsHere: true}))
+                    : this.setState({prolificIsHere: false}) 
+                : null
             if (!this.getCookie('user') && !store.get('user')) {
                 document.cookie = `user=${uuidv4()}; max-age=${+this.state.experimentData.sessionTime*60}`
                 this.setState({user: this.getCookie('user')})
                 store.set('user', 'set')
             }
-
-            // console.log('params', !(this.state.experimentData.UseProlific && Boolean(this.state.prolific)),Boolean(this.state.prolific) )
         })
     }).catch((data) => {
-        console.log(`Try again! Error: ${Error(data.status)}`)
+        console.log(`Try again! Error: ${Error(data)}`)
     })
     }
     nextPage () {
@@ -100,7 +114,6 @@ componentDidMount() {
     this.setState({pageNumber: +this.state.pageNumber+1, currentPage: 'Goodbye'}) :
     this.setState({pageNumber: +this.state.pageNumber+1, currentPage: this.state.experimentData.pagesNeeded[+this.state.pageNumber+1]}, function() {
         store.set('pageNumber', this.state.pageNumber)
-        console.log('nextpage', this.state.pageNumber, this.state.currentPage, this.state.experimentData.pagesNeeded)
     })
     }
     getCookie(name) {
@@ -132,6 +145,12 @@ componentDidMount() {
                         <>
                         <h3>Oops!</h3>
                         <p>Something went wrong! We didn't get your Prolific ID. Please try again or contact us.</p>
+                        </> :
+                    this.state.experimentData.UseProlific && this.state.prolificIsDouble ?
+                        <>
+                        <h3>Oops!</h3>
+                        <p>Thank you for the interest in our research! Our data show that you have already taken 
+                            part in this experiment. Unfortunately, you cannot repeat it. Look out for our new studies!</p>
                         </>
                     :
                         this.state.currentPage == "Hello" ? 

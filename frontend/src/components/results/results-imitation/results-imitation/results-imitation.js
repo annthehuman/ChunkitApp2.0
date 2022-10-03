@@ -24,7 +24,6 @@ export default class ImitationResults extends Component {
     }).then(response => {
       const result = response.text() 
       const status_code = response.status;
-      console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         throw Error(status_code);
@@ -34,7 +33,6 @@ export default class ImitationResults extends Component {
       fetch(`/static/media/Experement/${this.props.name}/sentence.csv`)
       .then(response => {
         const status_code = response.status;
-        console.log(status_code)
         if(status_code != 200) {
           console.log('Error in getting brand info!')
           throw Error(status_code);
@@ -67,11 +65,8 @@ export default class ImitationResults extends Component {
   }
 
   onSubmit(e) {
-    
     e.preventDefault()
-    console.log(e.target)
     const input = document.getElementById('secretWord')
-    console.log(input.value)
     if (input.value == this.state.secret) {
       document.getElementById('secretWordForm').style.display = 'none'
       document.getElementById('panel').style.display = 'block'

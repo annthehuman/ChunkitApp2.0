@@ -24,7 +24,6 @@ class SendEmailResetPassword extends Component{
     handleSubmit(event) {
         // alert('A username and password was submitted: ' + this.state.username + " " + this.state.password);
         event.preventDefault();
-        console.log('dd')
         fetch('/auth/users/reset_password/', {
             method: "POST",
             headers: {

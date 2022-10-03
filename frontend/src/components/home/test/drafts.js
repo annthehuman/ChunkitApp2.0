@@ -107,7 +107,6 @@ export default class Draft extends Component {
   startExperiment(e) {
     //TODO: delete by user token and name
     let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
-    console.log('start_experiment', experiment_name)
     fetch('/start_experiment/?'+ new URLSearchParams({
       name: experiment_name}), {
       method: "GET",
@@ -118,14 +117,12 @@ export default class Draft extends Component {
     }).then(response => {
       const result = response.json() 
       const status_code = response.status;
-      console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         return false;
     }
       return result
     }).then(store => {
-      console.log(store)
       this.componentDidMount()
     }).catch(error => {
     console.log(error)
@@ -133,9 +130,7 @@ export default class Draft extends Component {
   }
 
   stopExperiment(e) {
-    //TODO: delete by user token and name
     let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
-    console.log('stop_experiment', experiment_name)
     fetch('/stop_experiment/?'+ new URLSearchParams({
       name: experiment_name}), {
       method: "GET",
@@ -146,14 +141,12 @@ export default class Draft extends Component {
     }).then(response => {
       const result = response.json() 
       const status_code = response.status;
-      console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         return false;
     }
       return result
     }).then(store => {
-      console.log(store)
       this.componentDidMount()
     }).catch(error => {
     console.log(error)
@@ -173,14 +166,12 @@ export default class Draft extends Component {
     }).then(response => {
       const result = response.json() 
       const status_code = response.status;
-      console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         return false;
     }
       return result
     }).then(store => {
-      console.log(store)
       this.componentDidMount()
     }).catch(error => {
     console.log(error)
@@ -199,14 +190,12 @@ export default class Draft extends Component {
     }).then(response => {
       const result = response.json() 
       const status_code = response.status;
-      console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         return false;
     }
       return result
     }).then(store => {
-      console.log(store)
       this.componentDidMount()
     }).catch(error => {
     console.log(error)
@@ -214,7 +203,6 @@ export default class Draft extends Component {
   }
   getFormFromDB(e){
     let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
-    console.log('target', experiment_name)
     fetch('/load_draft/?'+ new URLSearchParams({
       name: experiment_name}), {
       method: "GET",
@@ -226,7 +214,6 @@ export default class Draft extends Component {
     .then(response => {
         const result = response.json() 
         const status_code = response.status;
-        console.log(status_code)
         if(status_code != 200) {
           console.log('Error in getting brand info!')
           return false;
@@ -236,18 +223,14 @@ export default class Draft extends Component {
     .then(result => {
         const n = new Object(result)
         let store = require('store')
-        // console.log(n.entries())
         Object.entries(result).forEach(([key, value]) => {
-          console.log('load', key, value)
           store.set(key, value);
         })
         return store
     })
     .then(store => {
       if (store.get('nameExperementForParticipants') == experiment_name){
-        
         this.props.history.push('/constructor')
-        console.log(this.props.history)
       }
     })
     .catch(error => {
@@ -256,7 +239,6 @@ export default class Draft extends Component {
 
   }
   loadResults(e) {
-    console.log(e.target.value.split('/')[1])
     this.props.history.push(`/results/${e.target.value.split('/')[1]}`)
   }
   getCookie(name) {
@@ -274,7 +256,6 @@ export default class Draft extends Component {
     return cookieValue;
 }
   componentDidMount() {
-    console.log('props',this.props.links)
     const usertoken = this.getCookie('access_token');
     fetch ('/drafts_list/?'+ new URLSearchParams({
       access_token: usertoken}), {
@@ -285,11 +266,8 @@ export default class Draft extends Component {
     }
     })
     .then(response => {
-        // console.log(response.text())
         const result = response.json()
-        console.log('result', result);
         const status_code = response.status;
-        console.log(status_code)
         if(status_code != 200) {
             console.log('Error in getting brand info!')
             return false;
@@ -297,16 +275,13 @@ export default class Draft extends Component {
         
         return result
       }).then(result => {
-        console.log('result', result);
         const links = result.pop()
-        console.log('links', links.links)
         let links_set = new Set(links.links)
-        this.setState({drafts_list: result, links: links_set},console.log('result', this.state.drafts_list))
+        this.setState({drafts_list: result, links: links_set})
         // Do something with the result
         let rows = []
         let i = 0
         result.map(({nameExperementForParticipants, pagesNeeded, UseQuestions, UseProlific}) => {
-          console.log('nameExperementForParticipants, ImitationTask, UseQuestions, UseProlifi', nameExperementForParticipants, pagesNeeded.indexOf('Imitation') != -1, UseQuestions, UseProlific)
           let experiment_link = Array.from(links_set).filter(link => link.split('/')[link.split('/').length-1].indexOf(nameExperementForParticipants) != -1)
           experiment_link = experiment_link[experiment_link.length - 1]
           i += 1
@@ -314,7 +289,6 @@ export default class Draft extends Component {
           UseQuestions = UseQuestions ? 'Yes' : 'No'
           UseProlific = UseProlific ? 'Yes' : 'No'
           let stop_start_value = experiment_link && experiment_link.length > 0 ? nameExperementForParticipants : undefined
-          // console.log('link',experiment_link.length > 0, stop_value)
           rows.push({id: i, experimentName: String(nameExperementForParticipants).replace(/_/g, ' '), imitationTask: ImitationTask, 
             questions: UseQuestions, prolific: UseProlific, link: experiment_link,
              load: nameExperementForParticipants, start:stop_start_value, stop: stop_start_value, delete:nameExperementForParticipants})})
@@ -326,7 +300,6 @@ export default class Draft extends Component {
   }   
   render () {
     let i = 0
-    console.log(this.state.drafts_list.length)
     return(
       <AppBlock>
         

@@ -58,20 +58,6 @@ export default class TestRun extends Component {
     this.toggleBack = this.toggleBack.bind(this);
     this.toggleNext = this.toggleNext.bind(this);
 }
-componentDidMount() {
-    // let store = require('store')
-    // console.log('tabTest',store.get('tabTest'))
-    // if (store.get('tabTest'))
-    // {this.setState({ activeTabNumber: store.get('tabTest') });}
-    // if (store.get('pagesNeeded')) {
-    //     this.setState({pagesNeeded: store.get('pagesNeeded'), activeTabName: store.get('pagesNeeded')[this.state.activeTabNumber]})
-    // }
-    
-    // console.log('this.state.activeTabName', store.get('pagesNeeded')[this.state.activeTabNumber] )
-    // {const f = document.getElementById('constructorForm')
-    
-    // }
-}
 toggle (event, tab) {
     let store = require('store')
     if(this.state.activeTabName !== tab) {
@@ -92,7 +78,6 @@ toggleNext () {
   }
   render() {
     let store = require('store')
-    console.log('pages', this.state.pagesNeeded, this.state.pagesNeeded.length, this.state.activeTabNumber, this.state.activeTabName == 'Consent')
     return(
             <>
             <>

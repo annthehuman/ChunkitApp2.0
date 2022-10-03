@@ -28,9 +28,6 @@ export default class App extends Component {
             experimentLinks: ['1']
         }
     }
-    componentDidMount(){
-        // console.log('experimentLinks',this.state.experimentLinks)
-    }
     render () {return(
         <>
         <Router>

@@ -38,7 +38,6 @@ export default class CustomButton extends Component {
     super(props);}
 
   render() {
-    console.log('button children', this.props.children)
     return (
     <>
       <Tooltip title={this.props.title ? this.props.title : this.props.text} >

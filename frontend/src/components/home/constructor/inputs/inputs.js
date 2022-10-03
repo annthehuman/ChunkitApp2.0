@@ -99,7 +99,6 @@ class Inputs extends Component {
   onCheck(e) {
     let store = require('store')
     store.set(e.target.name, e.target.checked)
-    console.log(e.target.name, e.target.checked)
     this.props.appendForm(e.target.name, e.target.checked)
   }
   onCheckPages(e){
@@ -107,7 +106,6 @@ class Inputs extends Component {
     
     let pagesNeeded = store.get('pagesNeeded')
     store.set(e.target.name, e.target.checked)
-    // console.log('e', store.get('pagesNeeded'), (!Boolean(pagesNeeded)))
     //если никаких пейджес не отмечено
     if (!Boolean(pagesNeeded)) {
       store.set('pagesNeeded', [e.target.name.split('_')[1]])
@@ -115,7 +113,6 @@ class Inputs extends Component {
     //если пейджес отмечено
     else {
       if (e.target.checked) {
-        console.log('e.target.checked', e.target.checked, pagesNeeded.indexOf(e.target.name.split('_')[1]))
         if (pagesNeeded.indexOf(e.target.name.split('_')[1]) == -1) {
         let newP = store.get('pagesNeeded').concat(e.target.name.split('_')[1]).sort((a, b) => {
           if (this.state.pagesOrder[a] > this.state.pagesOrder[b]) {
@@ -127,53 +124,19 @@ class Inputs extends Component {
           return 0;})
         store.set('pagesNeeded',newP)
         this.props.appendForm('pagesNeeded', newP)
-        console.log('e.target.checked newP', newP)
         }
       } else {
         if (pagesNeeded.indexOf(e.target.name.split('_')[1]) != -1) {
           pagesNeeded.splice(pagesNeeded.indexOf(e.target.name.split('_')[1]), 1)
           store.set('pagesNeeded',pagesNeeded)
           this.props.appendForm('pagesNeeded', pagesNeeded)
-          console.log('e.target.checked pagesNeeded.indexOf(e.target.name.split()[1]) != -1', pagesNeeded.indexOf(e.target.name.split('_')[1]) != -1)
         }
       }
     }
-    //если никаких пейджес не отмечено
-    // if (!Boolean(pagesNeeded)) {
-    //   store.set('pagesNeeded', [e.target.name.split('_')[1]]), store.set(e.target.name, e.target.checked)
-    //   this.props.appendForm('pagesNeeded', [e.target.name.split('_')[1]])}
-    // //если пейджес отмечено
-    // else {
-    //   //добавляем отмеченное в список страниц в нужном порядке
-    //   let newP = store.get('pagesNeeded').concat(e.target.name.split('_')[1]).sort((a, b) => {
-    //     if (this.state.pagesOrder[a] > this.state.pagesOrder[b]) {
-    //       return 1;
-    //     }
-    //     if (this.state.pagesOrder[a] < this.state.pagesOrder[b]) {
-    //       return -1;
-    //     }
-    //     return 0;})
-    // //если отмечено
-    // e.target.checked ? 
-    // //и если есть в списке, то не делаем ничего
-    // pagesNeeded.indexOf(e.target.name.split('_')[1]) != -1 ? 
-    // null :
-    // //если нет в списке, то перезаписываем в сторе новым списком newP
-    // (store.set('pagesNeeded', newP), store.set(e.target.name, e.target.checked), this.props.appendForm('pagesNeeded', newP)):
-    // //если не отмечено, то удаляем из списка
-    // (console.log('pagesNeeded.indexOf(e.target.name.split()[1])',pagesNeeded.indexOf(e.target.name.split('_')[1])),
-    // pagesNeeded.indexOf(e.target.name.split('_')[1]) != -1 ?
-    // null:
-    // pagesNeeded.pop(pagesNeeded.indexOf(e.target.name.split('_')[1])),
-    // store.set('pagesNeeded', pagesNeeded),
-    // store.set(e.target.name, e.target.checked),
-    // this.props.appendForm('pagesNeeded', pagesNeeded))}
-    // this.props.appendForm('pagesNeeded', store.get('pagesNeeded').concat(e.target.name.split('_')[1]))
   }
 
   onChange(e) {
     let store = require('store')
-    console.log('change' + e.target.name)
     store.set(e.target.name, e.target.value)
     e.target.name == 'nameExperementForParticipants' ?
       this.setState({ nameExperiment: e.target.value, 
@@ -181,7 +144,6 @@ class Inputs extends Component {
     this.props.appendForm(e.target.name, e.target.value)
   }
   copyURL() {
-    console.log('copied')
     const url = document.getElementById('urltoStudy');
     url.select();
     url.setSelectionRange(0, 99999); /* For mobile devices */
@@ -419,7 +381,7 @@ class Inputs extends Component {
         <Accordion
           style={{width: '650px'}}
           expanded={this.state.accordionExpanded}
-          onChange={() => {console.log('expanded changed', !this.state.accordionExpanded),this.setState({accordionExpanded: !this.state.accordionExpanded})}}
+          onChange={() => {this.setState({accordionExpanded: !this.state.accordionExpanded})}}
           >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}

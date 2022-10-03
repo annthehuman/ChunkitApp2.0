@@ -59,7 +59,6 @@ class Login extends Component{
                 if (!data.ok){
                     data.json()
                     .then(data =>{
-                        console.log(data)
                         this.setState({errorLogin: data})       
                         throw Error(data);})
                 } else {

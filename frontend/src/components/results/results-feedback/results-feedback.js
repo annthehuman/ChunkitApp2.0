@@ -24,7 +24,6 @@ export default class FeedbackResults extends Component {
     }).then(response => {
       const result = response.text() 
       const status_code = response.status;
-      console.log(status_code)
       if(status_code != 200) {
         console.log('Error in getting brand info!')
         throw Error(status_code);
@@ -34,15 +33,13 @@ export default class FeedbackResults extends Component {
       fetch(`/static/media/Experement/${this.props.name}/feedback.csv`)
       .then(response => {
         const status_code = response.status;
-        console.log(status_code)
         if(status_code != 200) {
           console.log('Error in getting brand info!')
           throw Error(status_code);
         }
         return response.text()})
       .then(data => Papa.parse(data))
-      .then(result => {
-        console.log(result.data), this.setState({results:result.data})
+      .then(result => {this.setState({results:result.data})
         let cells = []
         let head = []
         result.data.forEach((i, index) => {

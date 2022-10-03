@@ -59,9 +59,7 @@ export default class Home extends Component {
   }
   onSubmit(e) {
     e.preventDefault()
-    console.log(e.target)
     const input = document.getElementById('secretWord')
-    console.log(input.value)
     if (input.value == this.state.secret) {
       document.getElementById('secretWordForm').style.display = 'none'
       document.getElementById('panel').style.display = 'block'
