@@ -1,11 +1,10 @@
 FROM nginxinc/nginx-unprivileged
-LABEL maintainer='chunkitapp.com'
+LABEL maintainer='chunkitapp.online'
 
-COPY ./default.conf.tpl /etc/nginx/default.conf.tpl
-COPY ./uwsgi_params /etc/nginx/uwsgi_params
+COPY ./* /etc/nginx/
 COPY ./run.sh /run.sh
 
-ENV LISTEN_PORT=8000
+
 ENV APP_HOST=app
 ENV APP_PORT=9000
 
@@ -18,7 +17,6 @@ RUN mkdir -p /vol/static && \
     chmod +x /run.sh
 
 VOLUME /vol/static
-
-USER nginx
+VOLUME /vol/www
 
 CMD ["/run.sh"]

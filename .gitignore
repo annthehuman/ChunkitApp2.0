@@ -213,3 +213,6 @@ lib*.pc
 /Debug/
 /Release/
 /tmp_install/
+
+data/certbot/conf*
+

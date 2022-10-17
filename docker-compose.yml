@@ -29,14 +29,30 @@ services:
     depends_on:
       - app
     ports:
-      - 80:8000
+      - 80:80
+      - 443:443
     volumes:
       - ./static/media/sentence/:/vol/static/media/sentence/
       - static-data:/vol/static
+      - proxy-dhparams:/vol/proxy
+      - certbot-web:/vol/www
+      - certbot-certs:/etc/letsencrypt
     environment:
-      - LISTEN_PORT=8000
       - APP_HOST=app
       - APP_PORT=9000
 
+  certbot:
+    build:
+      context: ./proxy/certbot
+    command: echo "Pooping..."
+    volumes:
+      - certbot-web:/vol/www
+      - certbot-certs:/etc/letsencrypt
+    depends_on:
+      - proxy
+
 volumes:
   static-data:
+  certbot-web:
+  proxy-dhparams:
+  certbot-certs:
