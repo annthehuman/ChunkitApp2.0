@@ -48,6 +48,7 @@ class Inputs extends Component {
       accordionExpanded: false,
       anchorElShuffle: null,
       anchorElName: null,
+      anchorElDuar: null,
       pagesOrder: {'Hello': 0, 'Consent': 1, 'Outline': 2, 'Background': 3, 'Practice': 4, 
                    'Experiment': 5, 'Imitation': 6, 'Feedback': 7, 'Goodbye': 8}
     }
@@ -190,11 +191,11 @@ class Inputs extends Component {
             value={store.get('nameExperementForParticipants') ? String(store.get('nameExperementForParticipants')).replace(/_/g, ' ') : ''}
             />{'   '}
             <CustomButton onClick={(event) => this.setState({anchorElName: event.currentTarget})} 
-                                onMouseOver={(event) => this.setState({anchorElName: event.currentTarget})}
-                                text='i' 
-                                theme='gray' 
-                                size='icon' 
-                                style={{marginBottom:'5px', marginLeft: '10px'}}/>
+                          onMouseOver={(event) => {console.log(event.currentTarget),this.setState({anchorElName: event.currentTarget})}}
+                          text='i' 
+                          theme='gray' 
+                          size='icon' 
+                          style={{marginBottom:'5px', marginLeft: '10px'}}/>
                   <Popover
                     className={classes.root}
                     id='popover'
@@ -227,18 +228,18 @@ class Inputs extends Component {
             value={store.get('sessionTime') ? store.get('sessionTime') : ''}
             inputProps={{style: {fontSize: '20px'}}}
             />{'   '}
-            <CustomButton onClick={(event) => this.setState({anchorElName: event.currentTarget})} 
-                                onMouseOver={(event) => this.setState({anchorElName: event.currentTarget})}
-                                text='i' 
-                                theme='gray' 
-                                size='icon' 
-                                style={{marginBottom:'5px'}}/>
+            <CustomButton onClick={(event) => this.setState({anchorElDuar: event.currentTarget})} 
+                          onMouseOver={(event) => this.setState({anchorElDuar: event.currentTarget})}
+                          text='i' 
+                          theme='gray' 
+                          size='icon' 
+                          style={{marginBottom:'5px'}}/>
                   <Popover
                     className={classes.root}
                     id='popover'
-                    open={Boolean(this.state.anchorElName)}
-                    anchorEl={this.state.anchorElName}
-                    onClose={() => this.setState({anchorElName: null})}
+                    open={Boolean(this.state.anchorElDuar)}
+                    anchorEl={this.state.anchorElDuar}
+                    onClose={() => this.setState({anchorElDuar: null})}
                     anchorOrigin={{
                       vertical: 'bottom',
                       horizontal: 'left'

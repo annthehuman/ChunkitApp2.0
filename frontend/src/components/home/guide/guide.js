@@ -32,11 +32,12 @@ export default class Guide extends Component {
       direction="column"
       justifyContent="flex-start"
       alignItems="center"
-      sx={{width: '850px'}}>
-  <div>
+      sx={{width: '850px', marginBottom: '20px'}}>
+  <div 
+    style={{fontSize: "18px"}}>
       <p>This project is distributed under CC-BY-NC-SA <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/'>license</a>.</p>
       <p><span style={{ fontWeight: 700 }}>Authors</span>: Alena Konina, Aleksandra Dobrego, Svetlana Vetchinnikova, Nina Mikušova, Anna Mauranen</p>
-      <p><span style={{ fontWeight: 700 }}>Developer</span>: Anna Kupriianova</p>
+      <p><span style={{ fontWeight: 700 }}>Developer</span>: Anna Galkova</p>
       <Accordion expanded={this.state.expanded === 'panel1'} onChange={() => this.handleChange('panel1')}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
@@ -79,9 +80,7 @@ export default class Guide extends Component {
           <a href='https://doi.org/10.21437/Interspeech.2017'>https://doi.org/10.21437/Interspeech.2017</a>
           </p>
           <Typography variant="h5">Contact us</Typography>
-          <Typography>
             <p>For any questions related to the app, please contact Alena Konina at <a href = "mailto: alena.konina@helsinki.fi">alena.konina@helsinki.fi</a></p>
-          </Typography>
         </AccordionDetails>
       </Accordion>
       <Accordion expanded={this.state.expanded === 'panel2'} onChange={() => this.handleChange('panel2')}>
@@ -90,11 +89,9 @@ export default class Guide extends Component {
           aria-controls="panel2a-content"
           id="panel2a-header"
         >
-          <Typography variant="h5">Specifics</Typography>
+          <Typography variant="h5">Registration and login</Typography>
         </AccordionSummary>
         <AccordionDetails>
-        <Typography variant="h5">Registration and login</Typography>
-          <Typography>
             <ol>
               <li>Upon your first visit to the website, you need to insert your email and come up with a password.</li>
               <li>You will receive a confirmation message to your email address with a link to activate your account.</li>
@@ -104,17 +101,22 @@ export default class Guide extends Component {
               </li><br/>
               <li>Click on Design & Run to start.</li>
             </ol>
-          </Typography>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion expanded={this.state.expanded === 'panel3'} onChange={() => this.handleChange('panel3')}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel3a-content"
+          id="panel3a-header"
+        >
           <Typography variant="h5">Design & Run</Typography>
-          <Typography>
+        </AccordionSummary>
+        <AccordionDetails>
           <p><span style={{ fontWeight: 700 }}>Disclaimer</span>: As a researcher, you can design and test your experiments both on a tablet and from a computer, but participants are always advised to use a tablet.
           </p>
           <img src="static/static/guide/2.png" alt="Design & Run" width="600" style={{paddingLeft:'40px'}}/>
           <p>Clicking on Design & Run takes you to a currently empty list where your experiments will appear as soon as you create one. From this list, you can edit and run the experiments you created, as well as stop data collection or delete an experiment. A big plus button on the top left of the list allows you to create a new experiment.</p>
-          <img src="static/static/guide/3.png" alt="Create a new experiment" width="600" style={{paddingLeft:'40px'}}/>
-          </Typography>
           <Typography variant="h5">Create a new experiment</Typography>
-          <Typography>
             <p>Clicking on the plus button takes you to a template where you can build you own design like a construction set.</p>
             <p>When you start designing a new experiment, you have three options of what to do with it.</p>
             <p>You can</p>
@@ -132,7 +134,6 @@ export default class Guide extends Component {
               <img src="static/static/guide/5.png" alt="Options" width="600" style={{paddingLeft:'40px'}}/>
             </ol>
             To complete the design, you need to go through a series of steps.
-          </Typography>
           <Typography variant="h6">Basics</Typography>
           <img src="static/static/guide/4.png" alt="Basic" width="600" style={{paddingLeft:'40px'}}/>
           <br/>
@@ -148,7 +149,7 @@ export default class Guide extends Component {
                  participants to the task.</li>
               <li>Check the box ‘Include comprehension questions after each extract’ 
                 if you would like to ask your participants a question after each extract.</li>
-              <li>Check the box    the experiment with Prolific’ 
+              <li>Check the box ‘Integrate the the experiment with Prolific’ 
                 if you would like to collect data for the experiment on this particular platform.
                 <p>If you check the box, two references will be generated. 
                   One that enables recording participant Prolific IDs:</p>
@@ -273,7 +274,17 @@ export default class Guide extends Component {
           <p>The <b>stop</b> button deactivates the link. When a participant 
             would click on a link to such an experiment, 
             a page appears saying "Data collection for this experiment has stopped."</p>
+            </AccordionDetails>
+      </Accordion>
+      <Accordion expanded={this.state.expanded === 'panel4'} onChange={() => this.handleChange('panel4')}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel4a-content"
+          id="panel4a-header"
+        >
           <Typography variant="h5">Fetch & Analyse</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
           <p>This part of the website is intended as a repository for collected
              data. It allows you to download raw data from the server, as well 
              as pre-process and aggregate collected data.</p>
