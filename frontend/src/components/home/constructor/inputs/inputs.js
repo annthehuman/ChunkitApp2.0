@@ -191,7 +191,7 @@ class Inputs extends Component {
             value={store.get('nameExperementForParticipants') ? String(store.get('nameExperementForParticipants')).replace(/_/g, ' ') : ''}
             />{'   '}
             <CustomButton onClick={(event) => this.setState({anchorElName: event.currentTarget})} 
-                          onMouseOver={(event) => {console.log(event.currentTarget),this.setState({anchorElName: event.currentTarget})}}
+                          onMouseOver={(event) => {this.setState({anchorElName: event.currentTarget})}}
                           text='i' 
                           theme='gray' 
                           size='icon' 
