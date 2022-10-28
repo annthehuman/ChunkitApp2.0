@@ -169,8 +169,8 @@ WSGI_APPLICATION = 'chunkitapp_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': '/vol/web/db.sqlite3',
-        'NAME': './db.sqlite3',
+        'NAME': '/vol/web/db.sqlite3',
+        # 'NAME': './db.sqlite3',
     }
 }
 
@@ -222,8 +222,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/static/media/'
 # MEDIA_URL = '/media/'
 
-# STATIC_ROOT = "/vol/web/static"
-# MEDIA_ROOT = "/vol/web/media"
+STATIC_ROOT = "/vol/web/static"
+MEDIA_ROOT = "/vol/web/media"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
