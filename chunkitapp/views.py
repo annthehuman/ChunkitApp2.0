@@ -1,12 +1,10 @@
 from distutils.log import error
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, response
-from .models import background, feedback, test, sessions, experiment_links
+from django.shortcuts import redirect
+from django.http import HttpResponse
+from .models import background, feedback, test, experiment_links
 from .models import sentence as s
 from .models import draft_data
-from .forms import backgroundForm, feedbackForm, sentenceForm, draftDataForm
-import random
-from django.contrib.sessions.models import Session
+from .forms import draftDataForm
 import os
 import datetime
 import json
@@ -15,14 +13,11 @@ import patoolib
 import ast
 from django.views.decorators.csrf import csrf_exempt
 import pandas as pd
-# from .serializers import *
 import shutil
 import pandas as pd
 from rest_framework.views import APIView
 import requests
-import time
 from Levenshtein import distance
-import re
 
 
 class UserActivationView(APIView):
@@ -39,7 +34,8 @@ class UserActivationView(APIView):
 
 def unpackArchive(experement_name):
     """
-    Unpack audios archive for practice or experiment
+    Unpack audios archive for practice or experiment and rewrite data in
+    database about it
     """
     name_set = list(draft_data.objects.all().values_list(
                             'nameExperementForParticipants', flat=True))
@@ -134,70 +130,74 @@ def unpackArchive(experement_name):
         if not os.path.exists(directory_to_extract_to):
             os.makedirs(directory_to_extract_to)
 
-        patoolib.extract_archive(path_to_zip_file, outdir = directory_to_extract_to)
+        patoolib.extract_archive(path_to_zip_file,
+                                 outdir=directory_to_extract_to)
         test = os.walk(directory_to_extract_to)
         _, dirs, _ = next(test)
-        if dirs:    
-            # print('folder', dirs)
+        if dirs:
             for dir in dirs:
                 if dir != '__MACOSX':
                     p = os.walk(os.path.join(directory_to_extract_to, dir))
                     _, _, fi = next(p)
                     for file in fi:
                         if file[0] != '.':
-                            # print(file[0], file)
-                            shutil.copy(os.path.join(directory_to_extract_to,dir,file), os.path.join(directory_to_extract_to,file))
+                            shutil.copy(os.path.join(directory_to_extract_to,
+                                                     dir,
+                                                     file),
+                                        os.path.join(directory_to_extract_to,
+                                                     file))
 
-        onlyfilesExperement = [os.path.join(experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
+        onlyfilesExperement = [os.path.join(experement_name, f) for f in
+                               os.listdir(directory_to_extract_to) if
+                               os.path.isfile(os.path.join(directory_to_extract_to,f))]
     
     draft_data.objects.filter(nameExperementForParticipants=experement_name).delete()
-    # print('draft_data_values.get("uploadExperimentTranscripts",0)', draft_data_values.get("uploadExperimentTranscripts",0))
     draft_data.objects.create(
-        accessToken = draft_data_values.get("accessToken", 0),
-        nameExperement = draft_data_values.get("nameExperement",0),
-        sessionTime = draft_data_values.get("sessionTime",90),
-        shuffleExtracts =  draft_data_values.get("shuffleExtracts",0),
-        shuffleExtractsPractice =  draft_data_values.get("shuffleExtractsPractice",0),
-        nameExperementForParticipants  = draft_data_values.get("nameExperementForParticipants",0),
-        ImitationTask  = draft_data_values.get("ImitationTask",0),
-        UseQuestions  = draft_data_values.get("UseQuestions",0),
-        UseProlific  = draft_data_values.get("UseProlific",0),
-        linkToProlific  = draft_data_values.get("linkToProlific",0),
-        helloEditor  = draft_data_values.get("helloEditor",0),
-        consentEditor  = draft_data_values.get("consentEditor",0),
-        outlineEditor  = draft_data_values.get("outlineEditor",0),
-        backgroundExample  = draft_data_values.get("backgroundExample",0),
-        backgroundAddQ  = draft_data_values.get("backgroundAddQ",0),
-        feedbackExample  = draft_data_values.get("feedbackExample",0),
-        feedbackAddQ  = draft_data_values.get("feedbackAddQ",0),
-        goodbyeEditor  = draft_data_values.get("goodbyeEditor",0),
-        uploadPracticeAudio  = draft_data_values.get("uploadPracticeAudio",0),
-        uploadPracticeTranscripts  = draft_data_values.get("uploadPracticeTranscripts",0),
-        uploadExperimentAudio  = draft_data_values.get("uploadExperimentAudio",0),
-        uploadExperimentTranscripts  = draft_data_values.get("uploadExperimentTranscripts",0),
-        experimentInstructions  = draft_data_values.get("experimentInstructions",0),
-        practiceInstructions  = draft_data_values.get("practiceInstructions",0),
+        accessToken=draft_data_values.get("accessToken", 0),
+        nameExperement=draft_data_values.get("nameExperement",0),
+        sessionTime=draft_data_values.get("sessionTime",90),
+        shuffleExtracts=draft_data_values.get("shuffleExtracts",0),
+        shuffleExtractsPractice=draft_data_values.get("shuffleExtractsPractice",0),
+        nameExperementForParticipants=draft_data_values.get("nameExperementForParticipants",0),
+        ImitationTask=draft_data_values.get("ImitationTask",0),
+        UseQuestions=draft_data_values.get("UseQuestions",0),
+        UseProlific=draft_data_values.get("UseProlific",0),
+        linkToProlific=draft_data_values.get("linkToProlific",0),
+        helloEditor=draft_data_values.get("helloEditor",0),
+        consentEditor=draft_data_values.get("consentEditor",0),
+        outlineEditor=draft_data_values.get("outlineEditor",0),
+        backgroundExample=draft_data_values.get("backgroundExample",0),
+        backgroundAddQ=draft_data_values.get("backgroundAddQ",0),
+        feedbackExample=draft_data_values.get("feedbackExample",0),
+        feedbackAddQ=draft_data_values.get("feedbackAddQ",0),
+        goodbyeEditor=draft_data_values.get("goodbyeEditor",0),
+        uploadPracticeAudio=draft_data_values.get("uploadPracticeAudio",0),
+        uploadPracticeTranscripts=draft_data_values.get("uploadPracticeTranscripts",0),
+        uploadExperimentAudio=draft_data_values.get("uploadExperimentAudio",0),
+        uploadExperimentTranscripts=draft_data_values.get("uploadExperimentTranscripts",0),
+        experimentInstructions=draft_data_values.get("experimentInstructions",0),
+        practiceInstructions=draft_data_values.get("practiceInstructions",0),
         pagesNeeded = draft_data_values.get("pagesNeeded",0),
         uploadPracticeTranscriptsData = transcripts_file_practice,
         uploadExperimentTranscriptsData = transcripts_file_experement,
-        audiosPractice  = onlyfilesPractice,
-        audiosExperement  = onlyfilesExperement
+        audiosPractice=onlyfilesPractice,
+        audiosExperement=onlyfilesExperement
         )
 
+
 def save_draft(request):
-    # print('request.FILES',request.FILES)
+    """
+    Save draft of experiment. Collect all questions and additional questions
+    for background and feedback. Add link to links database if it exists. 
+    Save data and unpack archives
+    """
     form = draftDataForm(request.POST, request.FILES)
     if request.method == 'POST':
-        
-        # print('req',request.FILES)
-        # print('access_token', request.POST.get('accessToken'))
         pagesNeeded = ''
         if (request.POST.get('pagesNeeded')):
             pagesNeeded = request.POST.get('pagesNeeded').split(',')
-            # print('pagesNeeded', pagesNeeded, type(pagesNeeded))
             if 'goodbye' not in pagesNeeded:
                 pagesNeeded.append('Goodbye')
-            # print('pagesNeeded', pagesNeeded)
         background = dict(filter(lambda x: 'useBackground' in x[0],dict(request.POST).items()))
         background_addQ = dict(filter(lambda x: 'BackgroundNew' in x[0] and not 'useBackground' in x[0],dict(request.POST).items()))
         feedback = dict(filter(lambda x: 'useFeedback' in x[0],dict(request.POST).items()))
@@ -206,39 +206,27 @@ def save_draft(request):
 
         name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
         names_dict = dict(zip(name_set, list(range(len(name_set)))))
-        model_columns = ['uploadPracticeAudio', 'uploadPracticeTranscripts', 'uploadExperimentAudio', 'uploadExperimentTranscripts']
         row_number = names_dict.get(experement_name, '')
-        links = list(filter(lambda x: request.POST.get('link', '') in x ,experiment_links.objects.all().values_list('experiment_link', flat = True)))
-        # print('links in bd', links, request.POST.get('link', ''))
+        links = list(filter(lambda x: request.POST.get('link', '') in x, experiment_links.objects.all().values_list('experiment_link', flat = True)))
+
         if not links:
             if request.POST.get('link'):
                 experiment_links.objects.create(
-                    experiment_link = request.POST.get('link', ''),
-                    accessToken = request.POST.get('accessToken', ''),
-                    experiment_stopped = False
+                    experiment_link=request.POST.get('link', ''),
+                    accessToken=request.POST.get('accessToken', ''),
+                    experiment_stopped=False
                 )
 
-        # print('back',feedback, feedback_addQ)
         if form.is_valid():
-            # print('valid',form)
-            # print('valid',form.sessionTime)
             form = form.save(commit=False)
             form.nameExperementForParticipants = experement_name
             form.backgroundExample = background
             form.feedbackExample = feedback
             form.backgroundAddQ = background_addQ
             form.feedbackAddQ = feedback_addQ
-            # form.accessToken = request.POST.get('accessToken')
-            # form.audiosPractice = onlyfilesPractice
-            # form.audiosExperement = onlyfilesExperement
-            # print('practice files not found audio',request.FILES.get('uploadPracticeAudio'), row_number, not request.FILES.get('uploadPracticeAudio') and row_number)
-            # print('practice files not found transcripts',request.FILES.get('uploadPracticeTranscripts'), row_number, not request.FILES.get('uploadPracticeAudio') and row_number)
-            # print('ex files not found audio',request.FILES.get('uploadExperimentAudio'))
-            # print('ex files not found transcripts',request.FILES.get('uploadExperimentTranscripts'))
             if pagesNeeded:
                 form.pagesNeeded = pagesNeeded
             if not request.FILES.get('uploadPracticeAudio') and row_number and row_number >= 0:
-                # print('practice files not found', request.FILES.get('uploadPracticeAudio'))
                 form.uploadPracticeAudio = list(draft_data.objects.all().values_list('uploadPracticeAudio', flat = True))[row_number]
             if not request.FILES.get('uploadPracticeTranscripts') and row_number and row_number >= 0:
                 form.uploadPracticeTranscripts = list(draft_data.objects.all().values_list('uploadPracticeTranscripts', flat = True))[row_number]
@@ -251,28 +239,18 @@ def save_draft(request):
             else:
                 form.uploadExperimentTranscripts = request.FILES.get('uploadExperimentTranscripts')
             form.save()
-            # print('form', form.uploadExperimentTranscripts)
-            # text_from_user_list = list(draft_data.objects.all().values_list())
-            # token = draft_data.objects.all().values_list('accessToken', flat = True)
-            # ids = draft_data.objects.all().values_list('id', flat = True)
-            # draft_data.objects.create(
-            #         backgroundExample = background,
-            #         feedbackExample = feedback,
-            #         )
-            # print(list(ex_data_model.objects.all().values_list()))
-            # print('tokens',token, ids)
-            # print('text_from_user_list', text_from_user_list)
         unpackArchive(experement_name)
         return HttpResponse('')
 
 
 def drafts_list(request):
+    """
+    Get drafts list for drafts table
+    """
     if request.method == 'GET':
         tokens = list(draft_data.objects.all().values_list('accessToken', flat = True))
         tokens_zip = list(zip(tokens, list(range(len(tokens)))))
         tokens_current = list(filter(lambda x: x[0] == request.GET['access_token'], tokens_zip))
-        # print(tokens_current)
-        # print('tokens', tokens)        
         link_tokens = list(experiment_links.objects.all().values_list('accessToken', flat = True))
         link_tokens_zip = list(zip(link_tokens, list(range(len(link_tokens)))))
         link_tokens_current = list(filter(lambda x: x[0] == request.GET['access_token'], link_tokens_zip))
@@ -280,19 +258,12 @@ def drafts_list(request):
         current_experiment_link = []
         for line in link_tokens_current:
             current_experiment_link.append(experiment_link[line[1]])
-        # print(current_experiment_link)
-        # name_set = dict()
-        # name_set = list(draft_data.objects.all().values_list('nameExperement', flat = True))
-        # names_dict = dict(zip(name_set, list(range(len(name_set)))))
-        # print(names_dict)
         model_columns = [f.name for f in draft_data._meta.get_fields()]
-        # row_number = names_dict[request.GET['name']]
         draft_data_list = []
         for line in tokens_current:
             draft_data_values = {}
             for col_name in model_columns:
                 col_data = list(draft_data.objects.all().values_list(col_name, flat = True))
-                # print(col_data[index])
                 if col_name == 'backgroundExample':
                     draft_data_values[col_name] = ast.literal_eval(col_data[line[1]])
                 else:
@@ -300,12 +271,13 @@ def drafts_list(request):
 
             draft_data_list.append(draft_data_values)
         draft_data_list.append({'links': current_experiment_link})
-            # print(list(ex_data_model.objects.all().values_list()))
-        # name_set = ','.join(name_set)
-            # print(list(ex_data_model.objects.all().values_list()))
         return HttpResponse(json.dumps(draft_data_list))
 
+
 def load_draft(request):
+    """
+    Load draft of experiment
+    """
     if request.method == 'GET':
         # print('GET',request.GET['name'])
         
@@ -328,68 +300,41 @@ def load_draft(request):
         draft_data_values['audiosPractice'] = ast.literal_eval(draft_data_values['audiosPractice'].replace('nan', '0'))
         draft_data_values['audiosExperement'] = ast.literal_eval(draft_data_values['audiosExperement'].replace('nan', '0'))
         draft_data_values['pagesNeeded'] = ast.literal_eval(draft_data_values['pagesNeeded'].replace('nan', '0'))
-        # print('uploadPracticeTranscriptsData',draft_data_values)
         return HttpResponse(json.dumps(draft_data_values))
 
-def delete_experiment(request):
-    if request.method == 'GET':
-        # print('GET',request.GET['name'])
-        name_set = experiment_links.objects.filter(experiment_link=request.GET['name']).delete()
-        response = dict()
-        if not (experiment_links.objects.filter(experiment_link=request.GET['name'])):
-            response['answer'] = 'Sucsess!'
-        else:
-            response['answer'] = 'Error'
-        # print(name_set)
-        return HttpResponse(json.dumps(response))
 
 def stop_experiment(request):
+    """
+    Stop experiment
+    """
     if request.method == 'GET':
-        # print('GET',request.GET['name'])
-        # links_set = list(experiment_links.objects.all().values_list('experiment_link', flat = True))
-        # links_dict = dict(zip(links_set, list(range(len(links_set)))))
-        # # print(names_dict)
-        # model_columns = [f.name for f in experiment_links._meta.get_fields()]
-        # row_number = links_dict[request.GET['name']]
-        # links_data_values = {}
-        
-        # for col_name in model_columns:
-        #     col_data = list(experiment_links.objects.all().values_list(col_name, flat = True))
-        #     # print(col_data[row_number])
-        #     links_data_values[col_name] = col_data[row_number]
-        # name_set = experiment_links.objects.filter(experiment_link=request.GET['name']).delete()
-        # experiment_links.objects.create(
-        #     experiment_link = links_data_values['experiment_link'],
-        #     accessToken = links_data_values['accessToken'],
-        #     experiment_stopped = True
-        # )
-        # print(name_set)
         experiment_name = request.GET['name']
         experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').update(experiment_stopped=True)
         return HttpResponse('Ok!')
 
+
 def start_experiment(request):
+    """
+    Start experiment, all the previous data from participants onot included in results
+    """
     if request.method == 'GET':
-        # print('GET',request.GET['name'])
         experiment_name = request.GET['name']
-        # links_dict = dict(zip(links_set, list(range(len(links_set)))))
         date = datetime.datetime.now()
-        # time.sleep(3)
-        # print(datetime.datetime.now(), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'))
-        # print(datetime.datetime.now() - datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f'), datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f').timestamp() > 0)
         experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').update(experiment_start_time=date)
         return HttpResponse('Ok!')
 
+
 def delete_draft(request):
+    """
+    Delete draft of experiment
+    """
     if request.method == 'GET':
-        # print('GET',request.GET['name'])
         name_set = draft_data.objects.filter(nameExperementForParticipants=request.GET['name']).delete()
         response = dict()
         if not (draft_data.objects.filter(nameExperementForParticipants=request.GET['name'])):
             response['answer'] = 'Sucsess!'
         else:
             response['answer'] = 'Error'
-        # print(name_set)
         return HttpResponse(json.dumps(response))
 
 
@@ -398,37 +343,25 @@ def load_draft_to_test(request, draft_experement_name):
 	if request.method == 'GET':
 		name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
 		names_dict = dict(zip(name_set, list(range(len(name_set)))))
-		# print(names_dict)
 		model_columns = ['uploadExperimentTranscripts','uploadExperimentAudio','uploadPracticeAudio', 'uploadPracticeTranscripts']
 		row_number = names_dict[draft_experement_name]
 		draft_data_values = {}
 		for col_name in model_columns:
 			col_data = list(draft_data.objects.all().values_list(col_name, flat = True))
-			# print(col_data[row_number])
 			draft_data_values[col_name] = col_data[row_number]
-			# print(list(ex_data_model.objects.all().values_list()))
-		# print(json.dumps(draft_data_values))
-		# print(settings.MEDIA_URL+draft_data_values['uploadPracticeAudio'])
-		# print(settings.MEDIA_ROOT)
-		### TODO linux
-		# path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadPracticeAudio']
-		# directory_to_extract_to = settings.MEDIA_ROOT + '/' + draft_experement_name
+        
 		onlyfilesPractice = ''
 		onlyfilesExperement = ''
-		# print("draft_data_values['uploadPracticeAudio']",draft_data_values['uploadPracticeAudio'])
 		if draft_data_values['uploadPracticeAudio']:
 			path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadPracticeAudio']
 			directory_to_extract_to = settings.MEDIA_ROOT + '/Practice/' + draft_experement_name
 			if list(os.walk(directory_to_extract_to)):
 				shutil.rmtree(directory_to_extract_to)
-			# print('path_to_zip_file',path_to_zip_file, directory_to_extract_to)
 			
 			patoolib.extract_archive(path_to_zip_file, outdir = directory_to_extract_to)
-		# print(x)
 			test = os.walk(directory_to_extract_to)
 			path, dirs, files = next(test)
-			if dirs:    
-				# print('folder', dirs)
+			if dirs:
 				for dir in dirs:
 					if dir != '__MACOSX':
 						p = os.walk(os.path.join(directory_to_extract_to,dir))
@@ -443,10 +376,8 @@ def load_draft_to_test(request, draft_experement_name):
 			directory_to_extract_to = settings.MEDIA_ROOT + '/Experement/' + draft_experement_name
 			if list(os.walk(directory_to_extract_to)):
 				shutil.rmtree(directory_to_extract_to)
-			# print('path_to_zip_file',path_to_zip_file, directory_to_extract_to)
 			
 			patoolib.extract_archive(path_to_zip_file, outdir = directory_to_extract_to)
-		# print(x)
 			test = os.walk(directory_to_extract_to)
 			path, dirs, files = next(test)
 			if dirs:
@@ -461,14 +392,12 @@ def load_draft_to_test(request, draft_experement_name):
 			onlyfilesExperement = [os.path.join(draft_experement_name, f) for f in os.listdir(directory_to_extract_to) if os.path.isfile(os.path.join(directory_to_extract_to, f))]
 		return HttpResponse(json.dumps({'audiosPractice': onlyfilesPractice, 'audiosExperement':onlyfilesExperement}))
 
+
 def load_experement(request, experement_name):
     experement_name = experement_name.split('=')[1].replace(' ', '_').replace('+', '_')
-    # print('experement_name', experement_name)
     if request.method == 'GET':
         name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
-        name_set_new = list(draft_data.objects.filter(nameExperementForParticipants=experement_name).values_list())
         names_dict = dict(zip(name_set, list(range(len(name_set)))))
-        # print(names_dict)
         model_columns = [f.name for f in draft_data._meta.get_fields()]
         row_number = names_dict[experement_name]
         draft_data_values = {}
@@ -476,11 +405,7 @@ def load_experement(request, experement_name):
             col_data = list(draft_data.objects.all().values_list(col_name, flat = True))
             draft_data_values[col_name] = col_data[row_number]
         
-        # links_set = list(experiment_links.objects.all().values_list('experiment_link', flat = True))
         link = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experement_name}.*').values_list())[-1]
-        # print('link set', name_set, draft_data_values)
-        # print()
-        # print('link',link[-1])
 
         draft_data_values['backgroundAddQ'] = ast.literal_eval(draft_data_values['backgroundAddQ'])
         draft_data_values['feedbackAddQ'] = ast.literal_eval(draft_data_values['feedbackAddQ'])
@@ -492,83 +417,13 @@ def load_experement(request, experement_name):
         draft_data_values['audiosExperement'] = ast.literal_eval(draft_data_values['audiosExperement'])
         draft_data_values['pagesNeeded'] = ast.literal_eval(draft_data_values['pagesNeeded'].replace('nan', '0'))
         draft_data_values['experimentStopped'] = ast.literal_eval(link[-2])
-        # print('draft_data_values',draft_data_values)
-        ### TODO linux
-        # path_to_zip_file = settings.MEDIA_ROOT + '/' + draft_data_values['uploadPracticeAudio']
-        # directory_to_extract_to = settings.MEDIA_ROOT + '/' + draft_experement_name
-
         return HttpResponse(json.dumps(draft_data_values))
-
-#?PROLIFIC_PID={{%PROLIFIC_PID%}}&STUDY_ID={{%STUDY_ID%}}&SESSION_ID={{%SESSION_ID%}}
-def introduction(request):
-    # #print(request)
-    if request.method == 'GET':
-        if request.GET.get('PROLIFIC_PID'):
-            global prolific
-            prolific = request.GET['PROLIFIC_PID']
-            #print(prolific, study)
-            if request.session.session_key:
-                ##print(request.session.session_key)
-                session_key = request.session.session_key
-                session = Session.objects.get(session_key=session_key)
-                ##print(session)
-                Session.objects.filter(session_key=session).delete()
-            x = prolific
-            request.session.set_expiry(5400)
-            request.session[x]=x
-            request.session.save()
-            # print('sessions', request.session.keys(), request.session.session_key)
-            
-            # #print('sessions', request.session[x], request.session.session_key)
-            return render(request, 'experiment/introduction.html', {})
-        else:
-            return redirect('noprolificid')
-
-def noprolificid(request):
-    return render(request, 'experiment/noprolificid.html', {})
-
-def get_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
-
-def consent(request):
-    if request.method == 'POST':
-        if request.POST['consent'] == "I agree":
-            ip = get_ip(request)
-
-            if sessions.objects.filter(ip=str(ip)) or sessions.objects.filter(session_id=list(request.session.keys())[1]):
-                return redirect('passed')
-
-            else:
-                session = request.session.session_key
-                prolific = list(request.session.keys())[1]
-                publish_date = datetime.datetime.now()
-                # print(prolific)
-                sessions.objects.create(
-                    session_id = request.session[prolific],
-                    session_key = session,
-                    ip = ip,
-                    published_date = publish_date,
-                    )
-                ##print(request.session[x])
-                return redirect('outline')
-        elif request.POST['consent'] == "I disagree":
-            return redirect('./?PROLIFIC_PID={}'.format(list(request.session.keys())[1]))
-    return render(request, 'experiment/consent.html', {})
-
-def you_passed(request):
-    return render(request, 'experiment/passed.html', {})
-
-def outline(request):
-    return render(request, 'experiment/outline.html', {})
 
 @csrf_exempt
 def questionnaire(request):
-    form = backgroundForm(request.POST)
+    """
+    Write down data from background questionnarie
+    """
     if request.method == 'POST':
         backgroundDict = dict(filter(lambda x: 'BackgroundNew' in x[0],dict(request.POST).items()))
         background.objects.create(
@@ -592,6 +447,9 @@ def questionnaire(request):
 
 @csrf_exempt
 def data(request):
+    """
+    Write down data from main task
+    """
     if request.method == 'POST':
         if request.is_ajax():
             req = json.loads(request.body)
@@ -616,49 +474,11 @@ def data(request):
         return HttpResponse('')
 
 
-def training1(request):
-    return render(request, 'experiment/training1.html', {})
-
-
-def training2(request):
-    return render(request, 'experiment/training2.html', {})
-
-def training3(request):
-    return render(request, 'experiment/training3.html', {})
-
-def trainingcompleted(request):
-    if request.method == 'POST':
-        ##print(request.POST['next'])
-        if request.POST['next'] == 'Proceed':
-            order = [i for i in range(4,54)]
-            random.shuffle(order)
-            request.session['order'] = order
-            return redirect('get_challenge')    
-    return render(request, 'experiment/trainingcompleted.html', {})
-
-def confirm(request):
-    return render(request, 'experiment/challenge.html', {'order': request.session['order']})
-
-def secret(request):
-    if request.method == 'GET':
-        secret_word = '12345'
-    return HttpResponse(json.dumps({'secret': secret_word}))
-
-def challenge(request):
-    ##print(request.session)
-    return render(request, 'experiment/challenge.html', {})
-
-def thanks(request):
-    return render(request, 'experiment/thanks.html', {})
-
-def taskcompleted(request):
-    return render(request, 'experiment/taskcompleted.html', {})
-
-def sentence(request):
-    form = sentenceForm(request.POST)
-    return render(request, 'experiment/sentence.html', {'form': form})
 @csrf_exempt
 def text(request):
+    """
+    Write down data from EIT experiment
+    """
     if request.method == 'POST':
         if request.is_ajax():
             req = json.loads(request.body)
@@ -679,16 +499,16 @@ def text(request):
             prolific_id = request.POST.get('prolific', ''),
             date = datetime.datetime.now()
             )
-        # print(request.POST)
         return HttpResponse('')
+
+
 @csrf_exempt
 def feedbackQ(request):
-    form = feedbackForm(request.POST)
+    """
+    Write down data from feedback questionnarie
+    """
     if request.method == 'POST':
         feedbackDict = dict(filter(lambda x: 'FeedbackNew' in x[0],dict(request.POST).items()))
-        # print(feedbackDict)
-        # print(form.is_valid(), form)
-        # print(request.POST.get('education'))
         feedback.objects.create(
             session_key = request.POST.get('session_key', ''),
             instructions = request.POST.get('instructions', ''),
@@ -709,18 +529,13 @@ def feedbackQ(request):
             prolific_id = request.POST.get('prolific', ''),
             date = datetime.datetime.now(),
             )
-            # newanswer = form.save(commit=False)
-            # newanswer.addedQ = backgroundDict
-            # newanswer.session_key = 0
-            # newanswer.save()
     return HttpResponse('')
 
-def end(request):
-    return render(request, 'experiment/end.html', {})
-
-from functools import reduce
 
 def results(request, name):
+    """
+    Get results for main task end put it in raw and not raw datasheets
+    """
     if request.method == 'GET':
         experiment_name = name.split('=')[1]
         
@@ -787,7 +602,6 @@ def results(request, name):
                             table[n][i] = v[1][z]
                             z += 1
         df = pd.DataFrame(table, index=[row_chunk, row_names])
-        # print(df, session_ids, session_time)
         df.columns = [session_ids, session_time]
 
         transcripts_name_index = model_columns.index('uploadExperimentTranscripts')
@@ -829,6 +643,9 @@ def results(request, name):
         
 
 def backgroundRES(request, name):
+    """
+    Get data from background questionnarie
+    """
     if request.method == 'GET':
         current_experiment_name = name.split('=')[1]
 
@@ -879,7 +696,11 @@ def backgroundRES(request, name):
         df.to_csv(os.path.join(outdir, 'background.csv'), sep=',', encoding='utf-8')
     return HttpResponse("ok!")
 
+
 def feedbackRES(request, name):
+    """
+    Get data from feedback questionnarie
+    """
     current_experiment_name = name.split('=')[1]
 
     model_columns = [f.name for f in feedback._meta.get_fields()]
@@ -897,7 +718,7 @@ def feedbackRES(request, name):
 
     feedback_questions = list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
                                                     .values_list('feedbackExample', flat = True))
-    # print(list(ast.literal_eval(background_questions[0]).keys()))
+
     model_columns = list(map(lambda x: x.split('Feedback')[1], list(ast.literal_eval(feedback_questions[0]).keys())))
     model_columns = list(filter(lambda x: 'New' not in x, model_columns))
     feedback_questions_added = ast.literal_eval(list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
@@ -927,8 +748,6 @@ def feedbackRES(request, name):
     df['session_key'] = df['session_key'].apply(lambda x: x[:5])
     rename_dict = dict(map(lambda x: (x, rename_dict.get(x)), filter(lambda x: x in rename_dict.keys(), model_columns)))
     df.rename(columns=rename_dict, errors="raise", inplace=True)
-
-
     outdir = os.path.join(settings.MEDIA_ROOT,'Experement',current_experiment_name)
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -938,6 +757,9 @@ def feedbackRES(request, name):
 
 
 def sentenceRES(request, name):
+    """
+    Get data from EIT
+    """
     current_experiment_name = name.split('=')[1]
     experiment_results = list(s.objects.filter(experiment_name=current_experiment_name).values_list())
     experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
@@ -971,6 +793,9 @@ def sentenceRES(request, name):
 
 
 def levi(request, name):
+    """
+    Get levinstein distance for data from EIT
+    """
     current_experiment_name = name.split('=')[1]
     experiment_results = list(s.objects.filter(experiment_name=current_experiment_name).values_list())
     experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
@@ -1202,8 +1027,6 @@ def send_email(filename, username):
 def get_user(user_key):
     from rest_framework.authtoken.models import Token
     from django.contrib.auth.models import User
-
-    # print(user_key)
 
     user_id = Token.objects.get(key=user_key).user_id
     user = User.objects.get(id=user_id)
