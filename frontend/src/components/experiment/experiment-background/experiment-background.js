@@ -64,7 +64,6 @@ export default class ExperimentBackground extends Component {
                 body: formData
                 }).then(data => {
                 let store = require('store')
-                store.clearAll();
                 if (!data.ok){
                     throw Error(data.status);
                 } else {

@@ -97,7 +97,6 @@ export default class Draft extends Component {
     }
     this.getFormFromDB = this.getFormFromDB.bind(this);
     this.deleteDraft = this.deleteDraft.bind(this);
-    this.deleteLink = this.deleteLink.bind(this);
     this.loadResults = this.loadResults.bind(this);
     this.getCookie = this.getCookie.bind(this);
     this.stopExperiment = this.stopExperiment.bind(this);
@@ -153,32 +152,7 @@ export default class Draft extends Component {
     })
   }
 
-  deleteLink(e) {
-    //TODO: delete by user token and name
-    let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
-    fetch('/delete_experiment/?'+ new URLSearchParams({
-      name: experiment_name}), {
-      method: "GET",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
-    }).then(response => {
-      const result = response.json() 
-      const status_code = response.status;
-      if(status_code != 200) {
-        console.log('Error in getting brand info!')
-        return false;
-    }
-      return result
-    }).then(store => {
-      this.componentDidMount()
-    }).catch(error => {
-    console.log(error)
-    })
-  }
   deleteDraft (e) {
-    //TODO: delete by user token and name
     let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
     fetch('/delete_draft/?'+ new URLSearchParams({
       name: experiment_name}), {

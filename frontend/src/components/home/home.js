@@ -111,7 +111,7 @@ export default class Home extends Component {
     <CustomButton theme='blue' text='Log in'/>
     </Link>
     <Link to='signup/'>
-    <CustomButton theme='black' text='Sing up'/>
+    <CustomButton theme='black' text='Sign 566up'/>
     </Link>
     </Stack>
     </Stack>}
