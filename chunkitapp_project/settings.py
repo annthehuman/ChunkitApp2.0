@@ -161,7 +161,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'chunkitapp_project.wsgi.application'
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
