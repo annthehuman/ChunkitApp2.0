@@ -135,7 +135,7 @@ toggleNext () {
             { this.state.activeTabName == "Consent" ? <TextTab key='Consent' header='Informed consent' textToTab={store.get('consentEditor')} toggle = {this.toggle} active={this.state.activeTabNumber} /> : <>No</> }
             </TabPanel>
             <TabPanel value="Outline">
-            { this.state.activeTabName == 'Outline' ?    <TextTab header='Session outline' textToTab={store.get('outlineEditor')} toggle = {this.toggle} active={this.state.activeTabNumber} /> : null }
+            { this.state.activeTabName == 'Outline' ?  <TextTab header='Session outline' textToTab={store.get('outlineEditor')} toggle = {this.toggle} active={this.state.activeTabNumber} /> : null }
             </TabPanel>
             <TabPanel value="Background">
             <TestBackground textToTab={store.get('outlineEditor')} toggle = {this.toggle} active={this.state.activeTabNumber} />
@@ -147,13 +147,13 @@ toggleNext () {
             <TestExperiment appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTabNumber} />
             </TabPanel>
             <TabPanel value="Imitation">
-            { this.state.activeTabName == 'Imitation' ?    <TestImitation appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTabNumber} />: null}
+            { this.state.activeTabName == 'Imitation' ? <TestImitation appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTabNumber} />: null}
             </TabPanel>
             <TabPanel value="Feedback">
             <TestFeedback appendForm={this.appendForm}  toggle = {this.toggle} active={this.state.activeTabNumber} />
             </TabPanel>
             <TabPanel value="Goodbye">
-            { this.state.activeTabName == 'Goodbye' ?     <TextTab header='Goodbye' textToTab={store.get('goodbyeEditor')} toggle = {this.toggle} active={this.state.activeTabNumber} /> : null }
+            { this.state.activeTabName == 'Goodbye' ? <TextTab header='Goodbye' textToTab={store.get('goodbyeEditor')} toggle = {this.toggle} active={this.state.activeTabNumber} /> : null }
             </TabPanel>
             
         <br/>
