@@ -21,7 +21,6 @@ export default class TestPractice extends Component {
         };
         this.instruction = this.instruction.bind(this);
         this.pause = this.pause.bind(this);
-        this.start = this.start.bind(this);
         this.audioend = this.audioend.bind(this);
         this.nextpart = this.nextpart.bind(this);
         this.shuffle = this.shuffle.bind(this);
