@@ -43,7 +43,7 @@ export default class ExperimentExperimentComponent extends Component {
                   audios = this.props.data.audiosExperement,
                   shuffle = this.props.data.shuffleExtracts;
             if (tableParts && audios){
-            if (tableParts[0][0] == 'Audio Name' || tableParts[0][0] == 'Audio name') {
+            if (tableParts[0][0].toLowerCase().includes('audio')) {
                 tableParts.shift()}
             let tableaudios = []
             let zipaudios = []

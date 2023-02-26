@@ -42,7 +42,7 @@ export default class TestExperimentComponent extends Component {
                   instructions = store.get('experimentInstructions'),
                   shuffle = store.get('shuffleExtracts');
             if (tableParts && audios){
-            if (tableParts[0][0] == 'Audio Name' || tableParts[0][0] == 'Audio name') {
+            if (tableParts[0][0].toLowerCase().includes('audio')) {
                 tableParts.shift()}
             let tableaudios = []
             let zipaudios = []
@@ -212,7 +212,7 @@ export default class TestExperimentComponent extends Component {
             <> 
             {(this.state.dataIsHere) ? ((this.state.audioTableEqual) ?
             <div>
-                <h2 id='step'>Step {(this.state.partid == this.state.totalParts) ? this.state.totalParts : this.state.partid+1}/{this.state.totalParts}</h2>
+                <h3 id='step'>Step {(this.state.partid == this.state.totalParts) ? this.state.totalParts : this.state.partid+1}/{this.state.totalParts}</h3>
                 <div id='instructions_experiment' style={{display: 'block'}}>
                     <h3>Instructions</h3>
                     {(store.get('experimentInstructions')) ?<div id='instructionsExperimentText' dangerouslySetInnerHTML={{__html: store.get('experimentInstructions')}}>

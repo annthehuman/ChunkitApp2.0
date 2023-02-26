@@ -91,7 +91,7 @@ toggleNext () {
                   justifyContent="space-between"
                   >
                 
-                <CustomHeader theme='small' text='Chunktapp 2.0'/>
+                <CustomHeader theme='small' text='ChunkitApp 2.0'/>
                 <Grid 
                     item
                     >

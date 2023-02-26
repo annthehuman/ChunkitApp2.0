@@ -54,7 +54,7 @@ export default class ExperimentPractice extends Component {
                   audios = this.props.data.audiosPractice;
                   
             if (tableParts && audios){
-            if (tableParts[0][0] == 'Audio Name') {
+            if (tableParts[0][0].toLowerCase().includes('audio')) {
                 tableParts.shift()}
             let tableaudios = []
             let zipaudios = []
