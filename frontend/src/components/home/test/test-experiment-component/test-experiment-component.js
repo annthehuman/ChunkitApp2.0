@@ -76,7 +76,7 @@ export default class TestExperimentComponent extends Component {
                     }
                     tableaudios.push(audio_name)
                 })
-                tableaudios = new Set(tableaudios)
+                let tableaudiosSet = new Set(tableaudios)
                 audios.forEach(audio => {
                     let splitter = '\\'
                     if (audio.indexOf('/') > -1)
@@ -89,18 +89,16 @@ export default class TestExperimentComponent extends Component {
                     zipaudios.push(b.join())})
                 const zipaudiosSet = new Set(zipaudios)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
-                if (areSetsEqual(tableaudios, zipaudiosSet)) { 
+                if (areSetsEqual(tableaudiosSet, zipaudiosSet)) { 
                     this.setState({audioTableEqual: true})
-                    tableParts.forEach((row, id) => {
+                    tableaudios.forEach((row, id) => {
                             zipaudios.forEach((zipaudio, zipaudioId) => {
-                                if (zipaudio == row[0]){
+                                if (zipaudio == row){
                                     tableParts[id][0] = audios[zipaudioId]
                                 }
                             })
                     })
                     this.setState({tableParts: tableParts})
-                        
-                    // store.set('uploadExperimentTranscriptsData', this.state.tableParts))
                     }
                 }}
         }
