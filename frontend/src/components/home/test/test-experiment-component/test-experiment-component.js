@@ -86,6 +86,7 @@ export default class TestExperimentComponent extends Component {
                           p = s[s.length - 1].split("."),
                           b = p.slice(0, p.length-1);
                     zipaudios.push(b.join())})
+                    console.log('audio', s, splitter, audio);
                 const zipaudiosSet = new Set(zipaudios)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
                 if (areSetsEqual(tableaudios, zipaudiosSet)) { 

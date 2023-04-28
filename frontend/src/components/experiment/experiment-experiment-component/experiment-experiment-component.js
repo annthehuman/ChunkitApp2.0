@@ -80,6 +80,7 @@ export default class ExperimentExperimentComponent extends Component {
                           b = p.slice(0, p.length-1);
                     zipaudios.push(b.join())})
                 const zipaudiosSet = new Set(zipaudios)
+                console.log('audio', zipaudios, audios)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
                 if (areSetsEqual(tableaudios, zipaudiosSet)) { 
                     this.setState({audioTableEqual: true})
