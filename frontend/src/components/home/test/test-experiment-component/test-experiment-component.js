@@ -64,16 +64,17 @@ export default class TestExperimentComponent extends Component {
                     }
                 }
                 
-                this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder}
-                            // function(){if (instructions){
-                            //     const e = document.createElement('div');
-                            //     e.innerHTML = instructions;
-                            //     const div = document.getElementById('instructionsExperimentText');
-                            //     div.append(e)
-                            // }})
-                )
+                this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder})
+
                 tableParts.forEach((row, id) => {
-                        tableaudios.push(row[0])
+                    let audio_name = row[0]
+                    if (audio_name.indexOf('.') > -1)
+                    {
+                        const p = audio_name.split("."),
+                              b = p.slice(0, p.length-1);
+                        audio_name = b.join()
+                    }
+                    tableaudios.push(audio_name)
                 })
                 tableaudios = new Set(tableaudios)
                 audios.forEach(audio => {
@@ -86,7 +87,6 @@ export default class TestExperimentComponent extends Component {
                           p = s[s.length - 1].split("."),
                           b = p.slice(0, p.length-1);
                     zipaudios.push(b.join())})
-                    console.log('audio', s, splitter, audio);
                 const zipaudiosSet = new Set(zipaudios)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
                 if (areSetsEqual(tableaudios, zipaudiosSet)) { 
