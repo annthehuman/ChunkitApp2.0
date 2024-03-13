@@ -80,7 +80,7 @@ export default class ExperimentFeedback extends Component {
             return(
             <>
             <h3>Feedback</h3>
-                <p>Please answer the questions below. Your responses are important for us! <br/>(Giving feedback is voluntary. If you do not want to answer the questions, you can simply click “Submit” at the end of the page.)</p>
+                <p>Please answer the questions below. Your responses are important for us!</p>
                 <form onSubmit={this.onSubmit} id='feedback'>
                 {this.props.data.feedbackExample.useFeedbackinstructions?
                     <FormGroup>
@@ -89,7 +89,7 @@ export default class ExperimentFeedback extends Component {
                     <CustomInput type="radio" name="instructions" id="TaskClearStrongly_disagree" value="Strongly disagree"  label="Strongly disagree" />
                     <CustomInput type="radio" name="instructions" id="TaskClearDisagree" value="Disagree"  label="Disagree" />
                     <CustomInput type="radio" name="instructions" id="TaskClearNeutral" value="Neutral"  label="Neutral" />
-                    <CustomInput type="radio" name="instructions" id="TaskClearDisagree" value="Agree"  label="Agree" />
+                    <CustomInput type="radio" name="instructions" id="TaskClearAgree" value="Agree"  label="Agree" />
                     <CustomInput type="radio" name="instructions" id="TaskClearStrongly_agree" value="Strongly agree"  label="Strongly agree" />
                     </div>
                     </FormGroup>: null}
@@ -100,7 +100,7 @@ export default class ExperimentFeedback extends Component {
                     <CustomInput type="radio" name="doing" id="KnewWhatDoingStrongly_disagree" value="Strongly disagree"  label="Strongly disagree" />
                     <CustomInput type="radio" name="doing" id="KnewWhatDoingDisagree" value="Disagree"  label="Disagree" />
                     <CustomInput type="radio" name="doing" id="KnewWhatDoingNeutral" value="Neutral"  label="Neutral" />
-                    <CustomInput type="radio" name="doing" id="KnewWhatDoingDisagree" value="Agree"  label="Agree" />
+                    <CustomInput type="radio" name="doing" id="KnewWhatDoingAgree" value="Agree"  label="Agree" />
                     <CustomInput type="radio" name="doing" id="KnewWhatDoingStrongly_agree" value="Strongly agree"  label="Strongly agree" />
                     </div>
                     </FormGroup>: null}
@@ -111,7 +111,7 @@ export default class ExperimentFeedback extends Component {
                     <CustomInput type="radio" name="simple" id="TaskSimpleStrongly_disagree" value="Strongly disagree"  label="Strongly disagree"/>
                     <CustomInput type="radio" name="simple" id="TaskSimpleDisagree" value="Disagree"  label="Disagree" />
                     <CustomInput type="radio" name="simple" id="TaskSimpleNeutral" value="Neutral"  label="Neutral" />
-                    <CustomInput type="radio" name="simple" id="TaskSimpleDisagree" value="Agree"  label="Agree" />
+                    <CustomInput type="radio" name="simple" id="TaskSimpleAgree" value="Agree"  label="Agree" />
                     <CustomInput type="radio" name="simple" id="TaskSimpleStrongly_agree" value="Strongly agree"  label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
@@ -122,7 +122,7 @@ export default class ExperimentFeedback extends Component {
                     <CustomInput type="radio" name="demanding" id="TaskDemandingStrongly_disagree" value="Strongly disagree"  label="Strongly disagree"/>
                     <CustomInput type="radio" name="demanding" id="TaskDemandingDisagree" value="Disagree"  label="Disagree" />
                     <CustomInput type="radio" name="demanding" id="TaskDemandingNeutral" value="Neutral"  label="Neutral" />
-                    <CustomInput type="radio" name="demanding" id="TaskDemandingDisagree" value="Agree"  label="Agree" />
+                    <CustomInput type="radio" name="demanding" id="TaskDemandingAgree" value="Agree"  label="Agree" />
                     <CustomInput type="radio" name="demanding" id="TaskDemandingStrongly_agree" value="Strongly agree"  label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
@@ -133,7 +133,7 @@ export default class ExperimentFeedback extends Component {
                     <CustomInput type="radio" name="pessure" id="TaskPressureStrongly_disagree" value="Strongly disagree"  label="Strongly disagree"/>
                     <CustomInput type="radio" name="pessure" id="TaskPressureDisagree" value="Disagree"  label="Disagree" />
                     <CustomInput type="radio" name="pessure" id="TaskPressureNeutral" value="Neutral"  label="Neutral" />
-                    <CustomInput type="radio" name="pessure" id="TaskPressureDisagree" value="Agree"  label="Agree" />
+                    <CustomInput type="radio" name="pessure" id="TaskPressureAgree" value="Agree"  label="Agree" />
                     <CustomInput type="radio" name="pessure" id="TaskPressureStrongly_agree" value="Strongly agree"  label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
@@ -144,7 +144,7 @@ export default class ExperimentFeedback extends Component {
                     <CustomInput type="radio" name="fun" id="FunStrongly_disagree" value="Strongly disagree"  label="Strongly disagree"/>
                     <CustomInput type="radio" name="fun" id="FunDisagree" value="Disagree"  label="Disagree" />
                     <CustomInput type="radio" name="fun" id="FunNeutral" value="Neutral"  label="Neutral" />
-                    <CustomInput type="radio" name="fun" id="FunDisagree" value="Agree"  label="Agree" />
+                    <CustomInput type="radio" name="fun" id="FunAgree" value="Agree"  label="Agree" />
                     <CustomInput type="radio" name="fun" id="FunStrongly_agree" value="Strongly agree"  label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
@@ -155,7 +155,7 @@ export default class ExperimentFeedback extends Component {
                     <CustomInput type="radio" name="reflects" id="ReflectsStrongly_disagree" value="Strongly disagree"  label="Strongly disagree"/>
                     <CustomInput type="radio" name="reflects" id="ReflectsDisagree" value="Disagree"  label="Disagree" />
                     <CustomInput type="radio" name="reflects" id="ReflectsNeutral" value="Neutral"  label="Neutral" />
-                    <CustomInput type="radio" name="reflects" id="ReflectsDisagree" value="Agree"  label="Agree" />
+                    <CustomInput type="radio" name="reflects" id="ReflectsAgree" value="Agree"  label="Agree" />
                     <CustomInput type="radio" name="reflects" id="ReflectsStrongly_agree" value="Strongly agree"  label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
