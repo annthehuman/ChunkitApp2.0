@@ -21,7 +21,6 @@ export default class TestPractice extends Component {
         };
         this.instruction = this.instruction.bind(this);
         this.pause = this.pause.bind(this);
-        this.start = this.start.bind(this);
         this.audioend = this.audioend.bind(this);
         this.nextpart = this.nextpart.bind(this);
         this.shuffle = this.shuffle.bind(this);
@@ -41,7 +40,7 @@ export default class TestPractice extends Component {
             const tableParts = store.get('uploadPracticeTranscriptsData'),
                   audios = store.get('audiosPractice');
             if (tableParts && audios){
-            if (tableParts[0][0] == 'Audio Name') {
+            if (tableParts[0][0].toLowerCase().includes('audio')) {
             tableParts.shift()}
             let tableaudios = []
             let zipaudios = []
@@ -53,9 +52,16 @@ export default class TestPractice extends Component {
                     }
                 this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder})
                 tableParts.forEach((row, id) => {
-                        tableaudios.push(row[0])
+                    let audio_name = row[0]
+                    if (audio_name.indexOf('.') > -1)
+                    {
+                        const p = audio_name.split("."),
+                              b = p.slice(0, p.length-1);
+                        audio_name = b.join()
+                    }
+                    tableaudios.push(audio_name)
                 })
-                tableaudios = new Set(tableaudios)
+                let tableaudiosSet = new Set(tableaudios)
                 audios.forEach(audio => {
                     let splitter = '\\'
                     if (audio.indexOf('/') > -1)
@@ -68,18 +74,16 @@ export default class TestPractice extends Component {
                     zipaudios.push(b.join())})
                 const zipaudiosSet = new Set(zipaudios)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
-                if (areSetsEqual(tableaudios, zipaudiosSet)) { 
+                if (areSetsEqual(tableaudiosSet, zipaudiosSet)) { 
                     this.setState({audioTableEqual: true})
-                    tableParts.forEach((row, id) => {
+                    tableaudios.forEach((row, id) => {
                             zipaudios.forEach((zipaudio, zipaudioId) => {
-                                if (zipaudio == row[0]){
+                                if (zipaudio == row){
                                     tableParts[id][0] = audios[zipaudioId]
                                 }
                             })
                     })
                     this.setState({tableParts: tableParts})
-                        
-                    // store.set('uploadPracticeTranscriptsData', this.state.tableParts))
                     }
 
                 }

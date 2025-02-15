@@ -43,7 +43,7 @@ export default class ExperimentExperimentComponent extends Component {
                   audios = this.props.data.audiosExperement,
                   shuffle = this.props.data.shuffleExtracts;
             if (tableParts && audios){
-            if (tableParts[0][0] == 'Audio Name' || tableParts[0][0] == 'Audio name') {
+            if (tableParts[0][0].toLowerCase().includes('audio')) {
                 tableParts.shift()}
             let tableaudios = []
             let zipaudios = []
@@ -66,9 +66,16 @@ export default class ExperimentExperimentComponent extends Component {
                 }
                 this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder})
                 tableParts.forEach((row, id) => {
-                        tableaudios.push(row[0])
+                    let audio_name = row[0]
+                    if (audio_name.indexOf('.') > -1)
+                    {
+                        const p = audio_name.split("."),
+                              b = p.slice(0, p.length-1);
+                        audio_name = b.join()
+                    }
+                    tableaudios.push(audio_name)
                 })
-                tableaudios = new Set(tableaudios)
+                let tableaudiosSet = new Set(tableaudios)
                 audios.forEach(audio => {
                     let splitter = '\\'
                     if (audio.indexOf('/') > -1)
@@ -81,11 +88,11 @@ export default class ExperimentExperimentComponent extends Component {
                     zipaudios.push(b.join())})
                 const zipaudiosSet = new Set(zipaudios)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
-                if (areSetsEqual(tableaudios, zipaudiosSet)) { 
+                if (areSetsEqual(tableaudiosSet, zipaudiosSet)) { 
                     this.setState({audioTableEqual: true})
-                    tableParts.forEach((row, id) => {
+                    tableaudios.forEach((row, id) => {
                             zipaudios.forEach((zipaudio, zipaudioId) => {
-                                if (zipaudio == row[0]){
+                                if (zipaudio == row){
                                     tableParts[id][0] = audios[zipaudioId]
                                 }
                             })

@@ -159,7 +159,7 @@ toggle (e, tab) {
                   direction='row'
                   justifyContent="space-between"
                   >
-                <CustomHeader theme='small' text='ChunktApp 2.0'/>
+                <CustomHeader theme='small' text='ChunkitApp 2.0'/>
                 </Grid>
                 </Grid>
                 <Grid 

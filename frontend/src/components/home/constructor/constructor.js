@@ -52,13 +52,13 @@ export default class Constructor extends Component  {
             equal: false,
             disabled: true,
             difference: new Set(),
-            spelling: {'nameExperement': 'Name of Experiment',
-            'nameExperementForParticipants': 'Name of Experiment for Participants', 'sessionTime': 'Duration',
-            'helloEditor': 'Hello Editor','outlineEditor': 'Outline Editor','consentEditor': 'Consent Editor',
-            'backgroundExample': 'Background Questions','feedbackExample': 'Feedback Questions','goodbyeEditor': 'Goodbye Editor',
-            'uploadPracticeAudio': 'Audios for Practice','uploadPracticeTranscripts': 'Transcripts for Practice',
-            'practiceInstructions': 'Instructions for Practice','uploadExperimentAudio': 'Audios for Experiment',
-            'uploadExperimentTranscripts': 'Transcripts for Experiment','experimentInstructions':'Instructions for Experiment'}
+            spelling: {'nameExperement': 'name of experiment',
+            'nameExperementForParticipants': 'name of experiment for participants', 'sessionTime': 'duration',
+            'helloEditor': 'hello editor','outlineEditor': 'outline editor','consentEditor': 'consent editor',
+            'backgroundExample': 'background questions','feedbackExample': 'feedback questions','goodbyeEditor': 'goodbye editor',
+            'uploadPracticeAudio': 'audios for practice','uploadPracticeTranscripts': 'transcripts for practice',
+            'practiceInstructions': 'instructions for practice','uploadExperimentAudio': 'audios for main task',
+            'uploadExperimentTranscripts': 'transcripts for main task','experimentInstructions':'instructions for main task'}
         }
         this.toggleBack = this.toggleBack.bind(this);
         this.toggleNext = this.toggleNext.bind(this);
@@ -124,10 +124,9 @@ export default class Constructor extends Component  {
     const formData = new FormData(form)
     this.setState({controlSumm, controlSumm})
     let formSum = new Set()
-    
 
     formData.forEach((item, name) => {
-        if (item) {
+        if (item && item != 'false' && item != '<p></p>' && !name.includes('pageNeeded')) {
         if (name.includes('Background')) {
             formSum.add('backgroundExample')
         } else if (name.includes('Feedback')) {
@@ -139,8 +138,8 @@ export default class Constructor extends Component  {
         } else {
             formSum.add(name)
         }}
-        
     })
+
     if (store.get('uploadExperimentTranscriptsData') && store.get('audiosExperement')){
     if (store.get('uploadExperimentTranscriptsData').length > 0 && store.get('audiosExperement').length > 0) {
         formSum.add('uploadExperimentAudio')
@@ -154,10 +153,11 @@ export default class Constructor extends Component  {
     let difference = new Set(
         [...controlSumm].filter(x => !formSum.has(x)));
     this.setState({difference: difference})
+
     if (difference.size == 0) { 
         this.setState({equal: true, disabled: false})
     } else {
-        this.setState({equal: false})
+        this.setState({equal: false, disabled: true})
     }
     }
     toggle (event, tab) {
@@ -269,7 +269,6 @@ export default class Constructor extends Component  {
         this.setState({submitButton: e.target.name})
         if (e.target.name == "SaveDraft" || e.target.name == "SaveFinalVersion") {
             e.target.innerHTML = 'Saved!'
-            console.dir(e.target)
             setTimeout(() => {e.target.innerHTML = e.target.name == "SaveDraft" ? 'Save Draft': 'Save Final Version'}, 1000)
         }
     }
@@ -391,6 +390,7 @@ export default class Constructor extends Component  {
     
 
     render () {
+        let store = require('store');
         return(
             <>
             <Box mt={2} sx={{margin: '30px auto 15px auto',
@@ -403,7 +403,7 @@ export default class Constructor extends Component  {
                   justifyContent="space-between"
                   >
                 
-                <CustomHeader theme='small' text='ChunktApp 2.0'/>
+                <CustomHeader theme='small' text='ChunkitApp 2.0'/>
                 <Grid 
                     item
                     >
@@ -500,12 +500,17 @@ export default class Constructor extends Component  {
             direction='row'
             style={{ gap: '3px', padding: '0 0 24px 24px' }}>
         <CustomButton id='saved-popover' size='small' type='submit' onClick={this.getButton} name='SaveDraft' theme='blue' text='Save Draft'/>
-        <CustomButton size='small' type='submit' onClick={this.getButton} name='TestRun' theme='blue' text='Test Run'/>
+        <CustomButton size='small' type='submit' onClick={this.getButton} name='TestRun' theme='blue' 
+                      title={store.get('nameExperementForParticipants') ? 'Test Run':'You need to add a name of expriment for participants'}
+                      text='Test Run'/>
         <Tooltip 
             style={{whiteSpace: 'pre-line'}}
-            title={`You need to add: ${[...this.state.difference].map(item => this.state.spelling[item]).join(', ')}`}>
+            title={!this.state.equal ?
+                `You need to add: ${[...this.state.difference].map(item => this.state.spelling[item]).join(', ')}`:
+                'Save Final Version'}>
         <span>
-        <CustomButton size='small' type='submit' onClick={this.getButton} disabled={this.state.disabled} id='SaveFinalVersion' name='SaveFinalVersion' theme='blue' text='Save Final Version'/>
+        <CustomButton size='small' type='submit' onClick={this.getButton} disabled={this.state.disabled} id='SaveFinalVersion' name='SaveFinalVersion' theme='blue' 
+                      text='Save Final Version'/>
         </span>
         </Tooltip>
         </Grid>
@@ -518,10 +523,6 @@ export default class Constructor extends Component  {
         {this.state.activeTab != '9' ?<CustomButton size='small' type='button' name='Next' onClick={this.toggleNext} theme='blue' text='Next' endIcon={<ArrowForwardIosIcon />}/> : null}
         </Grid>
         </Stack>
-        {/* <Button type='submit' onClick={this.getButton} name='SaveDraft' color="primary">Save Draft</Button>{' '}
-        <Button type='submit' onClick={this.getButton} name='TestRun' color="primary">Test Run</Button>{' '}
-        <Button type='submit' onClick={this.getButton} disabled={this.state.disabled} id='SaveFinalVersion' name='SaveFinalVersion' color={this.state.equal ? 'primary': 'secondary'}>Save Final Version</Button>{' '}
-                */}
         </form>         
         </CustomBox>
         </TabContext>

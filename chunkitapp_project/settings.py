@@ -161,7 +161,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'chunkitapp_project.wsgi.application'
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -170,7 +170,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '/vol/web/db.sqlite3',
-        # 'NAME': './db.sqlite3',
+        #'NAME': './db.sqlite3',
     }
 }
 
@@ -224,6 +224,7 @@ MEDIA_URL = '/static/media/'
 
 STATIC_ROOT = "/vol/web/static"
 MEDIA_ROOT = "/vol/web/media"
+
 
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')

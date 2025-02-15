@@ -3,7 +3,7 @@ server {
     server_name chunkitapp.online www.chunkitapp.online;
 
     location /.well-known/acme-challenge/ {
-        alias /vol/www//.well-known/acme-challenge/;
+        alias /vol/www/.well-known/acme-challenge/;
     }
 
     location /static {

@@ -11,8 +11,7 @@ export default class TestFeedback extends Component {
             return(
             <>
             <h3>Feedback</h3>
-                <p>Please answer the questions below. Your responses are important for us! </p>
-                <p>(Giving feedback is voluntary. If you do not want to answer the questions, you can simply click “Submit” at the end of the page.)</p>
+                <p>Please answer the questions below. Your responses are important for us!</p>
                 {store.get('useFeedbackinstructions')?
                     <FormGroup>
                     <Label>The task instructions were clear.</Label>
@@ -20,7 +19,7 @@ export default class TestFeedback extends Component {
                     <CustomInput type="radio" id="TaskClearStrongly_disagree" label="Strongly disagree" />
                     <CustomInput type="radio" id="TaskClearDisagree" label="Disagree" />
                     <CustomInput type="radio" id="TaskClearNeutral" label="Neutral" />
-                    <CustomInput type="radio" id="TaskClearDisagree" label="Agree" />
+                    <CustomInput type="radio" id="TaskClearAgree" label="Agree" />
                     <CustomInput type="radio" id="TaskClearStrongly_agree" label="Strongly agree" />
                     </div>
                     </FormGroup>: null}
@@ -31,7 +30,7 @@ export default class TestFeedback extends Component {
                     <CustomInput type="radio" id="KnewWhatDoingStrongly_disagree" label="Strongly disagree" />
                     <CustomInput type="radio" id="KnewWhatDoingDisagree" label="Disagree" />
                     <CustomInput type="radio" id="KnewWhatDoingNeutral" label="Neutral" />
-                    <CustomInput type="radio" id="KnewWhatDoingDisagree" label="Agree" />
+                    <CustomInput type="radio" id="KnewWhatDoingAgree" label="Agree" />
                     <CustomInput type="radio" id="KnewWhatDoingStrongly_agree" label="Strongly agree" />
                     </div>
                     </FormGroup>: null}
@@ -42,7 +41,7 @@ export default class TestFeedback extends Component {
                     <CustomInput type="radio" id="TaskSimpleStrongly_disagree" label="Strongly disagree" />
                     <CustomInput type="radio" id="TaskSimpleDisagree" label="Disagree" />
                     <CustomInput type="radio" id="TaskSimpleNeutral" label="Neutral" />
-                    <CustomInput type="radio" id="TaskSimpleDisagree" label="Agree" />
+                    <CustomInput type="radio" id="TaskSimpleAgree" label="Agree" />
                     <CustomInput type="radio" id="TaskSimpleStrongly_agree" label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
@@ -53,7 +52,7 @@ export default class TestFeedback extends Component {
                     <CustomInput type="radio" id="TaskDemandingStrongly_disagree" label="Strongly disagree" />
                     <CustomInput type="radio" id="TaskDemandingDisagree" label="Disagree" />
                     <CustomInput type="radio" id="TaskDemandingNeutral" label="Neutral" />
-                    <CustomInput type="radio" id="TaskDemandingDisagree" label="Agree" />
+                    <CustomInput type="radio" id="TaskDemandingAgree" label="Agree" />
                     <CustomInput type="radio" id="TaskDemandingStrongly_agree" label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
@@ -64,7 +63,7 @@ export default class TestFeedback extends Component {
                     <CustomInput type="radio" id="TaskPressureStrongly_disagree" label="Strongly disagree" />
                     <CustomInput type="radio" id="TaskPressureDisagree" label="Disagree" />
                     <CustomInput type="radio" id="TaskPressureNeutral" label="Neutral" />
-                    <CustomInput type="radio" id="TaskPressureDisagree" label="Agree" />
+                    <CustomInput type="radio" id="TaskPressureAgree" label="Agree" />
                     <CustomInput type="radio" id="TaskPressureStrongly_agree" label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
@@ -75,7 +74,7 @@ export default class TestFeedback extends Component {
                     <CustomInput type="radio" id="FunStrongly_disagree" label="Strongly disagree" />
                     <CustomInput type="radio" id="FunDisagree" label="Disagree" />
                     <CustomInput type="radio" id="FunNeutral" label="Neutral" />
-                    <CustomInput type="radio" id="FunDisagree" label="Agree" />
+                    <CustomInput type="radio" id="FunAgree" label="Agree" />
                     <CustomInput type="radio" id="FunStrongly_agree" label="Strongly agree" />
                     </div>
                     </FormGroup>:null}
@@ -86,7 +85,7 @@ export default class TestFeedback extends Component {
                     <CustomInput type="radio" id="ReflectsStrongly_disagree" label="Strongly disagree" />
                     <CustomInput type="radio" id="ReflectsDisagree" label="Disagree" />
                     <CustomInput type="radio" id="ReflectsNeutral" label="Neutral" />
-                    <CustomInput type="radio" id="ReflectsDisagree" label="Agree" />
+                    <CustomInput type="radio" id="ReflectsAgree" label="Agree" />
                     <CustomInput type="radio" id="ReflectsStrongly_agree" label="Strongly agree" />
                     </div>
                     </FormGroup>:null}

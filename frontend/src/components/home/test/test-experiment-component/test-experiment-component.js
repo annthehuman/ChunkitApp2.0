@@ -21,7 +21,6 @@ export default class TestExperimentComponent extends Component {
         };
         this.instruction = this.instruction.bind(this);
         this.pause = this.pause.bind(this);
-        this.start = this.start.bind(this);
         this.audioend = this.audioend.bind(this);
         this.nextpart = this.nextpart.bind(this);
         this.shuffle = this.shuffle.bind(this);
@@ -43,7 +42,7 @@ export default class TestExperimentComponent extends Component {
                   instructions = store.get('experimentInstructions'),
                   shuffle = store.get('shuffleExtracts');
             if (tableParts && audios){
-            if (tableParts[0][0] == 'Audio Name' || tableParts[0][0] == 'Audio name') {
+            if (tableParts[0][0].toLowerCase().includes('audio')) {
                 tableParts.shift()}
             let tableaudios = []
             let zipaudios = []
@@ -65,18 +64,19 @@ export default class TestExperimentComponent extends Component {
                     }
                 }
                 
-                this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder}
-                            // function(){if (instructions){
-                            //     const e = document.createElement('div');
-                            //     e.innerHTML = instructions;
-                            //     const div = document.getElementById('instructionsExperimentText');
-                            //     div.append(e)
-                            // }})
-                )
+                this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder})
+
                 tableParts.forEach((row, id) => {
-                        tableaudios.push(row[0])
+                    let audio_name = row[0]
+                    if (audio_name.indexOf('.') > -1)
+                    {
+                        const p = audio_name.split("."),
+                              b = p.slice(0, p.length-1);
+                        audio_name = b.join()
+                    }
+                    tableaudios.push(audio_name)
                 })
-                tableaudios = new Set(tableaudios)
+                let tableaudiosSet = new Set(tableaudios)
                 audios.forEach(audio => {
                     let splitter = '\\'
                     if (audio.indexOf('/') > -1)
@@ -89,18 +89,16 @@ export default class TestExperimentComponent extends Component {
                     zipaudios.push(b.join())})
                 const zipaudiosSet = new Set(zipaudios)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
-                if (areSetsEqual(tableaudios, zipaudiosSet)) { 
+                if (areSetsEqual(tableaudiosSet, zipaudiosSet)) { 
                     this.setState({audioTableEqual: true})
-                    tableParts.forEach((row, id) => {
+                    tableaudios.forEach((row, id) => {
                             zipaudios.forEach((zipaudio, zipaudioId) => {
-                                if (zipaudio == row[0]){
+                                if (zipaudio == row){
                                     tableParts[id][0] = audios[zipaudioId]
                                 }
                             })
                     })
                     this.setState({tableParts: tableParts})
-                        
-                    // store.set('uploadExperimentTranscriptsData', this.state.tableParts))
                     }
                 }}
         }
@@ -213,7 +211,7 @@ export default class TestExperimentComponent extends Component {
             <> 
             {(this.state.dataIsHere) ? ((this.state.audioTableEqual) ?
             <div>
-                <h2 id='step'>Step {(this.state.partid == this.state.totalParts) ? this.state.totalParts : this.state.partid+1}/{this.state.totalParts}</h2>
+                <h3 id='step'>Step {(this.state.partid == this.state.totalParts) ? this.state.totalParts : this.state.partid+1}/{this.state.totalParts}</h3>
                 <div id='instructions_experiment' style={{display: 'block'}}>
                     <h3>Instructions</h3>
                     {(store.get('experimentInstructions')) ?<div id='instructionsExperimentText' dangerouslySetInnerHTML={{__html: store.get('experimentInstructions')}}>

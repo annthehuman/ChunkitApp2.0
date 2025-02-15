@@ -152,6 +152,30 @@ export default class Draft extends Component {
     })
   }
 
+  stopExperiment(e) {
+    let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
+    fetch('/stop_experiment/?'+ new URLSearchParams({
+      name: experiment_name}), {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    }).then(response => {
+      const result = response.json() 
+      const status_code = response.status;
+      if(status_code != 200) {
+        console.log('Error in getting brand info!')
+        return false;
+    }
+      return result
+    }).then(store => {
+      this.componentDidMount()
+    }).catch(error => {
+    console.log(error)
+    })
+  }
+
   deleteDraft (e) {
     let experiment_name = e.target.parentElement.value ? e.target.parentElement.value : e.target.parentElement.parentElement.value
     fetch('/delete_draft/?'+ new URLSearchParams({

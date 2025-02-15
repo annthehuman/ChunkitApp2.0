@@ -1,9 +1,9 @@
 server {
-    listen 8000;
+    listen 80;
     server_name chunkitapp.online www.chunkitapp.online;
 
     location /.well-known/acme-challenge/ {
-        alias /vol/www/;
+        alias /vol/www/.well-known/acme-challenge/;
     }
 
     location / {
