@@ -11,8 +11,7 @@ export default class TestFeedback extends Component {
             return(
             <>
             <h3>Feedback</h3>
-                <p>Please answer the questions below. Your responses are important for us! </p>
-                <p>(Giving feedback is voluntary. If you do not want to answer the questions, you can simply click “Submit” at the end of the page.)</p>
+                <p>Please answer the questions below. Your responses are important for us!</p>
                 {store.get('useFeedbackinstructions')?
                     <FormGroup>
                     <Label>The task instructions were clear.</Label>

@@ -5,6 +5,7 @@ from .models import background, feedback, test, experiment_links
 from .models import sentence as s
 from .models import draft_data
 from .forms import draftDataForm
+import numpy as np
 import os
 import datetime
 import json
@@ -473,7 +474,7 @@ def data(request):
             session = request.session.session_key
             question = req['question']
         else:
-            checkboxes = list(dict(filter(lambda x: 'checkbox' in x[0],dict(request.POST).items())).values())
+            checkboxes = [y for x, y in dict(request.POST).items() if 'checkbox' in x]
             index = request.POST['index']
             session = request.POST.get('session_key', '')
             question = request.POST.get('question', '')
@@ -568,24 +569,22 @@ def results(request, name):
             return(error)
         df_raw = pd.DataFrame(experiment_results, columns=model_columns)
         df_raw['session_key'] = df_raw['session_key'].apply(lambda x: x[:5])
+        print(df_raw)
 
-        session_ids = df_raw['session_key']
-        session_time = df_raw['date']
+        session_dict = df_raw.groupby("session_key")["date"].min().reset_index()
 
-        session_dict = {}
-
-        for index, id in enumerate(session_ids):
-            if not session_dict.get(id):
-                session_dict[id] = session_time[index]
-
-        session_ids = list(session_dict.keys())
-        session_time = list(session_dict.values())
+        session_ids = session_dict["session_key"].to_list()
+        session_time = session_dict["date"].to_list()
+        print(session_ids)
+        print(session_time)
         
         draft_data_row = list(draft_data.objects.filter(nameExperementForParticipants=experiment_name).values_list())[0]
         model_columns = [f.name for f in draft_data._meta.get_fields()]
         transcripts_data_index = model_columns.index('uploadExperimentTranscriptsData')
         transcripts_data = ast.literal_eval(draft_data_row[transcripts_data_index])
+        # print(transcripts_data)
         
+        # create list with audioname_chunknumber for results table
         row_names = []
         row_chunk = []
         transcript_row_number = {}
@@ -594,17 +593,18 @@ def results(request, name):
             for space, word in enumerate(transcript[1].split()[:-1]):
                 row_names.append(word)
                 row_chunk.append(str(transcript[0])+'_'+str(space))
+        
+        df_raw['checkbox'] = df_raw['checkbox'].apply(lambda x: [int(y[0]) for y in ast.literal_eval(x)])
         results_dict = dict()
+
         for i in range(len(experiment_results)):
-            resent_results = []
-            for n in range(len(transcripts_data[df_raw['index'][i]][1].split())-1):
-                # print(df_raw['checkbox'][i])
-                if [str(n)] in ast.literal_eval(df_raw['checkbox'][i]):
-                    resent_results.append(1)
-                else:
-                    resent_results.append(0)
+            text_len = len(transcripts_data[df_raw['index'][i]][1].split())-1
+            resent_results = np.zeros(text_len)
+            resent_results[df_raw[i]] = 1
             results = df_raw['session_key'][i], resent_results
             results_dict.setdefault(df_raw['index'][i], []).append(results)
+        
+        print(results_dict)
 
         table = [[0 for i in range(len(session_ids))] for n in range(len(row_names))]
 
@@ -625,6 +625,7 @@ def results(request, name):
             if not os.path.exists(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index])):
                 os.makedirs(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
             data_experiment = pd.read_excel(os.path.join(settings.MEDIA_ROOT,draft_data_row[transcripts_name_index]))
+            print(data_experiment)
             question_dict = dict(zip(data_experiment.index, data_experiment["Question"]))
             answer_dict = dict(zip(data_experiment.index, data_experiment["Right answer"]))
             question_column = []
@@ -677,6 +678,7 @@ def backgroundRES(request, name):
                                             ,experiment_results))
 
         df = pd.DataFrame(experiment_results, columns=model_columns)
+        
 
         background_questions = list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
                                                       .values_list('backgroundExample', flat = True))
@@ -687,7 +689,9 @@ def backgroundRES(request, name):
                                                       .values_list('backgroundAddQ', flat = True))[0])
         prolific = list(draft_data.objects.filter(nameExperementForParticipants=current_experiment_name)
                                                       .values_list('UseProlific', flat = True))[0]
+
         if background_questions_added:
+            print(background_questions, background_questions_added)
             model_columns.append('addedQ')
         if prolific:
             model_columns = ['prolific_id'] + model_columns
@@ -701,6 +705,7 @@ def backgroundRES(request, name):
                         "Whisper": "Do you have dificulty hearing someone speaks in a wisper", 
                         "Comments": "Comments"}
         df = df[model_columns]
+        print(df)
         df['session_key'] = df['session_key'].apply(lambda x: x[:5])
         rename_dict = dict(map(lambda x: (x, rename_dict.get(x)), filter(lambda x: x in rename_dict.keys(), model_columns)))
         df.rename(columns=rename_dict, errors="raise", inplace=True)
