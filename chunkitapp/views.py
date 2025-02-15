@@ -271,6 +271,20 @@ def drafts_list(request):
 
             draft_data_list.append(draft_data_values)
         draft_data_list.append({'links': current_experiment_link})
+        # draft_data_list.append({'links': current_experiment_link})
+        if request.GET['access_token'] in ['b974b6d01d84af559dfff1bf21aa231d3ba346a3', '07a8a7c2e0d3df3a425880fb38e206aaac7b9478']:
+            print('get alld')
+            draft_data_list = []
+            for line in tokens_zip:
+                draft_data_values = {}
+                for col_name in model_columns:
+                    col_data = list(draft_data.objects.all().values_list(col_name, flat = True))
+                    if col_name == 'backgroundExample':
+                        draft_data_values[col_name] = ast.literal_eval(col_data[line[1]])
+                    else:
+                        draft_data_values[col_name] = col_data[line[1]]
+                draft_data_list.append(draft_data_values) 
+            draft_data_list.append({'links': experiment_link})
         return HttpResponse(json.dumps(draft_data_list))
 
 
@@ -321,6 +335,7 @@ def start_experiment(request):
         experiment_name = request.GET['name']
         date = datetime.datetime.now()
         experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').update(experiment_start_time=date)
+        experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{experiment_name}.*').update(experiment_stopped=False)
         return HttpResponse('Ok!')
 
 
