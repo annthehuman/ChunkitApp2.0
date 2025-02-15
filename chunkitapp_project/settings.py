@@ -85,7 +85,7 @@ REST_FRAMEWORK = {
 #setting up email server
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'info.chunkitapp@gmail.com'
-EMAIL_HOST_PASSWORD = 'jajrtoxekmgcbimo'
+EMAIL_HOST_PASSWORD = 'ppppppp'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
@@ -169,8 +169,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': '/vol/web/db.sqlite3',
-        'NAME': './db.sqlite3',
+        'NAME': '/vol/web/db.sqlite3',
+        #'NAME': './db.sqlite3',
     }
 }
 
@@ -222,8 +222,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/static/media/'
 # MEDIA_URL = '/media/'
 
-# STATIC_ROOT = "/vol/web/static"
-# MEDIA_ROOT = "/vol/web/media"
+STATIC_ROOT = "/vol/web/static"
+MEDIA_ROOT = "/vol/web/media"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
