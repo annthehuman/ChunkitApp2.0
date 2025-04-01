@@ -1,6 +1,13 @@
 ---
 title: "Statement of purpose"
-author: "Alena Konina, Anna Galkova, Anna Mauranen"
+author:
+  - name: Alena Konina ^1^
+    email: alena.konina@helsinki.fi
+  - name: Anna Galkova
+  - name: Anna Mauranen^1^
+address:
+  - code: 1
+    address: University of Helsinki, Finland 
 date: "2025-03-16"
 tags: 
   - speech segmentation
