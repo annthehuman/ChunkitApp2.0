@@ -1,6 +1,6 @@
 ---
-title: "ChunkitApp 2.0 a speech segmentation app"
-authors: 
+title: 'ChunkitApp 2.0 a speech segmentation app'
+authors:
   - name: Anna Galkova
     affiliation: ''
   - name: Alena Konina
