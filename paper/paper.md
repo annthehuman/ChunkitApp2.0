@@ -1,18 +1,34 @@
 Paper
 ================
-Anna Galkova, Alena Konina 1, Anna Mauranen 1
-1 University of Helsinki
-2025-03-16
+title: ChunkitApp 2.0, a speech segmentation app
+
+authors:
+  - name: Anna Galkova
+    affiliation: ''
+
+  - name: Alena Konina
+    affiliation: '1'
+    
+  - name: Anna Mauranen
+    affiliation: '1'
+
+affiliations:
+  - index: 1
+    name: University of Helsinki
+    
+date: 16 March 2025
+
+bibliography: chunkitapp_ref.bib
+
+================
 
 # Summary
 
 ChunkitApp 2.0 is a data collection platform for speech segmentation
 experiments. It allows researchers to design and run their experiments,
 as well as pre-process their data. It initially grew out of the Chunking
-in Language project (2017-2021, University of Helsinki, Mauranen (2012))
-and was later featured in our group’s research (Vetchinnikova, Mauranen,
-and Mikušová (2017), Vetchinnikova et al. (2022), Dobrego, Konina, and
-Mauranen (2023), Vetchinnikova et al. (2023)).
+in Language project (2017-2021, University of Helsinki, @mauranen2012linear)
+and was later featured in our group’s research (@Vetchinnikova:2017, @Vetchinnikova:2022, @dobrego2023continuous, @vetchinnikova2023chunking).
 
 # Statement of need
 
@@ -74,57 +90,3 @@ versions of the app.
 The app was modelled after the original ChunkitApp used for collecting
 data in the CLUMP project. Below you can a list of publications
 featuring data collected through the original app.
-
-<div id="refs" class="references csl-bib-body hanging-indent"
-entry-spacing="0">
-
-<div id="ref-dobrego2023continuous" class="csl-entry">
-
-Dobrego, Aleksandra, Alena Konina, and Anna Mauranen. 2023. “Continuous
-Speech Segmentation by L1 and L2 Speakers of English: The Role of
-Syntactic and Prosodic Cues.” *Language Awareness* 32 (3): 487–507.
-
-</div>
-
-<div id="ref-github2025" class="csl-entry">
-
-Galkova, Anna, Alena Konina, and Anna Mauranen. 2025. “ChunkitApp 2.0.”
-2025. <https://github.com/annthehuman/ChunkitApp2.0>.
-
-</div>
-
-<div id="ref-mauranen2012linear" class="csl-entry">
-
-Mauranen, Anna. 2012. “Linear Unit Grammar—a Real-Time Grammar.” *The
-Encyclopedia of Applied Linguistics*, 1–11.
-
-</div>
-
-<div id="ref-Vetchinnikova:2022" class="csl-entry">
-
-Vetchinnikova, Svetlana, Alena Konina, Nitin Williams, Nina Mikušová,
-and Anna Mauranen. 2022. “Perceptual Chunking of Spontaneous Speech:
-Validating a New Method with Non-Native Listeners.” *Research Methods in
-Applied Linguistics* 1 (2).
-<https://doi.org/10.1016/j.rmal.2022.100012>.
-
-</div>
-
-<div id="ref-vetchinnikova2023chunking" class="csl-entry">
-
-———. 2023. “Chunking up Speech in Real Time: Linguistic Predictors and
-Cognitive Constraints.” *Language and Cognition* 15 (3): 453–79.
-<https://doi.org/10.1017/langcog.2023.8>.
-
-</div>
-
-<div id="ref-Vetchinnikova:2017" class="csl-entry">
-
-Vetchinnikova, Svetlana, Anna Mauranen, and Nina Mikušová. 2017.
-“ChunkitApp: Investigating the Relevant Units of Online Speech
-Processing.” In *Proceedings of INTERSPEECH 2017*.
-<https://doi.org/10.21437/Interspeech.2017>.
-
-</div>
-
-</div>
