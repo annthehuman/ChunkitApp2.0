@@ -1,7 +1,5 @@
-Paper
-================
-/title: ChunkitApp 2.0, a speech segmentation app
-
+---
+title: "ChunkitApp 2.0, a speech segmentation app"
 authors:
   - name: Anna Galkova
     affiliation: ''
@@ -17,10 +15,8 @@ affiliations:
     name: University of Helsinki
     
 date: 16 March 2025
-
 bibliography: chunkitapp_ref.bib
-
-================
+---
 
 # Summary
 
