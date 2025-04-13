@@ -1,13 +1,13 @@
 ---
 title: "ChunkitApp 2.0 a speech segmentation app"
-authors:
+authors: 
   - name: Anna Galkova
     affiliation: ''
   - name: Alena Konina
     affiliation: '1'
   - name: Anna Mauranen
     affiliation: '1'
-affiliations:
+affiliations: 
   - index: 1
     name: University of Helsinki
     
