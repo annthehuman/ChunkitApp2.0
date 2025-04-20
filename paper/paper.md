@@ -1,5 +1,5 @@
 Paper
-================
+--------------
 title: ChunkitApp 2.0, a speech segmentation app
 
 authors:
@@ -20,7 +20,7 @@ date: 16 March 2025
 
 bibliography: chunkitapp_ref.bib
 
-================
+----------------
 
 # Summary
 
