@@ -67,16 +67,16 @@ conflict of interest pertaining to the development of the app.
 # Community guidelines
 
 If you wish to contribute to the ChunkitApp 2.0, you need to fork the
-initiral repository. For publications and talks, see Citations on how to
+initial repository. For publications and talks, see Citations on how to
 cite.
 
-If you encountered a bug, you can report an issue through Github or seel
+If you encountered a bug, you can report an issue through Github or seek
 support at <alena.konina@helsinki.fi>
 
 # Citations
 
 To cite the app, please use the following from the References section
-(to be updated to a jounal reference when published) - Galkova, Konina,
+(to be updated to a journal reference when published) - Galkova, Konina,
 and Mauranen (2025)
 
 # Acknowledgments
