@@ -1,6 +1,5 @@
-Paper
 --------------
-title: ChunkitApp 2.0, a speech segmentation app
+title: 'ChunkitApp 2.0, a speech segmentation app'
 
 authors:
   - name: Anna Galkova
