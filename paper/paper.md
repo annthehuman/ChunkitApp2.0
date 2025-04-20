@@ -1,25 +1,18 @@
---------------
+---
 title: 'ChunkitApp 2.0, a speech segmentation app'
-
 authors:
   - name: Anna Galkova
     affiliation: ''
-
   - name: Alena Konina
     affiliation: '1'
-    
   - name: Anna Mauranen
     affiliation: '1'
-
 affiliations:
   - index: 1
     name: University of Helsinki
-    
 date: 16 March 2025
-
 bibliography: chunkitapp_ref.bib
-
-----------------
+---
 
 # Summary
 
