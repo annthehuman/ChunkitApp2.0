@@ -31,6 +31,6 @@ to run it.
 
 You can access your application in a browser at 127.0.0.1 on local machine or at the ip adress of your server.
 
-If you have any questions about the software part of the application, please contact me. For any other questions, please contact Alena Konina at alena.konina@helsinki.fi.
+If you have any questions about the software part of the application, please contact me on Github. For any other questions, please contact Alena Konina on Github or at alena.konina@helsinki.fi.
 
 ## This project is distributed under CC-BY-NC-SA license.
