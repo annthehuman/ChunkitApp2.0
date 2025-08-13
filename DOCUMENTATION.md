@@ -580,7 +580,7 @@ Based on project structure, recommended practices:
 - Research questions: alena.konina@helsinki.fi
 
 ### License
-This project is distributed under **CC-BY-NC-SA license**.
+This project is distributed under **Academic Free License v. 3.0**.
 
 ---
 
