@@ -9,7 +9,7 @@ ChunkitApp 2.0 is a web-based data collection platform for speech segmentation e
 - Researchers studying language processing, speech segmentation, and chunking
 
 ### Key Features
-- **Experiment Design**: Create custom speech segmentation experiments with audio files and transcripts. The app shows the transcripts as the speech extract plays. Participants in an experiment can mark boundaries between segments by tapping an interactive symbol between words and take them away by tapping it again. The experimental design is flexible: researchers can choose which experiment features to include.
+- **Experiment Design**: Create custom speech segmentation experiments with audio files and transcripts. The app shows the transcript as the speech extract plays. Participants in an experiment can mark boundaries between segments by tapping an interactive symbol between words and take them away by tapping it again. The experimental design is flexible: researchers can choose which experiment features to include.
 - **Flexible Data Collection**: Create your own or choose sample background questionnaires, feedback forms, and comprehension questions around your segmentation task.
 - **English Proficiency Testing**: Optional built-in imitation tasks for assessing participants' English proficiency.
 - **Data Aggregation**: Automatic aggregation of segmentation data across participants
@@ -75,7 +75,7 @@ https://github.com/user-attachments/assets/e36ec384-9b81-4062-ad40-7778e51e26fd
 
 1. **Clone the repository:**
    ```bash
-git clone https://github.com/annthehuman/ChunkitApp2.0.git
+   git clone https://github.com/annthehuman/ChunkitApp2.0.git
    cd ChunkitApp2.0
    ```
 
@@ -91,8 +91,8 @@ git clone https://github.com/annthehuman/ChunkitApp2.0.git
 
 3. **Build the application:**
    ```bash
-docker-compose build
-```
+   docker-compose build
+   ```
 
 4. **Run the application:**
    ```bash
