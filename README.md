@@ -6,7 +6,7 @@
 ChunkitApp 2.0 is a web-based data collection platform for speech segmentation experiments. The app allows researchers to design and run experiments where participants segment orthographic transcripts of speech extracts by tapping interactive symbols between words. It aggregates data across participants and extracts, and can run Monte Carlo simulations to analyze segmentation behavior.
 
 ### Target Users
-- Researchers studying language processing, speech segmentation, and chunking
+Researchers studying language processing, speech segmentation, and chunking
 
 ### Key Features
 - **Experiment Design**: Create custom speech segmentation experiments with audio files and transcripts. The app shows the transcript as the speech extract plays. Participants in an experiment can mark boundaries between segments by tapping an interactive symbol between words and take them away by tapping it again. The experimental design is flexible: researchers can choose which experiment features to include.
