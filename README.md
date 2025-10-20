@@ -21,7 +21,7 @@ ChunkitApp 2.0 is a web-based data collection platform for speech segmentation e
 
 See ChunkitApp 2.0 in action:
 
-https://github.com/user-attachments/assets/YOUR-VIDEO-ID-HERE
+https://github.com/user-attachments/assets/e36ec384-9b81-4062-ad40-7778e51e26fd
 
 ## 2. Tech Stack
 
