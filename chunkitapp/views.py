@@ -1,4 +1,3 @@
-from distutils.log import error
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from .models import background, feedback, test, experiment_links
@@ -312,6 +311,154 @@ def load_draft(request):
         return HttpResponse(json.dumps(draft_data_values))
 
 
+def _parse_dt_maybe(value):
+    """Parse datetime stored as text in DB, return None if not parseable."""
+    try:
+        return datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')
+    except Exception:
+        return None
+
+
+def _get_session_time_minutes(experiment_name):
+    """Return session duration in minutes for experiment (defaults to 90)."""
+    try:
+        return int(list(draft_data.objects.filter(
+            nameExperementForParticipants=experiment_name
+        ).values_list('sessionTime', flat=True))[0])
+    except Exception:
+        return 90
+
+
+def _get_last_link_row(experiment_name):
+    rows = list(experiment_links.objects.filter(
+        experiment_link__iregex=rf'experiment/{experiment_name}.*'
+    ).values_list())
+    return rows[-1] if rows else None
+
+
+def _now():
+    return datetime.datetime.now()
+
+
+def _basename_no_ext(path):
+    try:
+        base = os.path.basename(path)
+        return os.path.splitext(base)[0]
+    except Exception:
+        return ''
+
+
+def _literal_eval_safely(value, default):
+    try:
+        return ast.literal_eval(value)
+    except Exception:
+        return default
+
+
+def experiment_status(request):
+    """
+    Return JSON status for experiment timing based on start time and sessionTime.
+    GET params: name=<experiment_name>
+    { over: bool, start: str|None, end: str|None, remaining_seconds: int|None }
+    """
+    if request.method == 'GET':
+        experiment_name = request.GET.get('name', '')
+        link_row = _get_last_link_row(experiment_name)
+        if not link_row:
+            return HttpResponse(json.dumps({
+                'over': False,
+                'start': None,
+                'end': None,
+                'remaining_seconds': None
+            }))
+
+        # experiment_links fields order (inspect usages in code):
+        # (..., experiment_start_time index likely 4, experiment_stopped index likely -2)
+        start_raw = link_row[4]
+        start_dt = _parse_dt_maybe(start_raw) if start_raw and start_raw != 'nothing' else None
+        if not start_dt:
+            return HttpResponse(json.dumps({
+                'over': False,
+                'start': None,
+                'end': None,
+                'remaining_seconds': None
+            }))
+
+        minutes = _get_session_time_minutes(experiment_name)
+        end_dt = start_dt + datetime.timedelta(minutes=minutes)
+        now = _now()
+        over = now >= end_dt
+        remaining = int((end_dt - now).total_seconds()) if not over else 0
+        return HttpResponse(json.dumps({
+            'over': over,
+            'start': str(start_dt),
+            'end': str(end_dt),
+            'remaining_seconds': remaining
+        }))
+
+
+def validate_uploads(request):
+    """
+    Validate that number of audio extracts equals number of transcript rows and
+    that transcript names correspond to audio basenames.
+    GET params: name=<experiment_name>
+    { ok: bool, warning: str, audio_count: int, transcript_count: int }
+    """
+    if request.method == 'GET':
+        experiment_name = request.GET.get('name', '')
+        qs = list(draft_data.objects.filter(
+            nameExperementForParticipants=experiment_name
+        ).values_list())
+        if not qs:
+            return HttpResponse(json.dumps({
+                'ok': False,
+                'warning': 'Experiment not found',
+                'audio_count': 0,
+                'transcript_count': 0
+            }), status=404)
+
+        row = qs[0]
+        model_columns = [f.name for f in draft_data._meta.get_fields()]
+        audios_idx = model_columns.index('audiosExperement')
+        transcripts_idx = model_columns.index('uploadExperimentTranscriptsData')
+
+        audios_raw = row[audios_idx]
+        transcripts_raw = row[transcripts_idx]
+        audios = _literal_eval_safely(audios_raw, []) if isinstance(audios_raw, str) else (audios_raw or [])
+        transcripts = _literal_eval_safely(transcripts_raw, []) if isinstance(transcripts_raw, str) else (transcripts_raw or [])
+
+        audio_names = set(_basename_no_ext(p) for p in audios)
+        transcript_names = []
+        for r in transcripts:
+            if isinstance(r, list) and r:
+                name = str(r[0]) if r[0] is not None else ''
+                name = name.split('/')[-1].split('\\')[-1]
+                name = os.path.splitext(name)[0]
+                transcript_names.append(name)
+        transcript_names_set = set(transcript_names)
+
+        audio_count = len(audios)
+        transcript_count = len(transcripts)
+        names_match = transcript_names_set.issubset(audio_names)
+        counts_match = audio_count == transcript_count
+
+        ok = counts_match and names_match
+        warning_msgs = []
+        if not counts_match:
+            warning_msgs.append(f'Counts differ: audios={audio_count}, transcripts={transcript_count}')
+        if not names_match:
+            missing = list(transcript_names_set - audio_names)
+            if missing:
+                warning_msgs.append(f'Transcripts without matching audio: {missing}')
+        warning = '; '.join(warning_msgs)
+        return HttpResponse(json.dumps({
+            'ok': ok,
+            'warning': warning,
+            'audio_count': audio_count,
+            'transcript_count': transcript_count
+        }))
+
+
 def stop_experiment(request):
     """
     Stop experiment
@@ -476,7 +623,8 @@ def data(request):
     Write down data from main task
     """
     if request.method == 'POST':
-        if request.is_ajax():
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        if is_ajax:
             req = json.loads(request.body)
             checkboxes = req['check']
             index = req['index']
@@ -505,7 +653,8 @@ def text(request):
     Write down data from EIT experiment
     """
     if request.method == 'POST':
-        if request.is_ajax():
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        if is_ajax:
             req = json.loads(request.body)
             #print(checkboxes)
             index = req['index']
@@ -575,7 +724,7 @@ def results(request, name):
                                       ,experiment_results))
 
         if not experiment_results:
-            return(error)
+            return HttpResponse('No experiment results found', status=404)
         df_raw = pd.DataFrame(experiment_results, columns=model_columns)
         df_raw['session_key'] = df_raw['session_key'].apply(lambda x: x[:5])
         print(df_raw)
@@ -664,7 +813,7 @@ def results(request, name):
             df_raw.rename(columns={"question": "reply", 'question text': 'question'}, inplace=True)
             df_raw.to_csv(os.path.join(outdir, 'results_raw.csv'), sep=',', encoding='utf-8')
             return HttpResponse('Success!')
-        return HttpResponse(error)
+        return HttpResponse('No transcript file found', status=404)
         
 
 def backgroundRES(request, name):
@@ -677,7 +826,7 @@ def backgroundRES(request, name):
         model_columns = [f.name for f in background._meta.get_fields()]
         experiment_results = list(background.objects.filter(experiment_name=current_experiment_name).values_list())
         if not experiment_results:
-            return(error)
+            return HttpResponse('No background results found', status=404)
         experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
 
         if experiment_time != 'nothing':
@@ -736,7 +885,7 @@ def feedbackRES(request, name):
     experiment_results = list(feedback.objects.filter(experiment_name=current_experiment_name).values_list())
     experiment_time = list(experiment_links.objects.filter(experiment_link__iregex=rf'experiment/{current_experiment_name}.*').values_list())[0][4]
     if not experiment_results:
-        return(error)
+        return HttpResponse('No feedback results found', status=404)
     if experiment_time != 'nothing':
         experiment_results = list(filter(
                                         lambda x: datetime.datetime.strptime(x[-1], '%Y-%m-%d %H:%M:%S.%f').timestamp() 

@@ -25,6 +25,8 @@ urlpatterns = [
     path('start_experiment/', views.start_experiment, name='start_experiment'),
     path('permutation/<name>', views.permutation, name='permutation'),
     path('create_demo/', views.create_demo, name='create_demo'),
+    path('experiment_status/', views.experiment_status, name='experiment_status'),
+    path('validate_uploads/', views.validate_uploads, name='validate_uploads'),
 ]
 
 urlpatterns += [
