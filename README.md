@@ -112,7 +112,7 @@ https://github.com/user-attachments/assets/e36ec384-9b81-4062-ad40-7778e51e26fd
    Email/Username: test@chunkit.app
    Password:       test1234
    ```
-or **Access the Demo**
+   or **Access the Demo** through the Demo buttom at the welcome screen
 
 ### Development Setup
 
