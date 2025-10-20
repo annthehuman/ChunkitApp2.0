@@ -10,8 +10,8 @@ git clone https://github.com/annthehuman/ChunkitApp2.0.git
 
 2. Rename the .env.sample file to .env and change the
 - DEBUG to 1
-- SECRET_KEY to normal secret key (you can generate it on this site https://djecrety.ir/)
-- ALLOWED_HOSTS to 127.0.0.1,localhost and ip adress of your server.
+- SECRET_KEY to normal secret key (you can generate it on https://djecrety.ir/)
+- ALLOWED_HOSTS to 127.0.0.1,localhost, or ip adress of your server.
 
 3. In the terminal run the command
 

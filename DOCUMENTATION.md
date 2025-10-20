@@ -6,21 +6,15 @@
 ChunkitApp 2.0 is a web-based data collection platform for speech segmentation experiments. The app allows researchers to design and run experiments where participants segment orthographic transcripts of speech extracts by tapping interactive symbols between words. It aggregates data across participants and extracts, and can run Monte Carlo simulations to analyze segmentation behavior.
 
 ### Target Users
-- Linguists and speech researchers
-- Academic researchers studying language processing and speech segmentation
-- Research groups investigating chunking in language perception
+- Researchers studying language processing, speech segmentation, and chunking
 
 ### Key Features
-- **Experiment Design**: Create custom speech segmentation experiments with audio files and transcripts
-- **Interactive Transcripts**: Participants tap symbols between words to mark segment boundaries
-- **Multi-modal Data Collection**: Background questionnaires, feedback forms, and comprehension questions
-- **English Proficiency Testing**: Built-in imitation tasks for assessing participants' English proficiency
+- **Experiment Design**: Create custom speech segmentation experiments with audio files and transcripts. The app shows the transcripts as the speech extract plays. Participants in an experiment can mark boundaries between segments by tapping an interactive symbol between words and take them away by tapping it again. The experimental design is flexible: researchers can choose which experiment features to include.
+- **Flexible Data Collection**: Create your own or choose sample background questionnaires, feedback forms, and comprehension questions around your segmentation task.
+- **English Proficiency Testing**: Optional built-in imitation tasks for assessing participants' English proficiency.
 - **Data Aggregation**: Automatic aggregation of segmentation data across participants
 - **Statistical Analysis**: Monte Carlo simulations and permutation tests for significance testing
 - **Result Export**: CSV export of raw and processed data
-- **User Authentication**: JWT-based authentication system with email activation
-- **Draft Management**: Save and load experiment drafts
-- **Audio File Management**: Support for ZIP archives containing audio files
 - **Prolific Integration**: Built-in support for Prolific participant recruitment
 
 ## 2. Tech Stack
@@ -107,6 +101,13 @@ ChunkitApp 2.0 is a web-based data collection platform for speech segmentation e
    - Local: http://127.0.0.1
    - Server: http://your_server_ip
 
+6. **Login with test account:**
+   ```
+   Email/Username: test@chunkit.app
+   Password:       test1234
+   ```
+or **Access the Demo**
+
 ### Development Setup
 
 For local development without Docker:
@@ -157,10 +158,13 @@ For local development without Docker:
 
 ### Email Configuration
 
+The application uses email for user account activation. Email behavior differs between development and production:
+
 **Development Mode (DEBUG=1):**
 - Uses `django.core.mail.backends.console.EmailBackend`
 - Emails are printed to console/Docker logs instead of being sent
 - No SMTP credentials required
+- View activation emails with: `docker-compose logs app | grep -A 20 "activation"`
 
 **Production Mode (DEBUG=0):**
 - Uses `django.core.mail.backends.smtp.EmailBackend`
@@ -176,6 +180,8 @@ For local development without Docker:
 export EMAIL_HOST_USER=your-email@gmail.com
 export EMAIL_HOST_PASSWORD=your-app-password  # Use Gmail App Password, not regular password
 ```
+
+**Note:** For detailed information on user registration and email activation, see the "User Registration and Email Activation" section in the Testing chapter.
 
 ### Feature Flags
 - **ImitationTask**: Boolean field in experiment configuration
@@ -520,10 +526,6 @@ Demo files are committed to the repository and served from `data/demo/`:
 
 ## 8. Testing
 
-### **MISSING**: Comprehensive Testing Information
-
-The project structure indicates test files exist (`tests.py` in both `chunkitapp/` and `frontend/`) but specific testing procedures are not documented.
-
 **Available Test Files:**
 - `chunkitapp/tests.py`
 - `frontend/tests.py` 
@@ -531,15 +533,185 @@ The project structure indicates test files exist (`tests.py` in both `chunkitapp
 
 **Recommended Testing Commands:**
 ```bash
-# Django backend tests
+# Django backend tests (run all tests)
 python manage.py test
+
+# Run specific test class
+python manage.py test chunkitapp.tests.ExperimentViewTests
+
+# Run specific test method
+python manage.py test chunkitapp.tests.ExperimentViewTests.test_validate_uploads_counts_and_names
 
 # React frontend tests (if configured)
 cd frontend
 npm test
 ```
 
-**Test Accounts:**
+### Test Overview
+
+Performance tests are located in `chunkitapp/tests.py` and organized into the following classes:
+
+#### 1. UserCreationTests (Authentication Tests)
+Tests user registration and authentication functionality:
+- `test_create_user`: Verifies user account creation
+- `test_user_authentication`: Tests token generation for authenticated users
+- `test_duplicate_username_fails`: Ensures duplicate usernames are rejected
+
+#### 2. ExperimentCreationTests
+Tests experiment setup and configuration:
+- `test_create_experiment_link`: Verifies experiment link creation
+- `test_create_draft_experiment`: Tests draft experiment creation with all fields
+- `test_draft_experiment_default_pages`: Checks default page configuration
+- `test_stop_experiment`: Tests stopping an active experiment
+
+#### 3. QuestionnaireTests
+Tests questionnaire data submission:
+- `test_save_background_questionnaire`: Verifies background questionnaire data storage
+- `test_save_feedback_questionnaire`: Tests feedback form data storage
+
+#### 4. ExperimentDataTests
+Tests experiment data collection:
+- `test_save_test_data`: Tests segmentation task data storage
+- `test_save_sentence_data`: Tests English Imitation Task (EIT) data storage
+
+#### 5. ExperimentViewTests (Validation Tests)
+Tests experiment views and critical validation logic:
+
+**Experiment Time Management:**
+- `test_experiment_over_after_session_time`: **Validates that experiments automatically end after the configured `sessionTime` expires**
+  - Creates an experiment with `sessionTime=60` (60 minutes)
+  - Simulates experiment started 2 hours ago
+  - Verifies `/experiment_status/` endpoint returns `over=true`
+  - Ensures participants cannot access expired experiments
+  
+**File Upload Validation:**
+- `test_validate_uploads_counts_and_names`: **Validates that the number of audio extracts matches the number of transcripts**
+  - Tests the `/validate_uploads/` endpoint
+  - Checks with matching counts (2 audios, 2 transcripts): returns `ok=true`
+  - Checks with mismatched counts (1 audio, 2 transcripts): returns `ok=false` with warning "Counts differ"
+  - Returns `audio_count` and `transcript_count` for debugging
+  
+- `test_validate_uploads_name_mismatch_warning`: **Validates that transcript names match audio file basenames**
+  - Verifies warning when transcript references non-existent audio file
+  - Example: audio file `audio1.mp3` should have transcript named `audio1`
+  - Returns `ok=false` with warning "Transcripts without matching audio"
+  - Helps prevent runtime errors during experiment execution
+
+**Other View Tests:**
+- `test_drafts_list_returns_data`: Tests draft experiment listing
+- `test_stop_experiment_view`: Tests stopping experiments via API
+- `test_start_experiment_view`: Tests starting experiments and recording start time
+- `test_questionnaire_post`: Tests background questionnaire submission
+- `test_feedback_post`: Tests feedback form submission
+- `test_text_submission`: Tests EIT text data submission
+- `test_delete_draft`: Tests draft experiment deletion
+
+#### 6. ModelIntegrityTests
+Tests database model constraints:
+- `test_experiment_link_required_fields`: Verifies required fields and default values
+- `test_draft_data_boolean_fields`: Tests boolean field handling
+- `test_session_time_default`: Verifies default `sessionTime=90` minutes
+
+#### 7. IntegrationTests
+Tests complete workflows:
+- `test_complete_experiment_workflow`: Tests full experiment lifecycle (create → collect data → verify)
+- `test_multiple_participants_same_experiment`: Tests multiple participants submitting to same experiment
+
+### Critical Validation Features
+
+The test suite validates three critical features that prevent experiment failures:
+
+**1. Maximum Experiment Time (Session Duration)**
+```python
+# In experiment configuration
+sessionTime = 90  # Minutes
+
+# System behavior:
+# - Experiment starts when researcher clicks "Start"
+# - Start time recorded in experiment_links.experiment_start_time
+# - After sessionTime minutes, experiment_status returns over=true
+# - Participants see "Experiment ended" message
+# - Prevents late submissions and ensures data quality
+```
+
+**Test:** `test_experiment_over_after_session_time`  
+**Endpoint:** `/experiment_status/?name=<experiment_name>`  
+**Response:** `{"over": true/false, "stopped": true/false}`
+
+**2. Matching Number of Extracts and Transcripts**
+```python
+# Valid configuration:
+audiosExperement = ['test_exp/audio1.mp3', 'test_exp/audio2.wav']
+uploadExperimentTranscriptsData = [
+    ['audio1', 'hello world'],
+    ['audio2', 'lorem ipsum']
+]
+# Result: ok=true, audio_count=2, transcript_count=2
+
+# Invalid configuration:
+audiosExperement = ['test_exp/audio1.mp3']
+uploadExperimentTranscriptsData = [
+    ['audio1', 'hello world'],
+    ['audio2', 'lorem ipsum']  # No matching audio!
+]
+# Result: ok=false, warning="Counts differ"
+```
+
+**Test:** `test_validate_uploads_counts_and_names`  
+**Endpoint:** `/validate_uploads/?name=<experiment_name>`  
+**Response:** `{"ok": true/false, "audio_count": N, "transcript_count": M, "warning": "..."}`
+
+**3. Matching Names for Extracts and Transcripts**
+```python
+# Audio file: 'test_exp/audio1.mp3'
+# Transcript first column: 'audio1'  ✓ Match (basename without extension)
+
+# Audio file: 'test_exp/my_audio.wav'
+# Transcript first column: 'my_audio'  ✓ Match
+
+# Audio file: 'test_exp/audio1.mp3'
+# Transcript first column: 'audioX'  ✗ Mismatch - warning triggered
+```
+
+**Test:** `test_validate_uploads_name_mismatch_warning`  
+**Endpoint:** `/validate_uploads/?name=<experiment_name>`  
+**Validation Logic:**
+1. Extract basenames from audio file paths (remove directory and extension)
+2. Compare with first column of transcript data
+3. Warn if transcript has no matching audio file
+4. Ensures participants see correct transcript for each audio
+
+### Running Specific Validation Tests
+
+```bash
+# Test experiment time expiration
+python manage.py test chunkitapp.tests.ExperimentViewTests.test_experiment_over_after_session_time
+
+# Test audio/transcript count matching
+python manage.py test chunkitapp.tests.ExperimentViewTests.test_validate_uploads_counts_and_names
+
+# Test audio/transcript name matching
+python manage.py test chunkitapp.tests.ExperimentViewTests.test_validate_uploads_name_mismatch_warning
+
+# Run all validation tests
+python manage.py test chunkitapp.tests.ExperimentViewTests
+```
+
+### Test Coverage Summary
+
+The test suite provides coverage for:
+- ✅ User authentication and authorization
+- ✅ Experiment creation and configuration
+- ✅ File upload validation (counts and naming)
+- ✅ Experiment time management and expiration
+- ✅ Questionnaire data collection
+- ✅ Segmentation task data collection
+- ✅ English Imitation Task data collection
+- ✅ Multi-participant experiments
+- ✅ Complete experiment workflows
+- ✅ Data integrity and model constraints
+
+### Test Accounts
 
 A universal test account is available for development and testing:
 
@@ -553,13 +725,53 @@ Password:       test1234
 - Full access to all features
 - Suitable for testing experiment creation, data collection, and results analysis
 
-**Reset Test Account:**
+### User Registration and Email Activation
+
+New user signups require email activation. The activation process differs between development and production modes:
+
+**Development Mode (DEBUG=1):**
+- Activation emails are printed to Docker logs instead of being sent via SMTP
+- No SMTP configuration required
+- To activate a new user account:
+  1. Sign up as a new user through the web interface
+  2. Check Docker logs for the activation link:
+     ```bash
+     docker-compose logs app | grep -A 20 "activation"
+     ```
+  3. Copy the activation URL from the logs and paste it into your browser
+  4. The account will be activated and you can log in
+
+**Production Mode (DEBUG=0):**
+- Activation emails are sent via SMTP to the user's email address
+- Requires proper SMTP configuration (see Email Configuration section)
+- Users click the activation link in their email to activate their account
+
+**Alternative:** Use the pre-configured test account (test@chunkit.app) for immediate access without activation.
+
+### Troubleshooting Authentication
+
+**Reset Test Account Password:**
 ```bash
 # Reset password or recreate account
 docker exec chunkitapp20-app-1 python -c "from django.contrib.auth.models import User; u = User.objects.get(username='test@chunkit.app'); u.set_password('test1234'); u.save(); print('Password reset!')"
 ```
 
-**Note:** In development mode (DEBUG=1), email activation is handled via console backend, so activation emails will appear in Docker logs instead of being sent via SMTP.
+**Find Activation Emails in Logs:**
+```bash
+# View all app logs
+docker-compose logs app
+
+# Search specifically for activation emails
+docker-compose logs app | grep -A 20 "activation"
+
+# Follow logs in real-time
+docker-compose logs -f app
+```
+
+**Common Issues:**
+- **Cannot log in after signup**: Account needs activation (check logs for activation link)
+- **Activation link expired**: Register again or contact administrator
+- **Email not sent in production**: Check SMTP configuration in environment variables
 
 ## 9. Deployment
 
@@ -589,9 +801,7 @@ docker exec chunkitapp20-app-1 python -c "from django.contrib.auth.models import
 4. **Static Files:**
    Static files are automatically collected and served via Nginx proxy.
 
-### Manual Deployment
 
-**MISSING**: Detailed manual deployment instructions for non-Docker environments
 
 ### Database Migration
 ```bash
@@ -681,10 +891,6 @@ npm run dev
 
 ## 11. Contributing Guidelines
 
-### **MISSING**: Formal Contributing Guidelines
-
-Based on project structure, recommended practices:
-
 **Branch Naming:**
 - `feature/experiment-feature-name`
 - `bugfix/issue-description`
@@ -703,11 +909,10 @@ Based on project structure, recommended practices:
 
 **Contact:**
 - Technical issues: GitHub issues
-- Research questions: alena.konina@helsinki.fi
+- Research questions: alena.konina@helsinki.fi or alena.konina@gmail.com
 
 ### License
 This project is distributed under **Academic Free License v. 3.0**.
 
 ---
 
-*Documentation generated based on codebase analysis. Items marked as **MISSING** indicate gaps in current implementation or documentation that should be addressed.*
