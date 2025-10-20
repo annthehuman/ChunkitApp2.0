@@ -17,6 +17,12 @@ ChunkitApp 2.0 is a web-based data collection platform for speech segmentation e
 - **Result Export**: CSV export of raw and processed data
 - **Prolific Integration**: Built-in support for Prolific participant recruitment
 
+### Demo Video
+
+See ChunkitApp 2.0 in action:
+
+https://github.com/user-attachments/assets/YOUR-VIDEO-ID-HERE
+
 ## 2. Tech Stack
 
 ### Backend
@@ -69,7 +75,7 @@ ChunkitApp 2.0 is a web-based data collection platform for speech segmentation e
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/annthehuman/ChunkitApp2.0.git
+git clone https://github.com/annthehuman/ChunkitApp2.0.git
    cd ChunkitApp2.0
    ```
 
@@ -85,8 +91,8 @@ ChunkitApp 2.0 is a web-based data collection platform for speech segmentation e
 
 3. **Build the application:**
    ```bash
-   docker-compose build
-   ```
+docker-compose build
+```
 
 4. **Run the application:**
    ```bash
