@@ -32,11 +32,13 @@ export default class Home extends Component {
     super(props);
     this.state = {
       secret: '',
-      autorized: false
+      autorized: false,
+      demoLoading: false
     }
     this.onSubmit = this.onSubmit.bind(this);
     this.getCookie = this.getCookie.bind(this);
-}
+    this.handleDemoClick = this.handleDemoClick.bind(this);
+  }
 
   getCookie(name) {
     let cookieValue = null;
@@ -66,6 +68,36 @@ export default class Home extends Component {
     }
 
   }
+  
+  handleDemoClick() {
+    this.setState({ demoLoading: true });
+    
+    // Call the demo endpoint
+    fetch('/create_demo/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Navigate to the experiment
+        let store = require('store');
+        store.set('experimentName', data.experiment_name);
+        this.props.history.push(`/experiment/${data.experiment_name}`);
+      } else {
+        alert('Error creating demo: ' + data.error);
+        this.setState({ demoLoading: false });
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error creating demo experiment');
+      this.setState({ demoLoading: false });
+    });
+  }
+  
   render() {return(
     <>
     <br/>
@@ -114,6 +146,13 @@ export default class Home extends Component {
     <CustomButton theme='black' text='Sign up'/>
     </Link>
     </Stack>
+    <Typography sx={{fontSize:'14px', marginTop: '20px'}}>or try the</Typography>
+    <CustomButton 
+      theme='wight' 
+      text={this.state.demoLoading ? 'Loading Demo...' : 'Demo'} 
+      onClick={this.handleDemoClick}
+      disabled={this.state.demoLoading}
+    />
     </Stack>}
     </AppBlock>
     </>

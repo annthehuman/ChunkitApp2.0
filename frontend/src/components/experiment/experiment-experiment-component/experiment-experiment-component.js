@@ -25,8 +25,8 @@ export default class ExperimentExperimentComponent extends Component {
         this.audioend = this.audioend.bind(this);
         this.nextpart = this.nextpart.bind(this);
         this.shuffle = this.shuffle.bind(this);
-        this.audioplay - this.audioplay.bind(this);
-        this.gofurther - this.gofurther.bind(this);
+        this.audioplay = this.audioplay.bind(this);
+        this.gofurther = this.gofurther.bind(this);
         this.onload = this.onload.bind(this);
         this.getanswer = this.getanswer.bind(this);
         this.getCookie = this.getCookie.bind(this);
@@ -41,7 +41,24 @@ export default class ExperimentExperimentComponent extends Component {
             let store = require('store');
             const tableParts = this.props.data.uploadExperimentTranscriptsData,
                   audios = this.props.data.audiosExperement,
-                  shuffle = this.props.data.shuffleExtracts;
+                  shuffle = this.props.data.shuffleExtracts === 'true' || this.props.data.shuffleExtracts === true;
+            
+            console.log('=== DEMO DEBUG INFO ===');
+            console.log('Props data:', this.props.data);
+            console.log('tableParts:', tableParts);
+            console.log('audios:', audios);
+            console.log('shuffle:', shuffle);
+            
+            // Initialize with safe defaults
+            this.setState({
+                dataIsHere: false,
+                audioTableEqual: false,
+                tableParts: [],
+                partsOrder: [],
+                partid: 0,
+                totalParts: 0
+            });
+            
             if (tableParts && audios){
             if (tableParts[0][0].toLowerCase().includes('audio')) {
                 tableParts.shift()}
@@ -50,7 +67,9 @@ export default class ExperimentExperimentComponent extends Component {
             if (tableParts && audios) {
                 const tablelen = Object.keys(tableParts).length
                 let finalOrder = []
+                console.log('shuffle value:', shuffle, 'type:', typeof shuffle, 'truthy:', !!shuffle);
                 if (shuffle) {
+                console.log('Shuffle is true, using shuffle logic');
                 let practice = [...Array(+this.props.data.shuffleExtractsPractice || 0).keys()]
                 
                 if (tablelen > this.props.data.shuffleExtractsPractice)
@@ -60,12 +79,20 @@ export default class ExperimentExperimentComponent extends Component {
                     }
                     finalOrder =  practice.concat(this.shuffle(order))}
                 } else {
-                    for (var i = 0; i < tablelen; i++) {
-                        finalOrder.push(i);
-                    }
+                console.log('Shuffle is false, using sequential order');
+                console.log('tablelen:', tablelen);
+                for (var i = 0; i < tablelen; i++) {
+                    console.log('Adding to finalOrder:', i);
+                    finalOrder.push(i);
+                }
+                console.log('finalOrder after loop:', finalOrder);
                 }
                 this.setState({dataIsHere: true,totalParts : tablelen, partsOrder: finalOrder})
+                console.log('finalOrder:', finalOrder);
+                console.log('totalParts:', tablelen);
+                
                 tableParts.forEach((row, id) => {
+                    console.log(`Processing row ${id}:`, row);
                     let audio_name = row[0]
                     if (audio_name.indexOf('.') > -1)
                     {
@@ -73,7 +100,15 @@ export default class ExperimentExperimentComponent extends Component {
                               b = p.slice(0, p.length-1);
                         audio_name = b.join()
                     }
+                    // strip directories just in case
+                    const slash = audio_name.lastIndexOf('/')
+                    const back = audio_name.lastIndexOf('\\')
+                    if (slash > -1 || back > -1) {
+                        const idx = Math.max(slash, back)
+                        audio_name = audio_name.substring(idx+1)
+                    }
                     tableaudios.push(audio_name)
+                    console.log(`Normalized audio name for row ${id}:`, audio_name);
                 })
                 let tableaudiosSet = new Set(tableaudios)
                 audios.forEach(audio => {
@@ -88,18 +123,26 @@ export default class ExperimentExperimentComponent extends Component {
                     zipaudios.push(b.join())})
                 const zipaudiosSet = new Set(zipaudios)
                 let areSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
-                if (areSetsEqual(tableaudiosSet, zipaudiosSet)) { 
-                    this.setState({audioTableEqual: true})
-                    tableaudios.forEach((row, id) => {
-                            zipaudios.forEach((zipaudio, zipaudioId) => {
-                                if (zipaudio == row){
-                                    tableParts[id][0] = audios[zipaudioId]
-                                }
-                            })
+                
+                console.log('tableaudios:', tableaudios);
+                console.log('zipaudios:', zipaudios);
+                console.log('Sets equal:', areSetsEqual(tableaudiosSet, zipaudiosSet));
+                
+                // Map tableParts to full paths using basename matching regardless of equality
+                tableaudios.forEach((rowName, id) => {
+                    zipaudios.forEach((zipaudio, zipaudioId) => {
+                        if (zipaudio == rowName){
+                            console.log(`Mapping ${rowName} to ${audios[zipaudioId]}`);
+                            tableParts[id][0] = audios[zipaudioId]
+                        }
                     })
-                    this.setState({tableParts: tableParts})
-                    }
-                }}
+                })
+                this.setState({audioTableEqual: areSetsEqual(tableaudiosSet, zipaudiosSet)})
+                this.setState({tableParts: tableParts})
+                console.log('Final tableParts:', tableParts);
+                console.log('=== END DEBUG INFO ===');
+                }
+            }
         }
 
         pause() {
@@ -181,7 +224,22 @@ export default class ExperimentExperimentComponent extends Component {
                 }))
         }
         start() {
+            console.log('=== START METHOD DEBUG ===');
+            console.log('dataIsHere:', this.state.dataIsHere);
+            console.log('audioTableEqual:', this.state.audioTableEqual);
+            console.log('tableParts:', this.state.tableParts);
+            console.log('partsOrder:', this.state.partsOrder);
+            console.log('partid:', this.state.partid);
             
+            if (this.state.dataIsHere && this.state.audioTableEqual) {
+                console.log('Conditions met, calling audioplay()');
+                this.audioplay()
+            } else {
+                console.log('Conditions NOT met:');
+                console.log('- dataIsHere:', this.state.dataIsHere);
+                console.log('- audioTableEqual:', this.state.audioTableEqual);
+                alert('The experimental task Audio in zip and data in table are not equal')
+            }
         }
         instruction(){
             const instruction = document.getElementById('instructions_experiment'),
@@ -227,7 +285,11 @@ export default class ExperimentExperimentComponent extends Component {
             prolific ? formData.append('prolific', prolific) : null
             formData.append('question', this.state.answer);
             formData.append("csrfmiddlewaretoken", csrf);
-            formData.append('index', this.state.partsOrder[this.state.partid])
+            const currentIndex = this.state.partsOrder && this.state.partsOrder[this.state.partid] !== undefined 
+                ? this.state.partsOrder[this.state.partid] 
+                : this.state.partid;
+            console.log('Current index:', currentIndex, 'partsOrder:', this.state.partsOrder, 'partid:', this.state.partid);
+            formData.append('index', currentIndex)
             this.instruction()
             formData.append('experiment_name', this.props.data.nameExperementForParticipants)
             formData.append('session_key', user)

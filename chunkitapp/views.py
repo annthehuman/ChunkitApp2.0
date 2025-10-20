@@ -66,6 +66,12 @@ def unpackArchive(experement_name):
             table_row = []
             for col in range(df.shape[1]):
                 table_row.append(df.iat[row, col])
+            # Normalize first column to base filename without extension/whitespace
+            if table_row and table_row[0] is not None:
+                name = str(table_row[0]).strip()
+                name = name.split('/')[-1].split('\\')[-1]
+                name = name.split('.')[0]
+                table_row[0] = name
             transcripts_file_practice.append(table_row)
 
     if draft_data_values.get('uploadExperimentTranscripts'):
@@ -79,6 +85,12 @@ def unpackArchive(experement_name):
             table_row = []
             for col in range(df.shape[1]):
                 table_row.append(df.iat[row, col])
+            # Normalize first column to base filename without extension/whitespace
+            if table_row and table_row[0] is not None:
+                name = str(table_row[0]).strip()
+                name = name.split('/')[-1].split('\\')[-1]
+                name = name.split('.')[0]
+                table_row[0] = name
             transcripts_file_experement.append(table_row)
 
     onlyfilesPractice = []
@@ -114,10 +126,13 @@ def unpackArchive(experement_name):
                                         os.path.join(directory_to_extract_to,
                                                      file))
 
-        onlyfilesPractice = [os.path.join(experement_name, f) for f
-                             in os.listdir(directory_to_extract_to) if
-                             os.path.isfile(
-                                 os.path.join(directory_to_extract_to, f))]
+        onlyfilesPractice = [
+            os.path.join(experement_name, f)
+            for f in os.listdir(directory_to_extract_to)
+            if os.path.isfile(os.path.join(directory_to_extract_to, f))
+            and not f.startswith('.')
+            and os.path.splitext(f)[1].lower() in ['.mp3', '.wav', '.ogg', '.m4a']
+        ]
 
     if draft_data_values.get('uploadExperimentAudio'):
         path_to_zip_file = os.path.join(settings.MEDIA_ROOT,
@@ -148,37 +163,16 @@ def unpackArchive(experement_name):
                                         os.path.join(directory_to_extract_to,
                                                      file))
 
-        onlyfilesExperement = [os.path.join(experement_name, f) for f in
-                               os.listdir(directory_to_extract_to) if
-                               os.path.isfile(os.path.join(directory_to_extract_to,f))]
+        onlyfilesExperement = [
+            os.path.join(experement_name, f)
+            for f in os.listdir(directory_to_extract_to)
+            if os.path.isfile(os.path.join(directory_to_extract_to, f))
+            and not f.startswith('.')
+            and os.path.splitext(f)[1].lower() in ['.mp3', '.wav', '.ogg', '.m4a']
+        ]
     
-    draft_data.objects.filter(nameExperementForParticipants=experement_name).delete()
-    draft_data.objects.create(
-        accessToken=draft_data_values.get("accessToken", 0),
-        nameExperement=draft_data_values.get("nameExperement",0),
-        sessionTime=draft_data_values.get("sessionTime",90),
-        shuffleExtracts=draft_data_values.get("shuffleExtracts",0),
-        shuffleExtractsPractice=draft_data_values.get("shuffleExtractsPractice",0),
-        nameExperementForParticipants=draft_data_values.get("nameExperementForParticipants",0),
-        ImitationTask=draft_data_values.get("ImitationTask",0),
-        UseQuestions=draft_data_values.get("UseQuestions",0),
-        UseProlific=draft_data_values.get("UseProlific",0),
-        linkToProlific=draft_data_values.get("linkToProlific",0),
-        helloEditor=draft_data_values.get("helloEditor",0),
-        consentEditor=draft_data_values.get("consentEditor",0),
-        outlineEditor=draft_data_values.get("outlineEditor",0),
-        backgroundExample=draft_data_values.get("backgroundExample",0),
-        backgroundAddQ=draft_data_values.get("backgroundAddQ",0),
-        feedbackExample=draft_data_values.get("feedbackExample",0),
-        feedbackAddQ=draft_data_values.get("feedbackAddQ",0),
-        goodbyeEditor=draft_data_values.get("goodbyeEditor",0),
-        uploadPracticeAudio=draft_data_values.get("uploadPracticeAudio",0),
-        uploadPracticeTranscripts=draft_data_values.get("uploadPracticeTranscripts",0),
-        uploadExperimentAudio=draft_data_values.get("uploadExperimentAudio",0),
-        uploadExperimentTranscripts=draft_data_values.get("uploadExperimentTranscripts",0),
-        experimentInstructions=draft_data_values.get("experimentInstructions",0),
-        practiceInstructions=draft_data_values.get("practiceInstructions",0),
-        pagesNeeded = draft_data_values.get("pagesNeeded",0),
+    # Update existing entry (don't delete it - preserves fields set in demo.py)
+    draft_data.objects.filter(nameExperementForParticipants=experement_name).update(
         uploadPracticeTranscriptsData = transcripts_file_practice,
         uploadExperimentTranscriptsData = transcripts_file_experement,
         audiosPractice=onlyfilesPractice,
@@ -433,6 +427,21 @@ def load_experement(request, experement_name):
         draft_data_values['audiosExperement'] = ast.literal_eval(draft_data_values['audiosExperement'])
         draft_data_values['pagesNeeded'] = ast.literal_eval(draft_data_values['pagesNeeded'].replace('nan', '0'))
         draft_data_values['experimentStopped'] = ast.literal_eval(link[-2])
+
+        # Normalize transcript first column to basename (no dirs, no extension)
+        try:
+            import os
+            rows = draft_data_values.get('uploadExperimentTranscriptsData') or []
+            if isinstance(rows, list):
+                for row in rows:
+                    if isinstance(row, list) and row:
+                        name = str(row[0]) if row[0] is not None else ''
+                        name = name.split('/')[-1].split('\\')[-1]
+                        name = os.path.splitext(name)[0]
+                        row[0] = name
+        except Exception:
+            pass
+
         return HttpResponse(json.dumps(draft_data_values))
 
 @csrf_exempt
@@ -1059,3 +1068,27 @@ def get_all_prolific(request, name):
     prolific_id_set = set(experiment_results[index_prolific])
 
     return HttpResponse(json.dumps({'prolific_id_set': list(prolific_id_set)}))
+
+
+@csrf_exempt
+def create_demo(request):
+    """
+    Create and initialize a demo experiment for showcasing app functionality.
+    This endpoint creates a demo experiment with pre-loaded audio files and transcripts.
+    """
+    if request.method == 'GET':
+        try:
+            from .demo import create_demo_experiment
+            result = create_demo_experiment()
+            # Now unpack the demo files like we do for regular experiments
+            unpackArchive(result['experiment_name'])
+            return HttpResponse(json.dumps({
+                'success': True,
+                'experiment_name': result['experiment_name'],
+                'message': 'Demo experiment created successfully'
+            }))
+        except Exception as e:
+            return HttpResponse(json.dumps({
+                'success': False,
+                'error': str(e)
+            }), status=400)

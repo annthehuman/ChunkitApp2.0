@@ -23,7 +23,8 @@ urlpatterns = [
     path('load_draft_to_test/<draft_experement_name>', views.load_draft_to_test, name='load_draft_to_test'),
     path('stop_experiment/', views.stop_experiment, name='stop_experiment'),
     path('start_experiment/', views.start_experiment, name='start_experiment'),
-    path('permutation/<name>', views.permutation, name='permutation')
+    path('permutation/<name>', views.permutation, name='permutation'),
+    path('create_demo/', views.create_demo, name='create_demo'),
 ]
 
 urlpatterns += [

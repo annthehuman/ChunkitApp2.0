@@ -16,3 +16,5 @@ venv/
 
 # Local PostgreSQL data
 data/
+# BUT allow demo files
+!data/demo/

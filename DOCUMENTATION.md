@@ -1,6 +1,6 @@
 # ChunkitApp 2.0 Documentation
 
-## 1. Overview (High-Level Summary)
+## 1. Overview
 
 ### Purpose
 ChunkitApp 2.0 is a web-based data collection platform for speech segmentation experiments. The app allows researchers to design and run experiments where participants segment orthographic transcripts of speech extracts by tapping interactive symbols between words. It aggregates data across participants and extracts, and can run Monte Carlo simulations to analyze segmentation behavior.
@@ -65,10 +65,11 @@ ChunkitApp 2.0 is a web-based data collection platform for speech segmentation e
 ## 3. Setup Guide
 
 ### Prerequisites
+- **Python 3.9** 
 - Docker and Docker Compose installed
 - Git installed
 - Minimum 4GB RAM
-- **MISSING**: Specific Python version requirements beyond Python 3.9 (used in Dockerfile)
+- Node.js (for frontend development, if building outside Docker)
 
 ### Installation
 
@@ -80,8 +81,7 @@ ChunkitApp 2.0 is a web-based data collection platform for speech segmentation e
 
 2. **Environment Configuration:**
    ```bash
-   # MISSING: .env.sample file referenced in README.md
-   # Create .env file with the following variables:
+   # Change .env.sample file into .env file with the following variables:
    
    # Required environment variables:
    SECRET_KEY=your_secret_key_here  # Generate at https://djecrety.ir/
@@ -155,13 +155,27 @@ For local development without Docker:
 - `APP_HOST`: Application host for proxy (defaults to app)
 - `APP_PORT`: Application port for proxy (defaults to 9000)
 
-### Email Configuration (Hard-coded in settings.py)
-**MISSING**: These should be environment variables
+### Email Configuration
+
+**Development Mode (DEBUG=1):**
+- Uses `django.core.mail.backends.console.EmailBackend`
+- Emails are printed to console/Docker logs instead of being sent
+- No SMTP credentials required
+
+**Production Mode (DEBUG=0):**
+- Uses `django.core.mail.backends.smtp.EmailBackend`
 - `EMAIL_HOST`: smtp.gmail.com
-- `EMAIL_HOST_USER`: info.chunkitapp@gmail.com  
-- `EMAIL_HOST_PASSWORD`: **MISSING** - hardcoded as 'ppppppp'
+- `EMAIL_HOST_USER`: Environment variable or defaults to info.chunkitapp@gmail.com
+- `EMAIL_HOST_PASSWORD`: **Required** - Set via environment variable
 - `EMAIL_PORT`: 587
 - `EMAIL_USE_TLS`: True
+
+**Production Email Setup:**
+```bash
+# Set these environment variables for production
+export EMAIL_HOST_USER=your-email@gmail.com
+export EMAIL_HOST_PASSWORD=your-app-password  # Use Gmail App Password, not regular password
+```
 
 ### Feature Flags
 - **ImitationTask**: Boolean field in experiment configuration
@@ -412,7 +426,97 @@ curl -X POST http://localhost:8000/data/ \
     "experiment_name": "MyExperiment",
     "prolific": "participant123"
   }'
+
+# Create demo experiment (no authentication required)
+curl -X GET http://localhost:8000/create_demo/
 ```
+
+### Demo Experiment Endpoint
+```bash
+# Create a demo experiment for showcasing app functionality
+GET /create_demo/
+Response:
+{
+  "success": true,
+  "experiment_name": "Demo_Experiment",
+  "message": "Demo experiment created successfully"
+}
+```
+
+The demo endpoint loads pre-configured experiment files from `data/demo/` and creates a temporary experiment that can be run without user authentication. This is useful for:
+- **Product Demonstrations**: Show potential users how the app works
+- **Testing**: Quick testing without setting up full experiments
+- **Onboarding**: Help new users understand the interface
+
+## Demo Feature
+
+### Overview
+The Demo Mode allows unauthenticated visitors to experience the full functionality of ChunkitApp without creating an account. The demo loads pre-recorded speech extracts and transcripts from the `data/demo` folder.
+
+### How It Works
+1. Users click the "Demo" button on the home page
+2. The frontend calls `/create_demo/` endpoint
+3. Backend creates a temporary `Draft_Experiment` with demo files
+4. User is redirected to the experiment interface
+5. All experiment features work normally (questionnaires, feedback, segmentation)
+
+### Demo Files Location
+```
+data/demo/
+├── extracts_demo/
+│   ├── sonnet_01_01.mp3
+│   ├── sonnet_01_02.mp3
+│   └── sonnet_01_03.mp3
+├── transcripts_demo/
+│   └── transcripts_demo.xlsx
+└── demo_extracts.zip (auto-generated)
+```
+
+### Customizing Demo Content
+To change what users see in the demo:
+
+1. **Audio Files**: Replace files in `data/demo/extracts_demo/`
+2. **Transcripts**: Update `data/demo/transcripts_demo/transcripts_demo.xlsx` with corresponding transcripts
+   - Required columns: Audio name, Transcript, Question, Answer1, Answer2
+3. **Text Content**: Edit demo text in `chunkitapp/demo.py` (helloEditor, consentEditor, etc.)
+4. **Delete Cache**: Remove `data/demo/demo_extracts.zip` to force regeneration
+
+### File Upload to Server (General Instructions)
+
+#### For Local Files (HTTP POST)
+When uploading experiment files through the web interface:
+
+1. **Audio Files**: Must be in a ZIP archive
+   - Supported formats: .mp3, .wav, .ogg
+   - ZIP structure: Files can be directly in ZIP or one folder deep
+   - Avoid special characters and spaces in filenames
+
+2. **Transcripts**: Must be in XLSX (Excel) format
+   - Required columns: `Audio name`, `Transcript`, `Question`, `Answer1`, `Answer2`
+   - Audio names must match filenames in the ZIP (without extension)
+   - Question field: Optional comprehension question
+   - Answer fields: Possible answers for comprehension questions
+
+3. **Upload Process** (via save_draft endpoint):
+   ```python
+   # FormData sent to /save_draft/
+   nameExperementForParticipants: "Your Experiment Name"
+   uploadExperimentAudio: <ZIP file>
+   uploadExperimentTranscripts: <XLSX file>
+   # ... other form fields
+   ```
+
+4. **Server-Side Processing**:
+   - ZIP is stored in `settings.MEDIA_ROOT`
+   - Excel file is stored in `settings.MEDIA_ROOT`
+   - During experiment load, ZIP is extracted to `MEDIA_ROOT/Experement/{experiment_name}/`
+   - Transcripts are parsed into the database
+
+#### For Static Demo Files
+Demo files are committed to the repository and served from `data/demo/`:
+- Files must exist before app startup
+- Files are copied to media folder on demo creation
+- Demo can be reset by deleting `demo_audio.zip` and running demo creation again
 
 ## 8. Testing
 
@@ -436,7 +540,26 @@ npm test
 ```
 
 **Test Accounts:**
-**MISSING**: No predefined test accounts documented
+
+A universal test account is available for development and testing:
+
+```
+Email/Username: test@chunkit.app
+Password:       test1234
+```
+
+**Account Details:**
+- Pre-activated (no email verification required)
+- Full access to all features
+- Suitable for testing experiment creation, data collection, and results analysis
+
+**Reset Test Account:**
+```bash
+# Reset password or recreate account
+docker exec chunkitapp20-app-1 python -c "from django.contrib.auth.models import User; u = User.objects.get(username='test@chunkit.app'); u.set_password('test1234'); u.save(); print('Password reset!')"
+```
+
+**Note:** In development mode (DEBUG=1), email activation is handled via console backend, so activation emails will appear in Docker logs instead of being sent via SMTP.
 
 ## 9. Deployment
 
@@ -507,11 +630,14 @@ mkdir -p /vol/web/media/Experement
 - Verify `CORS_ORIGIN_WHITELIST` includes your frontend URL
 - Check `ALLOWED_HOSTS` includes your domain
 
-**Email Configuration:**
+**Email & Signup Issues:**
 ```bash
-# Email sending failures
-# Check EMAIL_HOST_PASSWORD is correctly set
-# Verify SMTP settings in settings.py
+# In development (DEBUG=1): Activation emails print to Docker logs
+docker logs --tail 50 chunkitapp20-app-1
+
+# In production: Check email credentials are set correctly
+# Verify EMAIL_HOST_PASSWORD environment variable is set
+# Use Gmail App Password (requires 2FA enabled on Gmail account)
 ```
 
 ### Logging & Debugging
