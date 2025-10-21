@@ -73,6 +73,8 @@ https://github.com/user-attachments/assets/e36ec384-9b81-4062-ad40-7778e51e26fd
 
 ### Installation
 
+> **⚠️ Windows Users:** If you encounter errors like `exec /scripts/run.sh: no such file or directory`, see the [Windows Fix Guide](WINDOWS_FIX.md) for a complete solution.
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/annthehuman/ChunkitApp2.0.git
@@ -113,6 +115,73 @@ https://github.com/user-attachments/assets/e36ec384-9b81-4062-ad40-7778e51e26fd
    Password:       test1234
    ```
    or **Access the Demo** through the Demo buttom at the welcome screen
+
+### Troubleshooting Installation Issues
+
+#### Windows Users: Line Ending Issues
+
+If you see errors like `exec /scripts/run.sh: no such file or directory` or `/run.sh: not found`, this is caused by Windows line endings (CRLF) in shell scripts. Here's how to fix it:
+
+**Step 1: Fix Git Configuration**
+```bash
+# Configure Git to not convert line endings on Windows
+git config --global core.autocrlf input
+```
+
+**Step 2: Re-clone or Reset Repository**
+```bash
+# Option A: Fresh clone (recommended)
+cd ..
+rm -rf ChunkitApp2.0
+git clone https://github.com/annthehuman/ChunkitApp2.0.git
+cd ChunkitApp2.0
+
+# Option B: Reset existing repository
+git rm --cached -r .
+git reset --hard
+```
+
+**Step 3: Convert Existing Script Line Endings** (if you prefer not to re-clone)
+```bash
+# On Windows with Git Bash or WSL:
+dos2unix scripts/run.sh proxy/run.sh proxy/certbot/certify-init.sh entrypoint.sh
+
+# Or manually with PowerShell:
+(Get-Content scripts/run.sh -Raw) -replace "`r`n","`n" | Set-Content scripts/run.sh -NoNewline
+(Get-Content proxy/run.sh -Raw) -replace "`r`n","`n" | Set-Content proxy/run.sh -NoNewline
+```
+
+**Step 4: Rebuild Docker Images**
+```bash
+docker-compose down
+docker-compose build --no-cache
+docker-compose up
+```
+
+#### Missing .env File
+
+If you see warnings about missing environment variables, create a `.env` file:
+
+```bash
+# Create .env file in project root
+cat > .env << 'EOF'
+SECRET_KEY=your-secret-key-here
+DEBUG=1
+ALLOWED_HOSTS=127.0.0.1,localhost
+EOF
+```
+
+Generate a secret key at: https://djecrety.ir/
+
+#### Permission Issues (Linux/Mac)
+
+If you encounter permission errors:
+```bash
+chmod +x scripts/run.sh
+chmod +x proxy/run.sh
+chmod +x entrypoint.sh
+chmod +x proxy/certbot/certify-init.sh
+```
 
 ### Development Setup
 
