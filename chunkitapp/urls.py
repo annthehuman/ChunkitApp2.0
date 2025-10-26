@@ -27,6 +27,7 @@ urlpatterns = [
     path('create_demo/', views.create_demo, name='create_demo'),
     path('experiment_status/', views.experiment_status, name='experiment_status'),
     path('validate_uploads/', views.validate_uploads, name='validate_uploads'),
+    path('auto_activate/', views.auto_activate_user, name='auto_activate'),
 ]
 
 urlpatterns += [

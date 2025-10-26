@@ -42,6 +42,7 @@ class Inputs extends Component {
     this.state = {
       initialValue: 0,
       useProlific: false,
+      useDemoMaterials: false,
       nameExperiment: '',
       shuffle: false,
       linkToProlific: '',
@@ -49,6 +50,7 @@ class Inputs extends Component {
       anchorElShuffle: null,
       anchorElName: null,
       anchorElDuar: null,
+      anchorElDemo: null,
       pagesOrder: {'Hello': 0, 'Consent': 1, 'Outline': 2, 'Background': 3, 'Practice': 4, 
                    'Experiment': 5, 'Imitation': 6, 'Feedback': 7, 'Goodbye': 8}
     }
@@ -345,6 +347,46 @@ class Inputs extends Component {
         </CustomBox>
         </Popover>
         </Grid>
+        
+        {/* Demo Materials Option */}
+        <Grid container
+              justifyContent="flex-start"
+              alignItems="center"
+              direction='row'
+              style={{marginTop: '15px'}}>
+        <FormControlLabel control={<Checkbox 
+                            type='checkbox'
+                            id='UseDemoMaterials' 
+                            name='UseDemoMaterials'
+                            onClick={(e) => { this.onCheck(e); 
+                              this.state.useDemoMaterials ? 
+                              this.setState({ useDemoMaterials: false }) : 
+                              this.setState({ useDemoMaterials: true }) }}
+                            checked={this.state.useDemoMaterials}
+                            />} 
+                label={<Typography style={{fontSize: '20px'}}>Use demo materials (audio and transcripts)</Typography>} />
+        <CustomButton onClick={(event) => this.setState({anchorElDemo: event.currentTarget})} 
+                                onMouseOver={(event) => this.setState({anchorElDemo: event.currentTarget})}
+                                text='i' 
+                                theme='gray' 
+                                size='icon' 
+                                style={{marginBottom:'9px'}}/>
+        <Popover
+          className={classes.root}
+          id='popover'
+          open={Boolean(this.state.anchorElDemo)}
+          anchorEl={this.state.anchorElDemo}
+          onClose={() => this.setState({anchorElDemo: null})}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+        ><CustomBox style={{paddingLeft: '10px', paddingRight: '10px'}} theme='white'>
+          <Typography sx={{fontSize: '20px'}}>Use pre-loaded demo audio files and transcripts from Shakespeare's Sonnets for testing and demonstration purposes.</Typography>
+        </CustomBox>
+        </Popover>
+        </Grid>
+        
         {this.state.useProlific ?
               <>
               <Grid container

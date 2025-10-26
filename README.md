@@ -106,7 +106,7 @@ https://github.com/user-attachments/assets/e36ec384-9b81-4062-ad40-7778e51e26fd
    ```
 
 5. **Access the application:**
-   - Local: http://127.0.0.1
+   - Local: http://127.0.0.1:8000
    - Server: http://your_server_ip
 
 6. **Login with test account:**

@@ -46,6 +46,66 @@ class UserActivationView(APIView):
         return redirect('authorized')
 
 
+@csrf_exempt
+def auto_activate_user(request):
+    """
+    Auto-activate user account in development mode.
+    This is a development-only feature for easier testing.
+    """
+    if not getattr(settings, 'DEBUG', False):
+        return HttpResponse(json.dumps({
+            'success': False,
+            'error': 'Auto-activation only available in development mode'
+        }), content_type='application/json')
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            password = data.get('password')
+            
+            if not email or not password:
+                return HttpResponse(json.dumps({
+                    'success': False,
+                    'error': 'Email and password required'
+                }), content_type='application/json')
+            
+            # Find the user by email
+            from django.contrib.auth.models import User
+            try:
+                user = User.objects.get(email=email)
+                # Verify password
+                if user.check_password(password):
+                    # Activate the user
+                    user.is_active = True
+                    user.save()
+                    return HttpResponse(json.dumps({
+                        'success': True,
+                        'message': 'Account activated successfully'
+                    }), content_type='application/json')
+                else:
+                    return HttpResponse(json.dumps({
+                        'success': False,
+                        'error': 'Invalid password'
+                    }), content_type='application/json')
+            except User.DoesNotExist:
+                return HttpResponse(json.dumps({
+                    'success': False,
+                    'error': 'User not found'
+                }), content_type='application/json')
+                
+        except Exception as e:
+            return HttpResponse(json.dumps({
+                'success': False,
+                'error': str(e)
+            }), content_type='application/json')
+    
+    return HttpResponse(json.dumps({
+        'success': False,
+        'error': 'Method not allowed'
+    }), content_type='application/json')
+
+
 def unpackArchive(experement_name):
     """
     Unpack audios archive for practice or experiment and rewrite data in
@@ -210,7 +270,13 @@ def save_draft(request):
         background_addQ = dict(filter(lambda x: 'BackgroundNew' in x[0] and not 'useBackground' in x[0],dict(request.POST).items()))
         feedback = dict(filter(lambda x: 'useFeedback' in x[0],dict(request.POST).items()))
         feedback_addQ = dict(filter(lambda x: 'FeedbackNew' in x[0] and not 'useFeedback' in x[0],dict(request.POST).items()))
-        experement_name = request.POST.get('nameExperementForParticipants').replace(' ', '_')
+        experement_name_raw = request.POST.get('nameExperementForParticipants')
+        if not experement_name_raw:
+            return HttpResponse(json.dumps({
+                'success': False,
+                'error': 'Experiment name is required'
+            }), content_type='application/json')
+        experement_name = experement_name_raw.replace(' ', '_')
 
         name_set = list(draft_data.objects.all().values_list('nameExperementForParticipants', flat = True))
         names_dict = dict(zip(name_set, list(range(len(name_set)))))
@@ -234,6 +300,30 @@ def save_draft(request):
             form.feedbackAddQ = feedback_addQ
             if pagesNeeded:
                 form.pagesNeeded = pagesNeeded
+            
+            # Handle demo materials option
+            use_demo_materials = request.POST.get('useDemoMaterials') == 'true'
+            if use_demo_materials:
+                # Load demo materials
+                from .demo import create_demo_experiment
+                try:
+                    demo_result = create_demo_experiment()
+                    # Use demo audio and transcripts
+                    form.uploadExperimentAudio = 'demo_audio.zip'
+                    form.uploadExperimentTranscripts = 'demo_transcripts.xlsx'
+                    # Set demo-specific content
+                    form.helloEditor = '<p>Welcome to ChunkitApp Demo!</p>'
+                    form.consentEditor = '<p>By continuing, you agree to participate in this demo.</p>'
+                    form.outlineEditor = '<p>In this demo, you will listen to speech extracts and mark segment boundaries.</p>'
+                    form.goodbyeEditor = '<p>Thank you for trying ChunkitApp!</p>'
+                    form.experimentInstructions = '<p>Listen to each audio and mark the segments.</p>'
+                    form.practiceInstructions = '<p>Practice with this audio first.</p>'
+                    form.pagesNeeded = ['Hello', 'Consent', 'Outline', 'Experiment', 'Feedback', 'Goodbye']
+                except Exception as e:
+                    return HttpResponse(json.dumps({
+                        'success': False,
+                        'error': f'Failed to load demo materials: {str(e)}'
+                    }), content_type='application/json')
             if not request.FILES.get('uploadPracticeAudio') and row_number and row_number >= 0:
                 form.uploadPracticeAudio = list(draft_data.objects.all().values_list('uploadPracticeAudio', flat = True))[row_number]
             if not request.FILES.get('uploadPracticeTranscripts') and row_number and row_number >= 0:

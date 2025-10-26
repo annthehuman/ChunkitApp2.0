@@ -283,6 +283,19 @@ export default class Constructor extends Component  {
         if (this.state.submitButton == 'SaveDraft'){
             const form = e.target
             const formData = new FormData(form);
+            
+            // Validate experiment name
+            const name = formData.get('nameExperementForParticipants');
+            if (!name) {
+                alert('Please enter a name for the experiment');
+                return;
+            }
+            
+            // Check if demo materials should be used
+            const useDemoMaterials = formData.get('UseDemoMaterials') === 'on';
+            if (useDemoMaterials) {
+                formData.append('useDemoMaterials', 'true');
+            }
          
             const csrf = this.getCookie('csrftoken');
             const files = form.querySelectorAll(`input[type='file']`);
@@ -309,6 +322,19 @@ export default class Constructor extends Component  {
         } else if (this.state.submitButton == 'TestRun') {
             const form = e.target
             const formData = new FormData(form);
+            
+            // Validate experiment name
+            const name = formData.get('nameExperementForParticipants');
+            if (!name) {
+                alert('Please enter a name for the experiment');
+                return;
+            }
+            
+            // Check if demo materials should be used
+            const useDemoMaterials = formData.get('UseDemoMaterials') === 'on';
+            if (useDemoMaterials) {
+                formData.append('useDemoMaterials', 'true');
+            }
 
             const csrf = this.getCookie('csrftoken');
             formData.append("csrfmiddlewaretoken", csrf);
@@ -360,11 +386,22 @@ export default class Constructor extends Component  {
             const formData = new FormData(form);
             const csrf = this.getCookie('csrftoken');
             let name = formData.get('nameExperementForParticipants')
+            if (!name) {
+                alert('Please enter a name for the experiment');
+                return;
+            }
+            
+            // Check if demo materials should be used
+            const useDemoMaterials = formData.get('UseDemoMaterials') === 'on';
+            if (useDemoMaterials) {
+                formData.append('useDemoMaterials', 'true');
+            }
+            
             const prolific = Boolean(formData.get('UseProlific'))
             const usertoken = this.getCookie('access_token');
             formData.append("accessToken", usertoken);
             formData.append("csrfmiddlewaretoken", csrf);
-            name.includes(" ") ? name = name.replace(' ', "_"): null
+            name = name.toString().replace(/ /g, "_")
             if (prolific){ 
             formData.append('link', `experiment/${name}?PROLIFIC_PID=test`)}
             else {
