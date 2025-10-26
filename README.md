@@ -825,11 +825,19 @@ New user signups require email activation. The activation process differs betwee
 
 ### Troubleshooting Authentication
 
-**Reset Test Account Password:**
+**Reset or Create Test Account (works in Docker and loads settings):**
 ```bash
-# Reset password or recreate account
-docker exec chunkitapp20-app-1 python -c "from django.contrib.auth.models import User; u = User.objects.get(username='test@chunkit.app'); u.set_password('test1234'); u.save(); print('Password reset!')"
+# If running with docker-compose (production compose)
+docker compose exec app python manage.py shell -c "from django.contrib.auth.models import User; u, _ = User.objects.get_or_create(username='test@chunkit.app', defaults={'email':'test@chunkit.app'}); u.set_password('test1234'); u.is_active=True; u.save(); print('Password reset or user created!')"
+
+# If running with docker-compose (legacy command name)
+docker-compose exec app python manage.py shell -c "from django.contrib.auth.models import User; u, _ = User.objects.get_or_create(username='test@chunkit.app', defaults={'email':'test@chunkit.app'}); u.set_password('test1234'); u.is_active=True; u.save(); print('Password reset or user created!')"
+
+# If running locally without Docker
+python manage.py shell -c "from django.contrib.auth.models import User; u, _ = User.objects.get_or_create(username='test@chunkit.app', defaults={'email':'test@chunkit.app'}); u.set_password('test1234'); u.is_active=True; u.save(); print('Password reset or user created!')"
 ```
+
+This approach ensures Django settings are initialized and avoids the "settings are not configured" error.
 
 **Find Activation Emails in Logs:**
 ```bash

@@ -22,13 +22,27 @@ from Levenshtein import distance
 
 class UserActivationView(APIView):
     def get(self, request, uid, token):
-        # print('get')
-        protocol = 'https://' if request.is_secure() else 'http://'
-        web_url = protocol + request.get_host()
-        post_url = web_url + "/auth/users/activation/"
+        # Prefer calling the internal app service directly when behind proxy (Docker),
+        # otherwise fall back to the public host (includes port in dev).
+        try:
+            if getattr(settings, 'DEBUG', False):
+                # Use the full absolute URI (includes port if any) in development
+                base_url = request.build_absolute_uri('/').rstrip('/')
+            else:
+                # In Docker production, the app listens on APP_HOST:APP_PORT (default app:9000)
+                app_host = os.environ.get('APP_HOST', 'app')
+                app_port = os.environ.get('APP_PORT', '9000')
+                base_url = f"http://{app_host}:{app_port}"
+        except Exception:
+            base_url = request.build_absolute_uri('/').rstrip('/')
+
+        post_url = f"{base_url}/auth/users/activation/"
         post_data = {'uid': uid, 'token': token}
-        result = requests.post(post_url, data=post_data)
-        content = result.text
+        try:
+            requests.post(post_url, data=post_data, timeout=5)
+        except Exception:
+            # Even if the activation POST fails, redirect user – the page will show auth state
+            pass
         return redirect('authorized')
 
 
