@@ -44,7 +44,7 @@ services:
   certbot:
     build:
       context: ./proxy/certbot
-    command: echo "Pooping..."
+    command: echo "loading..."
     volumes:
       - certbot-web:/vol/www
       - certbot-certs:/etc/letsencrypt
